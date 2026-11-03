@@ -216,8 +216,35 @@
   #discoverMain{
     position:relative; z-index:2;
     max-width:1320px; margin:0 auto;
-    padding:32px clamp(16px,4vw,48px) 96px;
+    padding:32px clamp(16px,4vw,48px) 40px;
     transition:filter 480ms var(--ease-out-expo), opacity 480ms var(--ease-out-expo);
+  }
+
+  footer{
+    border-top:1px solid rgba(255,255,255,.08);
+    padding:32px 0 48px;
+    color:var(--text-tertiary);
+    font-size:.88rem;
+    margin-top:48px;
+  }
+  footer .wrap{
+    width:100%;
+    margin:0 auto;
+  }
+  footer nav{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    margin:0 0 12px;
+    font-size:.9rem;
+  }
+  footer nav a{
+    color:var(--neon-cyan);
+    text-decoration:none;
+    transition:opacity 150ms;
+  }
+  footer nav a:hover{
+    text-decoration:underline;
   }
   #discoverMain.dimmed{ filter:blur(10px) brightness(.45); opacity:.75; pointer-events:none; }
 
@@ -826,6 +853,8 @@
     </div>
     <div id="discoverLevelRows"></div>
   </section>
+
+  <footer><div class="wrap"><nav aria-label="Footer"><a href="/privacy-policy.html">Privacy Policy</a><a href="/terms.html">Terms of Service</a><a href="/cookie-policy.html">Cookie Policy</a><a href="/">Home</a></nav>© 2026 LumenBooks. All rights reserved.</div></footer>
 
 </main>
 
