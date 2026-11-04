@@ -1,1 +1,575 @@
-About.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>About LumenBooks — English Reading Library</title>
+<meta name="description" content="Learn more about LumenBooks: an interactive English reading library calibrated to CEFR levels with instant word translations and vocabulary learning tools.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          void: '#04050A',
+          deep: '#0A0C16',
+          elevated: '#12141F',
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['"Inter"', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  /* ============================================================
+     DESIGN TOKENS
+     ============================================================ */
+  :root{
+    --bg-void:#04050A;
+    --bg-deep:#0A0C16;
+    --bg-elevated:#12141F;
+
+    --glass-fill: rgba(20,22,36,.55);
+    --glass-fill-soft: rgba(20,22,36,.32);
+    --glass-border: rgba(255,255,255,.08);
+    --glass-border-hi: rgba(255,255,255,.16);
+
+    --text-primary:#F5F7FA;
+    --text-secondary:#A7AFC2;
+    --text-tertiary:#666E82;
+
+    --neon-cyan:#00E5FF;
+    --neon-violet:#8A2BE2;
+    --neon-amber:#FFB800;
+    --neon-emerald:#10B981;
+    --neon-rose:#F43F5E;
+    --neon-sky:#38BDF8;
+
+    --radius-sm:8px;
+    --radius-md:14px;
+    --radius-lg:22px;
+    --radius-card:28px;
+    --radius-pill:999px;
+
+    --lvl-A1:#22C55E;
+    --lvl-A2:#10B981;
+    --lvl-B1:#06B6D4;
+    --lvl-B2:#3B82F6;
+    --lvl-C1:#8B5CF6;
+    --lvl-C2:#EC4899;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{
+    background:var(--bg-void);
+    color:var(--text-primary);
+    font-family:"Inter",sans-serif;
+    min-height:100%;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* BACKGROUND AMBIENCE */
+  .ambient{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(0,229,255,.07), transparent 38%),
+      radial-gradient(circle at 82% 28%, rgba(138,43,226,.09), transparent 44%),
+      radial-gradient(circle at 50% 85%, rgba(16,185,129,.05), transparent 42%);
+  }
+  .grain{
+    position:fixed; inset:0; pointer-events:none; z-index:1; opacity:.025;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  /* ============================================================
+     TOPBAR
+     ============================================================ */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    background:rgba(4,5,10,.78);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--glass-border);
+    height:64px;
+    padding:0 28px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:20px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;
+  }
+  .brand-mark{
+    width:32px; height:32px; border-radius:9px;
+    background:linear-gradient(135deg, var(--neon-cyan), var(--neon-violet));
+    display:grid; place-items:center;
+    box-shadow:0 0 20px rgba(0,229,255,.35);
+  }
+  .brand-mark svg{ width:18px; height:18px; color:#04050A; }
+  .brand-name{
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:700; font-size:1.15rem; letter-spacing:-.02em;
+  }
+
+  .nav-tabs{
+    display:flex; align-items:center; gap:6px;
+    background:rgba(20,22,36,.6);
+    border:1px solid var(--glass-border);
+    padding:3px;
+    border-radius:var(--radius-pill);
+  }
+  .nav-tab-btn{
+    padding:6px 14px;
+    border-radius:var(--radius-pill);
+    font-size:.82rem;
+    font-weight:600;
+    color:var(--text-secondary);
+    text-decoration:none;
+    transition:all .18s ease;
+  }
+  .nav-tab-btn:hover{
+    color:var(--text-primary);
+  }
+  .nav-tab-btn.active{
+    background:linear-gradient(135deg, rgba(0,229,255,.2), rgba(138,43,226,.25));
+    border:1px solid rgba(0,229,255,.35);
+    color:var(--text-primary);
+    box-shadow:0 0 12px rgba(0,229,255,.2);
+  }
+
+  .search-wrap{
+    position:relative; flex:1; max-width:380px;
+    display:flex; align-items:center;
+  }
+  .search-wrap svg{
+    position:absolute; left:14px; width:16px; height:16px;
+    color:var(--text-tertiary); pointer-events:none;
+  }
+  .search-wrap input{
+    width:100%;
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-pill);
+    padding:9px 16px 9px 38px;
+    color:var(--text-primary);
+    font-size:.86rem;
+    outline:none;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .search-wrap input:focus{
+    border-color:var(--neon-cyan);
+    box-shadow:0 0 0 3px rgba(0,229,255,.12);
+  }
+
+  .topbar-right{
+    display:flex; align-items:center; gap:12px;
+  }
+  .vocab-toggle-nav{
+    display:flex; align-items:center; gap:8px;
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-pill);
+    padding:7px 14px;
+    color:var(--text-primary);
+    font-size:.82rem; font-weight:600;
+    cursor:pointer;
+    transition:border-color .2s, background .2s;
+  }
+  .vocab-toggle-nav:hover{
+    border-color:var(--glass-border-hi);
+    background:rgba(255,255,255,.06);
+  }
+  .vocab-toggle-nav svg{ width:15px; height:15px; color:var(--neon-cyan); }
+  .vocab-count{
+    background:rgba(0,229,255,.15);
+    color:var(--neon-cyan);
+    font-size:.74rem; font-weight:700;
+    padding:2px 7px; border-radius:var(--radius-pill);
+  }
+
+  .lang-picker{ position:relative; }
+  .lang-trigger{
+    display:flex; align-items:center; gap:6px;
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-pill);
+    padding:6px 10px;
+    font-size:.9rem;
+    cursor:pointer;
+    color:var(--text-primary);
+  }
+  .lang-menu{
+    position:absolute; right:0; top:calc(100% + 8px);
+    background:var(--bg-elevated);
+    border:1px solid var(--glass-border-hi);
+    border-radius:var(--radius-md);
+    padding:6px; min-width:140px;
+    display:none; flex-direction:column; gap:2px;
+    box-shadow:0 12px 32px rgba(0,0,0,.6);
+    z-index:100;
+  }
+  .lang-menu.open{ display:flex; }
+  .lang-opt{
+    display:flex; align-items:center; gap:8px;
+    padding:6px 10px; border-radius:6px;
+    background:none; border:none; color:var(--text-secondary);
+    font-size:.82rem; cursor:pointer; width:100%; text-align:left;
+  }
+  .lang-opt:hover{ background:rgba(255,255,255,.06); color:var(--text-primary); }
+
+  /* ============================================================
+     MAIN LAYOUT
+     ============================================================ */
+  main{
+    position:relative; z-index:2;
+    max-width:1120px;
+    margin:0 auto;
+    padding:40px 24px 80px;
+  }
+
+  .about-hero{
+    text-align:center;
+    max-width:760px;
+    margin:0 auto 48px;
+  }
+  .about-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(0,229,255,.1);
+    border:1px solid rgba(0,229,255,.25);
+    color:var(--neon-cyan);
+    padding:5px 14px; border-radius:var(--radius-pill);
+    font-size:.76rem; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; margin-bottom:16px;
+  }
+  .about-hero-title{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:clamp(2rem, 4.5vw, 3rem);
+    font-weight:700;
+    line-height:1.15;
+    letter-spacing:-.03em;
+    margin-bottom:16px;
+    background:linear-gradient(135deg, #FFFFFF 30%, var(--neon-cyan) 100%);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .about-hero-sub{
+    font-size:1.05rem;
+    line-height:1.65;
+    color:var(--text-secondary);
+  }
+
+  .about-card{
+    background:var(--glass-fill-soft);
+    border:1px solid var(--glass-border);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border-radius:var(--radius-card);
+    padding:36px 32px;
+    position:relative;
+    overflow:hidden;
+    margin-bottom:40px;
+  }
+  .about-card::before{
+    content:"";
+    position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 10% 20%, rgba(0,229,255,.06), transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(138,43,226,.08), transparent 50%);
+  }
+
+  .about-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));
+    gap:22px;
+    position:relative; z-index:1;
+  }
+  .about-item{
+    background:rgba(20,22,36,.48);
+    border:1px solid var(--glass-border);
+    border-radius:18px;
+    padding:24px 22px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition:transform .2s ease, border-color .2s ease;
+  }
+  .about-item:hover{
+    transform:translateY(-2px);
+    border-color:var(--glass-border-hi);
+  }
+  .about-item-icon{
+    width:38px; height:38px; border-radius:10px;
+    background:rgba(0,229,255,.1);
+    display:grid; place-items:center;
+    color:var(--neon-cyan);
+    margin-bottom:4px;
+  }
+  .about-item-title{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:1.1rem;
+    font-weight:600;
+    color:var(--text-primary);
+  }
+  .about-item-text{
+    font-size:.9rem;
+    line-height:1.65;
+    color:var(--text-secondary);
+  }
+
+  .about-cta{
+    text-align:center;
+    margin-top:20px;
+    padding:32px 24px;
+    background:linear-gradient(135deg, rgba(0,229,255,.06), rgba(138,43,226,.08));
+    border:1px solid var(--glass-border-hi);
+    border-radius:22px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
+  .about-cta h3{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:1.35rem; font-weight:700;
+  }
+  .about-cta p{
+    font-size:.92rem; color:var(--text-secondary); max-width:540px; line-height:1.6;
+  }
+  .btn-primary{
+    display:inline-flex; align-items:center; gap:8px;
+    background:linear-gradient(135deg, var(--neon-cyan), #0099FF);
+    color:#04050A; font-weight:700; font-size:.9rem;
+    padding:10px 22px; border-radius:var(--radius-pill);
+    text-decoration:none;
+    box-shadow:0 0 20px rgba(0,229,255,.3);
+    transition:transform .2s, box-shadow .2s;
+  }
+  .btn-primary:hover{
+    transform:translateY(-1px);
+    box-shadow:0 0 28px rgba(0,229,255,.5);
+  }
+  .btn-primary svg{ width:18px; height:18px; }
+
+  /* VOCAB DRAWER */
+  .vocab-drawer{
+    position:fixed; top:0; right:-420px; width:min(400px, 92vw); height:100vh;
+    background:var(--bg-elevated);
+    border-left:1px solid var(--glass-border-hi);
+    z-index:95;
+    padding:24px 20px;
+    box-shadow:-12px 0 36px rgba(0,0,0,.6);
+    transition:right .28s cubic-bezier(.16,1,.3,1);
+    display:flex; flex-direction:column;
+  }
+  .vocab-drawer.open{ right:0; }
+  .vocab-drawer-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding-bottom:16px; border-bottom:1px solid var(--glass-border);
+    margin-bottom:16px;
+  }
+  .vocab-drawer-head h3{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:1.15rem; font-weight:700;
+  }
+  .icon-btn{
+    background:none; border:none; color:var(--text-tertiary);
+    cursor:pointer; padding:6px; border-radius:8px;
+    display:grid; place-items:center;
+  }
+  .icon-btn:hover{ color:var(--text-primary); background:rgba(255,255,255,.06); }
+  .vocab-list{
+    list-style:none; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:8px;
+  }
+
+  footer{
+    border-top:1px solid var(--glass-border);
+    padding:28px 24px;
+    text-align:center;
+    color:var(--text-tertiary);
+    font-size:.84rem;
+  }
+  footer .wrap{
+    max-width:1120px; margin:0 auto;
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+  }
+  footer nav{ display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
+  footer a{ color:var(--text-secondary); text-decoration:none; }
+  footer a:hover{ color:var(--neon-cyan); text-decoration:underline; }
+
+  @media (max-width: 768px){
+    .topbar{ padding:0 14px; height:58px; gap:8px; }
+    .span.vocab-label{ display:none; }
+    .search-wrap{ display:none; }
+    .about-card{ padding:24px 18px; }
+    .about-hero{ margin-bottom:32px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a class="brand" href="index.html">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M20 6v14h-4V6a2 2 0 0 1 4 0z" opacity=".55"/></svg>
+    </div>
+    <span class="brand-name">Lumen</span>
+  </a>
+
+  <nav class="nav-tabs" id="pageNavTabs">
+    <a href="index.html" class="nav-tab-btn" id="tabLibraryBtn">Library / Search</a>
+    <a href="discover.html" class="nav-tab-btn" id="tabDiscoverBtn">Discover</a>
+    <a href="about.html" class="nav-tab-btn active" id="tabAboutBtn">About</a>
+  </nav>
+
+  <label class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="searchInput" type="text" placeholder="Search titles or authors…" autocomplete="off">
+  </label>
+
+  <div class="topbar-right">
+    <button class="vocab-toggle-nav" id="navVocabBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>
+      <span class="vocab-label">My words</span> <span class="vocab-count" id="navVocabCount">0</span>
+    </button>
+    <div class="lang-picker" id="langPicker">
+      <button class="lang-trigger" id="langTrigger" aria-label="Choose translation language" aria-haspopup="true">
+        <span id="langTriggerFlag">🇸🇰</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="lang-menu" id="langMenu" hidden></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="about-hero">
+    <span class="about-badge">Interactive English Library</span>
+    <h1 class="about-hero-title">About LumenBooks</h1>
+    <p class="about-hero-sub">
+      A digital library purposefully crafted to help English language learners build comprehension, expand vocabulary, and master authentic reading skills through graded stories.
+    </p>
+  </div>
+
+  <section class="about-card" aria-label="LumenBooks Features">
+    <div class="about-grid">
+      <div class="about-item">
+        <div class="about-item-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <h2 class="about-item-title">Who LumenBooks Is For</h2>
+        <p class="about-item-text">
+          LumenBooks is an interactive digital reading library designed for English language learners of all backgrounds. If you want to bridge the gap between classroom theory and real-world fluency, our extensive library offers captivating stories that make reading English engaging and practical.
+        </p>
+      </div>
+
+      <div class="about-item">
+        <div class="about-item-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h2 class="about-item-title">CEFR Reading Levels (A1–C2)</h2>
+        <p class="about-item-text">
+          Every story is calibrated according to the Common European Framework of Reference for Languages (CEFR). Whether you are a beginner taking your first steps at A1–A2, an intermediate reader consolidating grammar at B1–B2, or an advanced learner targeting nuanced mastery at C1–C2, you can easily filter and choose books that perfectly match your skill level.
+        </p>
+      </div>
+
+      <div class="about-item">
+        <div class="about-item-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h2 class="about-item-title">Integrated Dictionary &amp; Translations</h2>
+        <p class="about-item-text">
+          Never let difficult words disrupt your reading momentum. Clicking or hovering over any unfamiliar word or phrase opens an instant popover with comprehensive definitions, IPA phonetics, and contextual translations in your preferred native language.
+        </p>
+      </div>
+
+      <div class="about-item">
+        <div class="about-item-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h2 class="about-item-title">Personal Vocabulary Collection</h2>
+        <p class="about-item-text">
+          Build your active vocabulary effortlessly as you read. Mark words as learning with a single click to save them into your personal vocabulary drawer, where you can organize, review, and practice them anytime with smart flashcards.
+        </p>
+      </div>
+
+      <div class="about-item" style="grid-column: 1 / -1;">
+        <div class="about-item-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <h2 class="about-item-title">Natural Learning Through Stories</h2>
+        <p class="about-item-text">
+          Extensive reading is one of the most effective methods to acquire a second language. By immersing yourself in diverse genres—from sci-fi adventures and business insights to timeless classics and daily dialogues—you absorb vocabulary, sentence structures, and idioms naturally in context, building long-term reading confidence.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="about-cta">
+    <h3>Ready to start reading?</h3>
+    <p>Explore hundreds of leveled stories and build your English confidence page by page.</p>
+    <a href="index.html" class="btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Browse Library
+    </a>
+  </div>
+</main>
+
+<!-- VOCAB DRAWER -->
+<aside class="vocab-drawer" id="vocabDrawer">
+  <div class="vocab-drawer-head">
+    <h3>My vocabulary</h3>
+    <button class="icon-btn" id="drawerCloseBtn" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:20px;height:20px;"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <ul class="vocab-list" id="vocabList"></ul>
+</aside>
+
+<footer>
+  <div class="wrap">
+    <nav aria-label="Footer">
+      <a href="/privacy-policy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms of Service</a>
+      <a href="/cookie-policy.html">Cookie Policy</a>
+      <a href="/cookie-policy.html#cookie-settings">Cookie Settings</a>
+      <a href="/">Home</a>
+    </nav>
+    <div>© 2026 LumenBooks. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/common.js"></script>
+<script>
+// Search redirect to index.html
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const q = searchInput.value.trim();
+      if (q) {
+        window.location.href = 'index.html?search=' + encodeURIComponent(q);
+      }
+    }
+  });
+}
+
+(async function init(){
+  await loadAllBooks();
+  initCommonListeners();
+  updateVocabCount();
+})();
+</script>
+</body>
+</html>
