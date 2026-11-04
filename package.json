@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Lumen — English Reading Library",
   "scripts": {
-    "build:catalog": "node scripts/build-catalog.js"
+    "build:catalog": "node scripts/build-catalog.js",
+    "build:views": "node scripts/generate-views.js"
   }
 }
