@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>The Years We Lost</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Literata:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+    <style>
+      :root{
+        --bg-void:#04050A;
+        --bg-deep:#0A0C16;
+        --bg-elevated:#12141F;
+        --bg-reader:#0C0E18;
+
+        --glass-fill: rgba(20,22,36,.55);
+        --glass-fill-soft: rgba(20,22,36,.32);
+        --glass-border: rgba(255,255,255,.08);
+        --glass-border-hi: rgba(255,255,255,.16);
+
+        --text-primary:#F5F7FA;
+        --text-secondary:#A7AFC2;
+        --text-tertiary:#666E82;
+        --text-reader:#EAE6DD;
+
+        --neon-cyan:#4CF5E0;
+        --neon-blue:#7CACF8;
+        --neon-violet:#9B7BFF;
+        --neon-magenta:#F472B6;
+        --neon-amber:#FFC876;
+
+        --lvl-A1:#34D399;
+        --lvl-A2:#4CF5E0;
+        --lvl-B1:#7CACF8;
+        --lvl-B2:#9B7BFF;
+        --lvl-C1:#F472B6;
+        --lvl-C2:#FB7185;
+
+        --radius-card:20px;
+        --radius-panel:26px;
+        --radius-pill:999px;
+
+        --ease-out-expo:cubic-bezier(.16,1,.3,1);
+      }
+
+      *{box-sizing:border-box;}
+      html,body{height:100%;}
+      body{
+        margin:0;
+        background:var(--bg-void);
+        color:var(--text-primary);
+        font-family:'Inter',sans-serif;
+        -webkit-font-smoothing:antialiased;
+        overflow-x:hidden;
+        padding-top:env(safe-area-inset-top,0px);
+        padding-bottom:env(safe-area-inset-bottom,0px);
+      }
+      ::selection{background:rgba(155,123,255,.35); color:#fff;}
+
+      a,button{font-family:inherit;}
+      button{cursor:pointer; background:none; border:none; color:inherit;}
+      img{max-width:100%; display:block;}
+
+      :focus-visible{
+        outline:2px solid var(--neon-cyan);
+        outline-offset:3px;
+        border-radius:6px;
+      }
+
+      h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-0.01em;}
+      p{margin:0;}
+
+      /* AMBIENT BACKGROUND */
+      .ambient{
+        position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+      }
+      .ambient::before, .ambient::after{
+        content:''; position:absolute; border-radius:50%; filter:blur(90px); opacity:.28;
+      }
+      .ambient::before{
+        width:640px; height:640px; top:-220px; left:-160px;
+        background:radial-gradient(circle, var(--neon-violet), transparent 70%);
+      }
+      .ambient::after{
+        width:560px; height:560px; bottom:-260px; right:-140px;
+        background:radial-gradient(circle, var(--neon-cyan), transparent 70%);
+        opacity:.18;
+      }
+      .grain{
+        position:fixed; inset:0; z-index:1; pointer-events:none;
+        opacity:.05; mix-blend-mode:overlay;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      /* GLASS CONTAINER */
+      .glass{
+        background:var(--glass-fill);
+        backdrop-filter:blur(22px) saturate(140%);
+        -webkit-backdrop-filter:blur(22px) saturate(140%);
+        border:1px solid var(--glass-border);
+      }
+
+      /* TOPBAR */
+      .topbar{
+        position:sticky; top:0; z-index:40;
+        display:flex; align-items:center; justify-content:space-between;
+        gap:16px; padding:16px clamp(16px,4vw,48px);
+        padding-top:calc(16px + env(safe-area-inset-top,0px));
+        background:rgba(4,5,10,.65);
+        backdrop-filter:blur(18px);
+        -webkit-backdrop-filter:blur(18px);
+        border-bottom:1px solid var(--glass-border);
+      }
+      .brand{display:flex; align-items:center; gap:10px; flex-shrink:0; text-decoration:none; color:inherit;}
+      .brand-mark{
+        width:34px; height:34px; border-radius:10px;
+        background:linear-gradient(145deg, var(--neon-cyan), var(--neon-violet));
+        display:flex; align-items:center; justify-content:center;
+        box-shadow:0 0 24px -4px rgba(155,123,255,.7);
+      }
+      .brand-mark svg{width:18px; height:18px; color:#04050A;}
+      .brand-name{font-family:'Space Grotesk'; font-weight:600; font-size:1.05rem; letter-spacing:-.01em;}
+
+      .nav-tabs{
+        display:flex; gap:4px; padding:3px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        flex-shrink:0;
+      }
+      .nav-tab-btn{
+        padding:6px 14px; border-radius:var(--radius-pill); font-size:.82rem; font-weight:500;
+        color:var(--text-secondary); transition:all 180ms var(--ease-out-expo);
+        text-decoration:none; display:inline-flex; align-items:center;
+      }
+      .nav-tab-btn:hover{ color:var(--text-primary); }
+
+      /* MAIN LAYOUT */
+      .page-main{
+        position:relative; z-index:2;
+        max-width:1100px; margin:0 auto;
+        padding:32px clamp(16px,4vw,48px) 96px;
+      }
+
+      /* BACK LINK */
+      .back-link-btn{
+        display:inline-flex; align-items:center; gap:8px;
+        padding:8px 16px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        font-size:.85rem; font-weight:500; color:var(--text-secondary);
+        transition:all 180ms var(--ease-out-expo); margin-bottom:28px;
+        text-decoration:none;
+      }
+      .back-link-btn:hover{ color:var(--text-primary); border-color:var(--glass-border-hi); transform:translateX(-2px); }
+      .back-link-btn svg{ width:16px; height:16px; }
+
+      /* HERO META CARD */
+      .hero-meta-card{
+        position:relative; padding:clamp(24px,4vw,40px);
+        border-radius:32px; overflow:hidden;
+        margin-bottom:36px;
+      }
+      .hero-grid{
+        display:grid; grid-template-columns:220px 1fr; gap:36px; align-items:start;
+      }
+      @media (max-width:768px){
+        .hero-grid{ grid-template-columns:1fr; gap:24px; justify-items:center; text-align:center; }
+        .hero-meta-chips{ justify-content:center; }
+        .hero-actions-row{ justify-content:center; }
+      }
+
+      .hero-cover{
+        width:220px; aspect-ratio:2/3; border-radius:20px; overflow:hidden; position:relative;
+        box-shadow:0 24px 60px -16px rgba(0,0,0,.75); flex-shrink:0;
+        background:linear-gradient(160deg, #3b2d6b, #151829);
+      }
+      .hero-cover img{ width:100%; height:100%; object-fit:cover; }
+      .hero-cover-fallback{
+        position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
+        padding:18px 16px; background:linear-gradient(0deg, rgba(0,0,0,.85) 0%, transparent 80%);
+      }
+      .hero-cover-title{ font-family:'Space Grotesk'; font-size:1.05rem; font-weight:600; color:#fff; }
+      .hero-cover-author{ font-size:.8rem; color:rgba(255,255,255,.7); }
+
+      .hero-info{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+      .book-display-title{ font-size:clamp(1.8rem,3.2vw,2.5rem); font-weight:700; line-height:1.2; }
+      .book-display-author{ font-size:1.05rem; color:var(--text-secondary); }
+
+      .hero-meta-chips{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+      .meta-chip{
+        display:inline-flex; align-items:center; gap:6px;
+        font-size:.82rem; font-weight:600; padding:6px 14px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border); color:var(--text-secondary);
+      }
+      .level-dot{ width:8px; height:8px; border-radius:50%; background:currentColor; display:inline-block; }
+
+      .vocab-meter{ display:flex; gap:4px; width:160px; height:5px; margin-top:2px; }
+      .vocab-meter i{ display:block; flex:1; height:100%; border-radius:99px; background:rgba(255,255,255,.1); }
+      .vocab-meter i.on{ background:var(--neon-violet); }
+
+      .hero-actions-row{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:8px; }
+      .btn-primary-lg{
+        display:inline-flex; align-items:center; gap:10px;
+        padding:14px 28px; border-radius:var(--radius-pill);
+        background:linear-gradient(120deg, var(--neon-cyan), var(--neon-violet));
+        color:#04050A; font-weight:700; font-size:1rem; text-decoration:none;
+        box-shadow:0 12px 36px -8px rgba(155,123,255,.6);
+        transition:transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+      }
+      .btn-primary-lg:hover{ transform:translateY(-2px); box-shadow:0 16px 42px -8px rgba(155,123,255,.75); }
+      .btn-primary-lg svg{ width:20px; height:20px; }
+
+      /* METADATA STATS GRID */
+      .sections-grid{ display:grid; grid-template-columns:2fr 1fr; gap:28px; margin-bottom:36px; }
+      @media (max-width:840px){
+        .sections-grid{ grid-template-columns:1fr; }
+      }
+
+      .section-box{
+        padding:28px; border-radius:24px; display:flex; flex-direction:column; gap:16px;
+      }
+      .section-box-title{ font-size:1.15rem; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:8px; }
+      .section-box-title svg{ width:18px; height:18px; color:var(--neon-cyan); }
+      .section-box-body{ font-size:.95rem; line-height:1.7; color:var(--text-secondary); }
+
+      .stat-list{ display:flex; flex-direction:column; gap:14px; list-style:none; padding:0; margin:0; }
+      .stat-item{ display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--glass-border); font-size:.88rem; }
+      .stat-item:last-child{ border-bottom:none; padding-bottom:0; }
+      .stat-label{ color:var(--text-tertiary); }
+      .stat-val{ color:var(--text-primary); font-weight:600; }
+
+      /* STORY READER CARD (CONTAINING REQUIRED H1, H2, P ELEMENTS) */
+      .story-reader-card{
+        border-radius:28px;
+        padding:clamp(28px,5vw,60px);
+        background:var(--bg-reader);
+        border:1px solid var(--glass-border);
+        box-shadow:0 30px 80px -20px rgba(0,0,0,.8);
+      }
+      .story-reader-container{
+        max-width:68ch; margin:0 auto;
+      }
+
+      /* REQUIRED ELEMENT SPECIFICATIONS */
+      h1.book-id-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.4rem, 2.5vw, 2rem);
+        font-weight:700;
+        color:var(--text-primary);
+        letter-spacing:-0.01em;
+        margin-bottom:24px;
+        padding-bottom:16px;
+        border-bottom:1px solid var(--glass-border);
+      }
+      h2.chapter-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.2rem, 2vw, 1.5rem);
+        font-weight:600;
+        color:var(--neon-cyan);
+        letter-spacing:-0.01em;
+        margin-top:36px;
+        margin-bottom:20px;
+      }
+      h2.chapter-heading:first-of-type{
+        margin-top:12px;
+      }
+      p.story-paragraph{
+        font-family:'Literata',serif;
+        font-size:1.12rem;
+        line-height:1.9;
+        color:var(--text-reader);
+        margin-bottom:1.5em;
+      }
+      p.story-paragraph:last-child{
+        margin-bottom:0;
+      }
+
+      @media (max-width:768px){
+        .topbar{ padding:10px 14px; }
+        .page-main{ padding:20px 14px 64px; }
+        .hero-meta-card{ padding:20px 16px; border-radius:24px; }
+        .section-box{ padding:20px 18px; }
+        .story-reader-card{ padding:24px 18px; border-radius:20px; }
+        p.story-paragraph{ font-size:1.02rem; line-height:1.75; }
+      }
+    </style>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a href="../../index.html" class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M20 6v14h-4V6a2 2 0 0 1 4 0z" opacity=".55"/></svg>
+    </div>
+    <span class="brand-name">Lumen</span>
+  </a>
+  <nav class="nav-tabs">
+    <a href="../../index.html" class="nav-tab-btn">Library / Search</a>
+    <a href="../../discover.html" class="nav-tab-btn">Discover</a>
+  </nav>
+</header>
+
+<main class="page-main">
+
+  <a href="../../book.html?id=classic-16" class="back-link-btn" id="backBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    Back to Book Details
+  </a>
+
+  <!-- HERO METADATA CARD (POPULATED DYNAMICALLY FROM JSON) -->
+  <article class="hero-meta-card glass" id="metaHeroCard">
+    <div class="hero-grid">
+      <div class="hero-cover" id="heroCoverContainer">
+        <!-- Render cover image or styled fallback -->
+      </div>
+      <div class="hero-info">
+        <h2 class="book-display-title" id="bookDisplayTitle">The Years We Lost</h2>
+        <p class="book-display-author" id="bookDisplayAuthor">—</p>
+
+        <div class="hero-meta-chips" id="heroMetaChips">
+          <span class="meta-chip" id="chipLevel">Level —</span>
+          <span class="meta-chip" id="chipGenre">Genre —</span>
+          <span class="meta-chip" id="chipReadingTime">⏱ — min read</span>
+          <span class="meta-chip" id="chipDateAdded">📅 Added —</span>
+          <span class="meta-chip" id="chipVocab">📚 — vocab items</span>
+        </div>
+
+        <div>
+          <p style="font-size: .78rem; color: var(--text-tertiary); margin-bottom: 6px;">DIFFICULTY RATING</p>
+          <div class="vocab-meter" id="vocabMeter" aria-label="Difficulty Rating"></div>
+        </div>
+
+        <div class="hero-actions-row">
+          <a href="../../book.html?id=classic-16" class="btn-primary-lg" id="readInteractiveBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span>Interactive Reader</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- METADATA SECTIONS (ABOUT, LEARNING, STATS) -->
+  <div class="sections-grid">
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        About This Book
+      </h3>
+      <p class="section-box-body" id="aboutTextDisplay">
+        Loading description…
+      </p>
+
+      <h3 class="section-box-title" style="margin-top: 14px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        What You'll Learn
+      </h3>
+      <p class="section-box-body" id="learnTextDisplay">
+        Loading learning objectives…
+      </p>
+    </div>
+
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Reading Stats
+      </h3>
+      <ul class="stat-list">
+        <li class="stat-item">
+          <span class="stat-label">CEFR Level</span>
+          <span class="stat-val" id="statLevel">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Author</span>
+          <span class="stat-val" id="statAuthor">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Genre</span>
+          <span class="stat-val" id="statGenre">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Estimated Time</span>
+          <span class="stat-val" id="statTime">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Word Count</span>
+          <span class="stat-val" id="statWordCount">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Vocabulary Items</span>
+          <span class="stat-val" id="statVocab">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Date Added</span>
+          <span class="stat-val" id="statDateAdded">—</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- STORY CONTENT (CONTAINING REQUIRED H1, H2, P ELEMENTS) -->
+  <article class="story-reader-card">
+    <div class="story-reader-container">
+        <h1 class="book-id-heading">classic-16</h1>
+        <h2 class="chapter-heading">0 A Room with a View</h2>
+
+        <p class="story-paragraph">Daniel Carter could see most of the city from the twenty-second floor, but he rarely looked at it. His office window faced a line of grey buildings and a strip of river. On Monday morning, he stood beside the glass with his phone at his ear and watched a small boat pass beneath a bridge.</p>
+        <p class="story-paragraph">“The figures are ready,” Laura Bennett said. She sat at the table behind him, a laptop open in front of her. She was his business partner and had known him for eight years. “But you haven’t read the last page.”</p>
+        <p class="story-paragraph">“I’ll read it now.”</p>
+        <p class="story-paragraph">“You said that ten minutes ago.”</p>
+        <p class="story-paragraph">Daniel turned from the window. “I was dealing with the bank.”</p>
+        <p class="story-paragraph">“You were looking at the river.” Laura’s voice was calm, but her eyes were tired. “That’s allowed, Daniel. Just don’t tell me you’re dealing with the bank when you aren’t.”</p>
+        <p class="story-paragraph">He took the report from her. Their company helped small shops and restaurants plan new branches. Daniel was good at finding money and solving problems quickly. People trusted him to make a decision. He liked that they did not ask what he was feeling.</p>
+        <p class="story-paragraph">Laura tapped the page. “If we sign this, we take on more work than we can do. We need to hire another manager.”</p>
+        <p class="story-paragraph">“We can wait until next month.”</p>
+        <p class="story-paragraph">“We’ve been waiting since spring. People are doing two jobs each.”</p>
+        <p class="story-paragraph">Daniel read the figures again. “All right. We’ll hire someone. Put it in the plan.”</p>
+        <p class="story-paragraph">She watched him for a moment. “You don’t have to agree with me just to end the conversation.”</p>
+        <p class="story-paragraph">“I do agree.”</p>
+        <p class="story-paragraph">“Then look at me when you say it.”</p>
+        <p class="story-paragraph">He did. Laura gave a small nod and turned back to her laptop. Neither of them spoke about the fact that he had slept badly for weeks. He had begun to wake at four in the morning and check messages until the sky grew pale.</p>
+        <p class="story-paragraph">At lunch, his phone rang. The number was from Bellford, the town where he had grown up. He let it ring once, then answered.</p>
+        <p class="story-paragraph">“Daniel?” It was his mother’s neighbour, Mrs. Shah. Her voice was kind and careful. “I’m sorry to call at work. Your mother asked me to let you know she’s back in hospital.”</p>
+        <p class="story-paragraph">Daniel stood. “What happened?”</p>
+        <p class="story-paragraph">“She was weak and short of breath. They’re keeping her in overnight, maybe longer. Michael is there with her.”</p>
+        <p class="story-paragraph">For a few seconds, Daniel heard the office around him: a printer, a phone, Laura asking someone for a file. “Is she all right?”</p>
+        <p class="story-paragraph">“She’s being looked after. She wanted you to know.”</p>
+        <p class="story-paragraph">He thanked Mrs. Shah and ended the call. His first thought was to ask when the next hospital update would come. His second was that there was a train at six ten.</p>
+        <p class="story-paragraph">Laura saw his face. “Your mother?”</p>
+        <p class="story-paragraph">“She’s in hospital again.”</p>
+        <p class="story-paragraph">“Are you going?”</p>
+        <p class="story-paragraph">He looked at his calendar. There were two meetings that afternoon and a client dinner the next day. “I’ll call Michael first.”</p>
+        <p class="story-paragraph">“You can call him on the train.”</p>
+        <p class="story-paragraph">Daniel frowned. “I need to know what’s happening.”</p>
+        <p class="story-paragraph">“Of course. But you don’t need to be in this office to find out.”</p>
+        <p class="story-paragraph">He called Michael. His younger brother answered after five rings. Daniel heard a quiet room and then the sound of a door closing.</p>
+        <p class="story-paragraph">“She’s tired,” Michael said. “They’re running tests.”</p>
+        <p class="story-paragraph">“Why didn’t you tell me earlier?”</p>
+        <p class="story-paragraph">“I did. I sent you a message on Saturday.”</p>
+        <p class="story-paragraph">Daniel found the message. It was short: Mum’s not doing well. Can you call? He had read it between meetings and planned to reply later.</p>
+        <p class="story-paragraph">“I’m sorry,” he said. “I’ll come tonight.”</p>
+        <p class="story-paragraph">There was a pause. “Do what you need to do.”</p>
+        <p class="story-paragraph">Daniel booked the train before he could find another reason to wait. When he told Laura, she closed the report and stood up.</p>
+        <p class="story-paragraph">“Go,” she said. “I’ll handle tomorrow’s meeting.”</p>
+        <p class="story-paragraph">“Thank you.”</p>
+        <p class="story-paragraph">“Just don’t spend the whole journey planning how to manage everyone from a distance.”</p>
+        <p class="story-paragraph">He wanted to tell her that he did not manage everyone. Instead, he packed his laptop and went to the station. As the train left the city, the tall buildings became smaller behind him. He kept his phone in his hand, waiting for a message from Michael, and watched the dark fields pass.</p>
+
+        <h2 class="chapter-heading">1 Bellford</h2>
+
+        <p class="story-paragraph">The train reached Bellford just after eight. Daniel had not been back for more than one night in almost a year. The station looked smaller than he remembered. Its painted sign was new, but the old clock still ran four minutes slow.</p>
+        <p class="story-paragraph">He took a taxi to the hospital. Michael was sitting beside their mother’s bed with a paper cup of tea between his hands. He stood when Daniel came in.</p>
+        <p class="story-paragraph">“You made it,” he said.</p>
+        <p class="story-paragraph">“How is she?”</p>
+        <p class="story-paragraph">“Tired. The doctor says her heart is weaker than it was last time. They’re changing her medicine.”</p>
+        <p class="story-paragraph">Margaret opened her eyes. She looked smaller in the hospital bed, her grey hair brushed back from her face. “There you are,” she said.</p>
+        <p class="story-paragraph">Daniel went to her side and took her hand. “I’m sorry I didn’t come sooner.”</p>
+        <p class="story-paragraph">“You’re here now.” Her fingers closed around his. “That’s enough for tonight.”</p>
+        <p class="story-paragraph">He asked questions about the tests and the new medicine. Margaret answered what she could. Michael filled in the rest, speaking in a low voice. He seemed to know the names of the nurses and which doctor would come in the morning.</p>
+        <p class="story-paragraph">“You’ve been here all day,” Daniel said.</p>
+        <p class="story-paragraph">“I came after school.”</p>
+        <p class="story-paragraph">“You should go home and sleep.”</p>
+        <p class="story-paragraph">Michael looked at him. “I’m fine.”</p>
+        <p class="story-paragraph">The words were polite, but his face was not. Daniel recognized the look. He had seen it across family tables for years: the closed door before anyone had knocked.</p>
+        <p class="story-paragraph">A nurse came in to check Margaret’s blood pressure. The brothers stepped into the hall. Daniel asked when their mother might come home.</p>
+        <p class="story-paragraph">“Could be tomorrow,” Michael said. “Could be a few days.”</p>
+        <p class="story-paragraph">“I can stay at the house.”</p>
+        <p class="story-paragraph">“There’s a room.”</p>
+        <p class="story-paragraph">“I know.”</p>
+        <p class="story-paragraph">“You haven’t used it in a while.”</p>
+        <p class="story-paragraph">Daniel let the remark pass. “How long has she been getting worse?”</p>
+        <p class="story-paragraph">Michael looked down at the cup. “For months. I’ve told you.”</p>
+        <p class="story-paragraph">“You said she was tired.”</p>
+        <p class="story-paragraph">“I said she couldn’t manage the stairs without stopping. I said she was forgetting her pills. You answered that you’d pay for someone to help.”</p>
+        <p class="story-paragraph">“I offered to pay because I thought that would help.”</p>
+        <p class="story-paragraph">“It did help with the cleaner. It didn’t mean she had someone here at night.”</p>
+        <p class="story-paragraph">Daniel felt a familiar heat rise in his face. “You could have called again.”</p>
+        <p class="story-paragraph">“I did.”</p>
+        <p class="story-paragraph">A passing nurse glanced at them. Michael lowered his voice. “We’re not doing this in the hospital.”</p>
+        <p class="story-paragraph">Daniel looked through the door at Margaret. She had closed her eyes, but he could not tell if she was asleep. “No,” he said. “We’re not.”</p>
+        <p class="story-paragraph">Michael took his coat. “I’ll come back in the morning. Helen said she can take you to the house.”</p>
+        <p class="story-paragraph">“Helen?”</p>
+        <p class="story-paragraph">“My friend from the library. She was bringing Mum a book when they took her in. She’s helping with the house.”</p>
+        <p class="story-paragraph">Daniel remembered hearing the name once or twice. He did not know what Helen looked like. “You don’t need to arrange everything for me.”</p>
+        <p class="story-paragraph">“I didn’t. She offered.” Michael left before Daniel could answer.</p>
+        <p class="story-paragraph">In the morning, Margaret was sitting up and drinking tea. She seemed brighter, though her breathing was still shallow. The doctor said she could probably go home that afternoon if the new medicine suited her.</p>
+        <p class="story-paragraph">A woman with dark hair and a green scarf arrived carrying a canvas bag. “You must be Daniel,” she said. “I’m Helen.”</p>
+        <p class="story-paragraph">She had a direct, friendly manner that made him feel he ought to say more than hello. “Thank you for helping.”</p>
+        <p class="story-paragraph">“Michael and I have been friends for a long time. I’m glad to help Margaret.” She placed the bag by the chair. “I brought her a book, but I think she may be too tired to read it today.”</p>
+        <p class="story-paragraph">“You work at the library?”</p>
+        <p class="story-paragraph">“Yes. I run the local-history room and the children’s reading group.”</p>
+        <p class="story-paragraph">When the doctor came back, he gave them instructions about medicine and follow-up appointments. Daniel wrote everything down. Michael asked about lifting, meals and what to do if Margaret became short of breath.</p>
+        <p class="story-paragraph">Daniel saw that his own notes were neat and complete. Michael’s questions were more useful.</p>
+        <p class="story-paragraph">On the way out, Margaret held both her sons’ hands. “No arguing at my house,” she said.</p>
+        <p class="story-paragraph">“We won’t,” Daniel promised.</p>
+        <p class="story-paragraph">Michael said nothing. Outside, Helen offered Daniel a lift. Through the car window, Bellford passed in familiar pieces: the bakery, the small park, the church with its dark stone tower. The town felt close around him. For the first time in years, Daniel had no meeting to prepare for and nowhere else to go.</p>
+
+        <h2 class="chapter-heading">2 The House on Mill Road</h2>
+
+        <p class="story-paragraph">The family house stood on Mill Road, two streets from the river. It was a narrow brick house with a small front garden and a blue door. The paint was peeling near the handle. Daniel remembered his father painting it on a warm Saturday, with the radio playing in the garden.</p>
+        <p class="story-paragraph">Peter Carter had been dead for seven years. He had spent most of his life repairing machines at the town factory. He was not a man who spoke easily about feelings, but he fixed a broken chair before anyone asked and left a cup of tea by Margaret’s bed when she was ill.</p>
+        <p class="story-paragraph">Daniel had been away when Peter died. A client meeting had run late in the city. He had reached Bellford after midnight, and his father was already gone. He had never forgiven himself. He had also never forgiven Michael for calling too late, though he knew now that Michael had called as soon as the nurse said Peter was failing.</p>
+        <p class="story-paragraph">The front door opened before Daniel could knock. Michael stood inside. “I thought you had a key.”</p>
+        <p class="story-paragraph">“I do.” Daniel lifted the key on his ring. “I didn’t want to walk in.”</p>
+        <p class="story-paragraph">“Fair enough.” Michael moved aside.</p>
+        <p class="story-paragraph">The hall smelled of polish and old books. A framed photograph of Peter and Margaret stood on the small table. Beside it was a bowl of keys and a pile of letters. The house was clean, but a little too warm. Margaret liked the radiators on, even when the sun came through the windows.</p>
+        <p class="story-paragraph">Daniel put his bag in the spare room. It had once been his room. The curtains were new, but the desk was the same one he had used as a boy. A mark on its side came from a compass he had pressed too hard into the wood.</p>
+        <p class="story-paragraph">“You still have it,” he said.</p>
+        <p class="story-paragraph">Michael appeared at the door. “Mum didn’t want to throw it away.”</p>
+        <p class="story-paragraph">“There’s a lot she keeps.”</p>
+        <p class="story-paragraph">“Yes. There is.” Michael’s eyes moved to the bag. “There are clean towels in the bathroom.”</p>
+        <p class="story-paragraph">They spoke in small sentences. The weather was wet. The train had been on time. The doctor had called. Every ordinary remark seemed to carry something else beneath it.</p>
+        <p class="story-paragraph">Helen arrived with a bag of food from the shop. She had brought soup, bread and fruit. “I wasn’t sure what Margaret can eat,” she said. “I left the receipt in case she needs it.”</p>
+        <p class="story-paragraph">Daniel offered to pay her back. She shook her head. “I’m not asking you for money. Michael can have half when he does his next shop.”</p>
+        <p class="story-paragraph">Michael gave her a look. “You didn’t have to do that.”</p>
+        <p class="story-paragraph">“I know. I chose to.” She put the food on the kitchen counter. “And I know how to use a receipt.”</p>
+        <p class="story-paragraph">Margaret was resting in the sitting room. When Daniel went in, she reached for his hand. “It feels good to have both of you here,” she said. Her voice was quiet, but she smiled.</p>
+        <p class="story-paragraph">“We’ll stay as long as you need,” Daniel said.</p>
+        <p class="story-paragraph">“Don’t make promises you can’t keep.”</p>
+        <p class="story-paragraph">He sat beside her. “I can stay this week.”</p>
+        <p class="story-paragraph">“That’s better.” She closed her eyes for a moment. “Michael, have you shown him the leak under the kitchen sink?”</p>
+        <p class="story-paragraph">Michael sighed. “It’s a slow drip. I put a bowl underneath.”</p>
+        <p class="story-paragraph">“It’s been dripping for weeks,” Margaret said. “I don’t want water ruining the cupboard.”</p>
+        <p class="story-paragraph">Daniel stood. “I can call a plumber.”</p>
+        <p class="story-paragraph">“No,” Margaret said. “You can look at it first. Your father taught you both how to fix things.”</p>
+        <p class="story-paragraph">“He taught Michael more than me,” Daniel said.</p>
+        <p class="story-paragraph">“You were good at taking things apart,” Michael replied. “Putting them together was the harder part.”</p>
+        <p class="story-paragraph">Margaret gave a tired laugh. “There. You have something in common already.”</p>
+        <p class="story-paragraph">She fell asleep soon after. Daniel went into the kitchen and saw the bowl beneath the sink. A thin line of water ran from the pipe into it. The cupboard smelled damp.</p>
+        <p class="story-paragraph">Michael leaned against the doorway. “I tried tightening the joint. It didn’t stop.”</p>
+        <p class="story-paragraph">“We might need a new seal.”</p>
+        <p class="story-paragraph">“The tools are in the shed.”</p>
+        <p class="story-paragraph">Daniel looked at the tap, then at his brother. “I’ll get them.”</p>
+        <p class="story-paragraph">“You don’t know where they are.”</p>
+        <p class="story-paragraph">“Then show me.”</p>
+        <p class="story-paragraph">Michael was quiet before he said, “All right.”</p>
+        <p class="story-paragraph">Together they went out into the small garden. The shed door stuck, as it always had. Michael pushed it with his shoulder while Daniel pulled. It opened at last, and dust moved in the light. On the wall hung Peter’s old tool belt. Neither brother touched it at first.</p>
+        <p class="story-paragraph">Then Michael reached for a screwdriver. Daniel lifted the tool box from the floor. They carried it back into the house without speaking, but they carried it together.</p>
+
+        <h2 class="chapter-heading">3 The Drip</h2>
+
+        <p class="story-paragraph">The next morning, Margaret stayed in bed while the brothers worked in the kitchen. Helen had gone to the library, but she had left a note on the counter with the number of the local plumber. “Call him if you need to,” she had written.</p>
+        <p class="story-paragraph">Daniel took off his jacket and rolled up his sleeves. Michael placed a towel beneath the sink. The drip had become faster overnight, and a dark line marked the back of the cupboard.</p>
+        <p class="story-paragraph">“We need to turn off the water,” Michael said.</p>
+        <p class="story-paragraph">“I know.”</p>
+        <p class="story-paragraph">“The stopcock is under the front step. It sticks, so use the small wrench.”</p>
+        <p class="story-paragraph">Daniel found the wrench in the tool box. “Dad kept these in order.”</p>
+        <p class="story-paragraph">“He kept the tools in order. The rest of the shed was a mess.”</p>
+        <p class="story-paragraph">Daniel smiled despite himself. He could picture Peter standing in the shed, making a place for every tool. He could also picture himself at seventeen, leaving a spanner on the garden wall and being told to put it back.</p>
+        <p class="story-paragraph">The brothers turned off the water. Michael held a torch while Daniel loosened the joint. The seal was old and cracked. A little water ran onto the towel.</p>
+        <p class="story-paragraph">“Careful,” Michael said.</p>
+        <p class="story-paragraph">“I am being careful.”</p>
+        <p class="story-paragraph">“You’re pulling it too hard.”</p>
+        <p class="story-paragraph">Daniel stopped. “Can you do it?”</p>
+        <p class="story-paragraph">“I can hold the pipe while you turn the ring.”</p>
+        <p class="story-paragraph">They changed places. Michael braced the pipe, and Daniel loosened the ring more slowly. It came free with a small click. The broken seal was flat and hard.</p>
+        <p class="story-paragraph">“That’s the problem,” Daniel said.</p>
+        <p class="story-paragraph">“There should be a new one in the box.” Michael searched through a small tin. “Dad had every size.”</p>
+        <p class="story-paragraph">They found three seals and tried the largest. It was too wide. The smallest was too small. The middle one looked right.</p>
+        <p class="story-paragraph">“You go and turn the water on,” Daniel said.</p>
+        <p class="story-paragraph">Michael went outside. When he returned, they watched the joint. For a few seconds, nothing happened. Then one drop appeared.</p>
+        <p class="story-paragraph">“Still leaking,” Michael said.</p>
+        <p class="story-paragraph">Daniel turned off the water again. He took the seal out and looked at it. “It’s worn, but it may be the wrong shape.”</p>
+        <p class="story-paragraph">“The plumber can come this afternoon.”</p>
+        <p class="story-paragraph">Daniel checked the note from Helen. “He charges a call-out fee.”</p>
+        <p class="story-paragraph">“Yes. I know.”</p>
+        <p class="story-paragraph">“I can find a better price.”</p>
+        <p class="story-paragraph">Michael’s mouth tightened. “Mum needs the leak fixed. She doesn’t need you to save every pound.”</p>
+        <p class="story-paragraph">“Money matters. I’m not saying it doesn’t.” Daniel placed the seal on the counter. “I also don’t want to throw money away if this is easy to fix.”</p>
+        <p class="story-paragraph">“It hasn’t been easy for me. I’ve been trying to keep things going here while you send money and ask for updates.”</p>
+        <p class="story-paragraph">Daniel looked at him. “I thought that was useful.”</p>
+        <p class="story-paragraph">“Sometimes it was. The new washing machine helped. The cleaner helped. But you spoke as if paying meant you knew what was happening.”</p>
+        <p class="story-paragraph">Daniel felt his first answer forming, sharp and quick. He let it pass. “I didn’t know what was happening. I should have asked more clearly.”</p>
+        <p class="story-paragraph">Michael leaned both hands on the counter. “You could have come.”</p>
+        <p class="story-paragraph">“I could have.” Daniel glanced towards the sitting room. “I was angry after Dad died. I thought you should have called sooner.”</p>
+        <p class="story-paragraph">“I did call. You were in a meeting. You said you couldn’t leave.”</p>
+        <p class="story-paragraph">“I remember.” He rubbed the back of his neck. “I’m not saying you were wrong to be angry.”</p>
+        <p class="story-paragraph">“I was angry because I was here when he died, and you weren’t. Then you acted as if I’d taken that choice away from you.”</p>
+        <p class="story-paragraph">Daniel looked down at the broken seal. “I was wrong about that.”</p>
+        <p class="story-paragraph">Michael did not answer at once. “You were working. I know that too. Dad knew you were trying to build something.” He picked up the plumber’s note. “That doesn’t mean it didn’t hurt.”</p>
+        <p class="story-paragraph">“No,” Daniel said. “It doesn’t.”</p>
+        <p class="story-paragraph">For a moment, they stood in the small kitchen with the water turned off and the old tools spread across the counter. No one had forgiven anyone yet. But neither brother had walked out.</p>
+        <p class="story-paragraph">Michael called the plumber. The man said he could come before lunch and would charge a fair amount. Daniel agreed to pay the bill, and Michael agreed to be there when the work was done.</p>
+        <p class="story-paragraph">While they waited, Daniel made tea. He put Margaret’s cup on a tray and carried it upstairs. She was awake, sitting against her pillows.</p>
+        <p class="story-paragraph">“Did you fix it?” she asked.</p>
+        <p class="story-paragraph">“Not quite,” Daniel said. “The plumber is coming.”</p>
+        <p class="story-paragraph">“Good. And did you fight?”</p>
+        <p class="story-paragraph">“Not exactly.”</p>
+        <p class="story-paragraph">Margaret studied his face. “That may be enough for one morning.”</p>
+        <p class="story-paragraph">Downstairs, Michael was wiping the tools clean. Daniel joined him and took the second cloth. Outside, a bus passed on Mill Road, carrying people to work and children to school. The house was quiet again, except for the clock in the hall.</p>
+        <p class="story-paragraph">When the plumber arrived, both brothers went to meet him. They had found one small job they could finish together, and they had made a plan for what to do next.</p>
+
+        <h2 class="chapter-heading">4 The Saturday Table</h2>
+
+        <p class="story-paragraph">On Saturday morning, Daniel woke to the smell of toast. For a few seconds he thought he was in his flat in the city. Then he heard Margaret moving cups in the kitchen and remembered the spare room above the old shop.</p>
+        <p class="story-paragraph">He came downstairs in his shirt sleeves. Michael was at the table with a pile of exercise books. A girl of about fifteen sat opposite him, tapping a pencil against her knee.</p>
+        <p class="story-paragraph">“This is Samira,” Michael said. “She is preparing for her English exam.”</p>
+        <p class="story-paragraph">“I’m Daniel,” Daniel said.</p>
+        <p class="story-paragraph">Samira smiled politely. “Michael says you work in the city.”</p>
+        <p class="story-paragraph">“I do. I manage a team for a building company.”</p>
+        <p class="story-paragraph">“He means he is very busy,” Michael said, without looking up from the exercise book.</p>
+        <p class="story-paragraph">Daniel could not tell if this was a joke. He poured coffee and sat by the window. Samira read out a paragraph, stopping twice to ask Michael about a word. He explained each one with an example from her own life. He did not hurry her when she got stuck.</p>
+        <p class="story-paragraph">“You’re good at that,” Daniel said when Samira had gone.</p>
+        <p class="story-paragraph">“At correcting commas?”</p>
+        <p class="story-paragraph">“At teaching.”</p>
+        <p class="story-paragraph">Michael closed the book. “It’s not a big job. Just a few evenings at the library and help for the school.”</p>
+        <p class="story-paragraph">“It looked like more than a few evenings.”</p>
+        <p class="story-paragraph">“You have been here one night.” Michael stood to put the kettle on. “You haven’t seen everything.”</p>
+        <p class="story-paragraph">Daniel took a bite of toast. He had meant to say that Michael’s life seemed small beside the work he did in the city. The words now sounded unkind, even inside his head.</p>
+        <p class="story-paragraph">After breakfast, Michael took two bags of books to the library. Daniel offered to drive, but Michael said he could walk. Margaret asked Daniel to bring a jar of marmalade to Mrs Bell next door. The two errands led him down Mill Road, past narrow gardens and houses with small front doors.</p>
+        <p class="story-paragraph">Mrs Bell was waiting on her step. She was in her seventies and wore a bright blue coat.</p>
+        <p class="story-paragraph">“You’re Peter’s eldest,” she said. “You have his eyes.”</p>
+        <p class="story-paragraph">Daniel did not know what to say. She took the jar and asked after Margaret. Then she told him about a loose gate in her back garden. Daniel found a screwdriver in her shed and fixed the hinge. It took ten minutes.</p>
+        <p class="story-paragraph">“Your father would have made a whole afternoon of that,” she said, laughing. “He never did anything quickly.”</p>
+        <p class="story-paragraph">Daniel thought of Peter’s hands, rough from his work, and the way he used to whistle while repairing things. He had not thought of that in years.</p>
+        <p class="story-paragraph">At the library, Michael was carrying a box of books into a small room. A man at the desk called his name and asked if he could help with a form. A young mother waved from the children’s corner. Michael answered each person without showing impatience.</p>
+        <p class="story-paragraph">On the way back, Daniel said, “People seem to depend on you.”</p>
+        <p class="story-paragraph">Michael glanced at him. “They also depend on Helen. She has a job and a house to run. I’m not the town’s hero.”</p>
+        <p class="story-paragraph">“I didn’t say you were.”</p>
+        <p class="story-paragraph">“You used to make it clear that helping here was a poor use of time.”</p>
+        <p class="story-paragraph">Daniel stopped at the crossing. “I may have said that.”</p>
+        <p class="story-paragraph">“You did.”</p>
+        <p class="story-paragraph">A bus passed between them. When it was gone, Daniel said, “I thought you were hiding from bigger things.”</p>
+        <p class="story-paragraph">Michael’s face tightened, but he did not answer at once. “Maybe I was, sometimes. But you never asked what I wanted from my life.”</p>
+        <p class="story-paragraph">They continued towards the house. Daniel knew that Michael had not answered his old question. He also knew the answer might be more complicated than he had wanted.</p>
+        <p class="story-paragraph">That evening, Helen came by with a tray of small cakes. She kissed Michael’s cheek and asked Margaret how she had slept. Then she asked Daniel about the flat he rented in the city.</p>
+        <p class="story-paragraph">“It’s comfortable,” he said.</p>
+        <p class="story-paragraph">“Is it home?” Helen asked.</p>
+        <p class="story-paragraph">Daniel smiled as if she had made a joke. But later, alone in the spare room, he thought about the quiet flat and the dinner he often ate at his desk. He thought about the people in the library who had called Michael by name.</p>
+        <p class="story-paragraph">He did not decide that one life was better than the other. He only began to see that he had not looked closely enough.</p>
+
+        <h2 class="chapter-heading">5 Different Evenings</h2>
+
+        <p class="story-paragraph">On Monday, Daniel took a video call from his office at the kitchen table. Margaret was resting upstairs, and Michael had gone to the school to meet a parent. Daniel had papers open beside his laptop and a list of costs on the screen.</p>
+        <p class="story-paragraph">“We can’t cut the safety checks,” he said to his manager. “I know the budget is tight, but that would be a bad risk.”</p>
+        <p class="story-paragraph">He listened. Then he explained the figures again, slower this time. When the call ended, he rubbed his eyes and saw Michael standing in the doorway.</p>
+        <p class="story-paragraph">“You sound different at work,” Michael said.</p>
+        <p class="story-paragraph">“Different how?”</p>
+        <p class="story-paragraph">“Like you know what you’re doing.”</p>
+        <p class="story-paragraph">Daniel closed the laptop. “I do know what I’m doing.”</p>
+        <p class="story-paragraph">“I know.” Michael lifted his hands. “I wasn’t insulting you.”</p>
+        <p class="story-paragraph">Daniel felt the old anger rise, then settle. “You never say that when we talk about my job.”</p>
+        <p class="story-paragraph">“Because you talk about your job all the time.”</p>
+        <p class="story-paragraph">“I’m sorry if it sounds as if I think it matters more than everything else.”</p>
+        <p class="story-paragraph">Michael leaned against the door frame. “You have built something for yourself. I can see that. You lead people. You have earned their trust.”</p>
+        <p class="story-paragraph">Daniel looked at him, surprised by the praise. “Thank you.”</p>
+        <p class="story-paragraph">Michael looked down at the floor. “I just don’t want you to think that means your choices were always better.”</p>
+        <p class="story-paragraph">“I don’t.”</p>
+        <p class="story-paragraph">They had moved no more than a few inches towards each other, but Daniel felt the difference. He wanted to ask what Michael meant by choices. Instead, he asked if the school meeting had gone well.</p>
+        <p class="story-paragraph">“The parent was worried about her son. We made a plan for extra reading.” Michael took a glass from the cupboard. “It’s not dramatic work.”</p>
+        <p class="story-paragraph">“It does not need to be.”</p>
+        <p class="story-paragraph">Michael studied him as if checking whether he was joking. Then the kettle clicked off, and they left the subject there.</p>
+        <p class="story-paragraph">That afternoon Margaret asked them to clear the cupboard at the end of the hall. It was full of old towels, shopping bags and boxes Peter had filled before he became ill. Margaret wanted a walking frame stored there, and the door would not shut.</p>
+        <p class="story-paragraph">They worked side by side, handing things down to the floor. Daniel found a cracked torch. Michael found a set of Peter’s old keys.</p>
+        <p class="story-paragraph">“We should keep these,” Margaret said from her chair in the hall. “He used to carry them everywhere.”</p>
+        <p class="story-paragraph">“They don’t open anything now,” Daniel said.</p>
+        <p class="story-paragraph">“That isn’t the only reason to keep them.”</p>
+        <p class="story-paragraph">He put them in a small bowl. At the back of the cupboard stood a grey cardboard box, its corners soft from damp. Margaret’s name was written on the top in Peter’s handwriting.</p>
+        <p class="story-paragraph">Michael lifted it carefully. “What’s in here?”</p>
+        <p class="story-paragraph">“I don’t know,” Margaret said. “Your father moved it into that cupboard before he went into hospital.”</p>
+        <p class="story-paragraph">Daniel looked at the box. Peter had always had papers in strange places. He had once kept a gas bill inside a recipe book. “We can sort it out after lunch.”</p>
+        <p class="story-paragraph">“We can sort it now,” Michael said. “It may be rubbish.”</p>
+        <p class="story-paragraph">Margaret’s voice grew sharp. “Not everything he left is rubbish.”</p>
+        <p class="story-paragraph">Michael’s face changed. “I didn’t mean that.”</p>
+        <p class="story-paragraph">“You said something like that when he was ill.”</p>
+        <p class="story-paragraph">Daniel felt the old scene open in his mind. He remembered the hospital corridor, Michael’s empty chair and Margaret trying not to cry. “He said it because he was tired,” Daniel said.</p>
+        <p class="story-paragraph">Michael turned towards him. “You don’t know what I said.”</p>
+        <p class="story-paragraph">“I was there.”</p>
+        <p class="story-paragraph">“You were there when you wanted to be.”</p>
+        <p class="story-paragraph">Margaret pushed herself forward in her chair. “Stop. I won’t have this in my house.”</p>
+        <p class="story-paragraph">Neither brother answered. She looked tired, not angry now.</p>
+        <p class="story-paragraph">“You have both told that story for years,” she said. “And each time you make yourselves the only person who was hurt. Your father is gone. I am still here. I am asking you to stop repeating the same accusations.”</p>
+        <p class="story-paragraph">Daniel reached for the box. Michael kept one hand on it. For a moment neither moved.</p>
+        <p class="story-paragraph">Then Michael let go. “All right,” he said.</p>
+        <p class="story-paragraph">“We’ll open it tomorrow,” Daniel said.</p>
+        <p class="story-paragraph">Margaret nodded. The box remained on the floor between them, sealed with old tape. From the sitting room came the sound of the clock Peter had wound every Sunday. Its steady ticking filled the silence.</p>
+
+        <h2 class="chapter-heading">6 The Grey Box</h2>
+
+        <p class="story-paragraph">The next morning, rain tapped the kitchen windows. Margaret sat at the table with a cup of tea while Daniel and Michael opened the grey box. They laid its contents out in small piles.</p>
+        <p class="story-paragraph">There were birthday cards, medical papers, bank letters and a brown envelope of photographs. A receipt from a local garage had been folded around a note. Peter had written the date on it, but not what the money was for.</p>
+        <p class="story-paragraph">Daniel began with the medical papers. His father’s illness had left him weak for months. There were records of hospital visits and notes about new tablets. Daniel remembered taking Peter to appointments and making a list of questions for the doctor.</p>
+        <p class="story-paragraph">“You always knew what to ask,” Margaret said.</p>
+        <p class="story-paragraph">“I was trying to help.”</p>
+        <p class="story-paragraph">Michael picked up a bank letter. “And I was trying to help too.”</p>
+        <p class="story-paragraph">Daniel looked at him. “I didn’t say you weren’t.”</p>
+        <p class="story-paragraph">“Not today. Before, you said I left you to do everything.”</p>
+        <p class="story-paragraph">The bank letter was about an unpaid loan. A second showed that Peter had missed several payments. The amount was more than Daniel expected. He read the numbers twice.</p>
+        <p class="story-paragraph">“I never knew he owed this much,” he said.</p>
+        <p class="story-paragraph">“He told me it was less,” Margaret said. “He said the business would pay it back.”</p>
+        <p class="story-paragraph">Daniel looked through the other papers. There were notes about Peter’s repair business, which had lost work after a large customer changed builders. Some bills had been pushed behind older ones. There were also small cash withdrawals that did not match the family’s usual spending.</p>
+        <p class="story-paragraph">Michael found another envelope. Inside was a letter written by Peter to him. The paper was creased, and the envelope had never been stamped.</p>
+        <p class="story-paragraph">“You should read it,” Michael said.</p>
+        <p class="story-paragraph">Daniel could see his brother’s hand shaking a little. “It’s addressed to you.”</p>
+        <p class="story-paragraph">“I don’t want to read it alone.”</p>
+        <p class="story-paragraph">Michael unfolded the letter. Peter’s writing was uneven, but it was clear enough. He read it quietly at first, then out loud.</p>
+        <p class="story-paragraph">“Michael, I am sorry I have not told you how bad the money is. I know you have offered to help. I told Daniel that you did not want to come home, and that was not fair. He asked me to call you. I said no because I did not want you to see the trouble I had made.”</p>
+        <p class="story-paragraph">Michael stopped. He turned the page over, as if there might be more. There was.</p>
+        <p class="story-paragraph">“I was ashamed. Please do not let your mother carry all of this. Your brother thinks I sent you away to keep your future safe. He is wrong. I sent you away because I could not bear for you to see me fail. I have made enough mistakes. I hope you can forgive me.”</p>
+        <p class="story-paragraph">No one spoke. The rain moved down the window in thin lines.</p>
+        <p class="story-paragraph">Daniel read the final lines again. He had been sure Michael had chosen to leave. He had believed Peter wanted him to go, and he had carried that belief like proof of his own burden.</p>
+        <p class="story-paragraph">“Dad told me you didn’t want to come,” Daniel said.</p>
+        <p class="story-paragraph">Michael placed the letter on the table. “I did leave. I was angry and I wanted to get away. But I called Dad twice. He told me you and Mum had enough to deal with.”</p>
+        <p class="story-paragraph">“I never heard about those calls.”</p>
+        <p class="story-paragraph">“He said you were handling the hospital and the bills. I thought you didn’t want me there.”</p>
+        <p class="story-paragraph">Daniel looked at his brother’s face. “I wanted you there.”</p>
+        <p class="story-paragraph">“You never said so.”</p>
+        <p class="story-paragraph">“I thought you knew.”</p>
+        <p class="story-paragraph">Margaret closed her eyes. “Your father made a choice for both of you. He wanted to protect everyone, but he made the hurt worse.”</p>
+        <p class="story-paragraph">Daniel picked up a bank letter. It showed that Peter had asked the bank to delay a payment. The date was two days before his final hospital visit. “He was trying to hide this from us until the end.”</p>
+        <p class="story-paragraph">“He was frightened,” Margaret said. “He thought he could fix it. Then he got ill, and he couldn’t.”</p>
+        <p class="story-paragraph">Daniel felt no quick answer arrive. He remembered the tired man in the hospital bed, asking whether the front gate still needed repair. He had been angry about the bills and had never asked Peter how afraid he was.</p>
+        <p class="story-paragraph">“I blamed you,” he said to Michael. “I’m sorry.”</p>
+        <p class="story-paragraph">Michael rubbed his thumb along the letter’s edge. “I was angry with you too. You made the decisions and told me afterwards. But you were doing a lot. I knew that, even when I didn’t say it.”</p>
+        <p class="story-paragraph">“I thought you had gone because this family was too much for you.”</p>
+        <p class="story-paragraph">“Part of me had gone because it was too much. That doesn’t mean I didn’t care.”</p>
+        <p class="story-paragraph">Margaret reached across the table and covered Peter’s letter with her hand. “You can both be hurt. You can both have made mistakes. But don’t use your father’s mistakes to keep hurting each other.”</p>
+        <p class="story-paragraph">Daniel nodded. Michael did too. The papers remained in uneven piles around them. Nothing about the money had changed, and their father could not explain himself. Still, the letter had opened a door neither brother had known was closed.</p>
+
+        <h2 class="chapter-heading">7 What We Keep</h2>
+
+        <p class="story-paragraph">Daniel stayed in Bellford for three more weeks. He worked from the kitchen table in the mornings and helped Margaret with small jobs in the afternoons. Michael continued with his evening classes and the library. Their days did not become perfect, but they began to share them.</p>
+        <p class="story-paragraph">They called the bank together and learned that Peter’s remaining debt was smaller than it first appeared. The house could cover it if they sold a strip of land at the back. Margaret agreed, though she asked them to wait until the spring before making any final choice.</p>
+        <p class="story-paragraph">Daniel made a clear list of bills and set up payments with her permission. Michael wrote down the dates for Margaret’s appointments and put them beside the calendar. They disagreed about where to keep the papers. Daniel wanted a file box. Michael wanted a drawer. In the end they used both.</p>
+        <p class="story-paragraph">One evening, Daniel drove Michael to the school. A group of students were waiting in the hall, and a teacher called out that the printer had stopped working. Michael checked it, found a sheet of paper caught inside, and fixed it. The students cheered as if he had repaired the whole building.</p>
+        <p class="story-paragraph">“They like you,” Daniel said when they were back in the car.</p>
+        <p class="story-paragraph">“They like that I bring biscuits.”</p>
+        <p class="story-paragraph">“You make time for them.”</p>
+        <p class="story-paragraph">Michael looked out at the wet road. “You make time for people at work. You don’t just look at the costs.”</p>
+        <p class="story-paragraph">Daniel kept his eyes on the road. “Sometimes I do. My manager says I can sound as if a person is another line on a page.”</p>
+        <p class="story-paragraph">“Do you?”</p>
+        <p class="story-paragraph">“When I’m tired.”</p>
+        <p class="story-paragraph">Michael nodded. “I can sound as if I’m right because I’m doing something useful.”</p>
+        <p class="story-paragraph">They shared a short laugh. It did not make the past disappear, but it gave them a way to speak about the present.</p>
+        <p class="story-paragraph">On Sunday, Helen invited them all to lunch at her house. She had cooked a roast and bought a small cake for Margaret. The meal was noisy, with stories about the school, the neighbours and a dog that kept stealing socks from a garden.</p>
+        <p class="story-paragraph">After lunch, Michael went to help Helen wash dishes. Daniel carried the plates to the kitchen.</p>
+        <p class="story-paragraph">“He was lonely when you first came,” Helen said, keeping her voice low. “He doesn’t like people to notice.”</p>
+        <p class="story-paragraph">Daniel looked through the doorway. Michael was drying a plate while Helen spoke about her next shift at the clinic. He listened closely and asked if she needed him to collect her from work.</p>
+        <p class="story-paragraph">“I didn’t know,” Daniel said.</p>
+        <p class="story-paragraph">“He thought you had a full life and didn’t need him. It wasn’t completely true, was it?”</p>
+        <p class="story-paragraph">Daniel thought of his quiet flat, the cold meals and the calls he ended because he was busy. “No,” he said. “It wasn’t.”</p>
+        <p class="story-paragraph">On the final Friday of Daniel’s stay, the brothers went through the papers once more. They put Peter’s letter in a folder with the medical records, then placed the garage receipt beside it. The receipt showed that Peter had paid for work on Mrs Bell’s gate the same week he had missed a loan payment.</p>
+        <p class="story-paragraph">“He was always helping someone,” Michael said.</p>
+        <p class="story-paragraph">“Even when he couldn’t afford it.”</p>
+        <p class="story-paragraph">“That was one of his good habits and one of his bad ones.”</p>
+        <p class="story-paragraph">Daniel smiled. “That sounds like him.”</p>
+        <p class="story-paragraph">Margaret came in with three cups of tea. “You can keep that box here. I don’t want it buried in the cupboard again.”</p>
+        <p class="story-paragraph">“We won’t hide it,” Daniel said.</p>
+        <p class="story-paragraph">She sat down and looked at both sons. “And you won’t hide things from each other?”</p>
+        <p class="story-paragraph">Michael sat beside her. “We’ll try not to.”</p>
+        <p class="story-paragraph">“Trying is not the same as doing,” she said, but her voice was gentle.</p>
+        <p class="story-paragraph">Daniel reached for his cup. “I can call more often. And I can come back next month, if you want.”</p>
+        <p class="story-paragraph">“I want,” Margaret said.</p>
+        <p class="story-paragraph">Michael did not speak right away. Then he said, “Come for a whole weekend. There’s a new group at the library. You could help me carry the books.”</p>
+        <p class="story-paragraph">“I can manage that.”</p>
+        <p class="story-paragraph">When Daniel left the next day, Michael drove him to Bellford station. The town looked the same as it had when Daniel arrived, with its narrow shops and damp stone walls. He now noticed the bakery owner lifting a box for a neighbour and the school children waving to Michael from the bus stop.</p>
+        <p class="story-paragraph">At the platform, Daniel put his bag down. “I’m sorry it took so long to ask what your life was like.”</p>
+        <p class="story-paragraph">Michael’s eyes moved to the tracks. “I’m sorry I acted as if yours was only about money and work.”</p>
+        <p class="story-paragraph">The train came around the bend. They hugged, awkwardly at first, then more firmly.</p>
+        <p class="story-paragraph">As Daniel stepped aboard, Michael said, “Call when you get home.”</p>
+        <p class="story-paragraph">“I will.”</p>
+        <p class="story-paragraph">The train carried him towards the city, but his mind stayed in Bellford with his mother, his brother and the box of papers they had chosen to keep. The years they had lost could not be returned. They could not make their father’s last months different, or undo the things they had said and believed.</p>
+        <p class="story-paragraph">But there was a next call, and a visit already planned. For now, that was enough.</p>
+
+        <h2 class="chapter-heading">8 The Name on the Paper</h2>
+
+        <p class="story-paragraph">The next morning, Daniel spread the papers from the grey box across the kitchen table. Margaret sat beside the window with her tea. Michael stood near the sink, reading a letter twice. The house was quiet except for the clock.</p>
+        <p class="story-paragraph">“This says Dad owed the bank nearly twelve thousand pounds,” Daniel said. He tapped a page with one finger. “And this one is dated the week Michael left.”</p>
+        <p class="story-paragraph">Michael put down the letter. “I didn’t know the amount. I knew he had money trouble, but Mum told me it was being handled.”</p>
+        <p class="story-paragraph">Margaret looked at the papers. “I said that because I wanted you to go to work without carrying all of it.”</p>
+        <p class="story-paragraph">“You knew I thought he was in trouble,” Michael said. “You could have told me how bad it was.”</p>
+        <p class="story-paragraph">“Yes,” she replied. “I could have.” She held her cup in both hands. “I thought if I told you everything, you would stay and lose the chance to earn proper money. Your father asked me to let you go.”</p>
+        <p class="story-paragraph">Daniel leaned back. “Dad asked you to send him away?”</p>
+        <p class="story-paragraph">“He asked me not to make him feel he had to stay,” Margaret said. “He had been unwell for months. He was tired all the time, and he could not work as many hours. He was proud. He wanted to protect the house and keep you both out of debt.”</p>
+        <p class="story-paragraph">“I was already working here,” Daniel said. “I could have helped.”</p>
+        <p class="story-paragraph">“You were trying to keep the shop open,” Margaret said. “You were carrying your own problems. Your father did not want to ask you for more.”</p>
+        <p class="story-paragraph">Daniel looked down at the papers. He had believed Michael had chosen a better life and left the rest of them to manage. He had never asked whether Peter had told him to go. The idea that he had been wrong did not make his anger disappear. It made the years feel heavier.</p>
+        <p class="story-paragraph">“Who else knew?” he asked.</p>
+        <p class="story-paragraph">Margaret gave him the name of Ellen Price, a bank clerk who had helped Peter make a payment plan. Ellen now worked in the large city, in a branch near the station. She had been a friend of the family, though they had not seen her for years.</p>
+        <p class="story-paragraph">“We can call her,” Michael said.</p>
+        <p class="story-paragraph">Daniel folded his arms. “We should hear it from someone who was there.”</p>
+        <p class="story-paragraph">Margaret nodded. “Then go together. And don’t ask her to choose which of you was right.”</p>
+        <p class="story-paragraph">They took the train the following afternoon. The city looked bright and busy after Bellford. People walked quickly past them, speaking into phones and carrying paper cups. Michael led the way to the bank. Daniel followed without speaking.</p>
+        <p class="story-paragraph">Ellen was older than they remembered, with short grey hair and small gold earrings. She greeted them carefully, then brought them to a quiet meeting room. When Michael explained why they had come, she listened without interrupting.</p>
+        <p class="story-paragraph">“Your father was worried about losing the house,” she said. “He had missed payments after his health got worse. We made a plan, but he could not meet it with his old wages.”</p>
+        <p class="story-paragraph">“Was he seriously ill?” Daniel asked.</p>
+        <p class="story-paragraph">“He told me he had a heart problem. He did not want people to worry. I don’t know all the medical details.” Ellen opened a folder she had kept from the family’s old account. “I remember him asking if Michael could take a job in another city. There was steady work there, and the pay was better.”</p>
+        <p class="story-paragraph">Michael’s face tightened. “He said that to you?”</p>
+        <p class="story-paragraph">“He said he wanted you to have a chance to save money and stand on your own feet. He hoped you would send some home, but he did not want to make it a condition.”</p>
+        <p class="story-paragraph">Daniel looked at his brother. “I thought you went because you wanted nothing to do with us.”</p>
+        <p class="story-paragraph">“I thought you knew Dad had asked me to go,” Michael said. “I thought you were angry because I wouldn’t stay and help with the shop.”</p>
+        <p class="story-paragraph">Ellen glanced between them. “There was a message on your father’s account. I was with him when he wrote it. He asked you to come home when you could.”</p>
+        <p class="story-paragraph">“I never got that,” Michael said.</p>
+        <p class="story-paragraph">Daniel felt his stomach tighten. He remembered the folded message, left on the hall table. He had read it, then put it in a drawer. At the time, he thought it was another request for money. He had been tired of carrying worry for everyone, and he had thought Michael needed to feel the same pressure.</p>
+        <p class="story-paragraph">“I saw it,” Daniel said. “I didn’t give it to him.”</p>
+        <p class="story-paragraph">Michael turned towards him. “You kept it from me?”</p>
+        <p class="story-paragraph">“I thought you had rejected us already. I wanted you to make your choice without Dad asking again.” Daniel’s voice was low. “I thought I was protecting him.”</p>
+        <p class="story-paragraph">“You decided for me,” Michael said.</p>
+        <p class="story-paragraph">“Yes,” Daniel replied. He did not look away. “I did.”</p>
+        <p class="story-paragraph">Ellen let the silence sit for a moment. Then she closed the folder. “I can give you copies of the payment plan. I’m sorry I didn’t know the message had never reached him.”</p>
+        <p class="story-paragraph">On the train home, neither brother spoke much. Daniel had finally said what he had done. Michael had heard him. It was not the same as forgiveness.</p>
+
+        <h2 class="chapter-heading">9 The Answer We Avoided</h2>
+
+        <p class="story-paragraph">At home, Michael put the copies from the bank beside the old letters. The numbers were clear. There had been missed payments, a new plan, and a note about Peter’s heart problem. Daniel sat across from him, his hands flat on the table.</p>
+        <p class="story-paragraph">“I need you to understand,” Daniel said. “I didn’t think the message would change anything. You had been gone for months.”</p>
+        <p class="story-paragraph">“I had been gone because we had that argument,” Michael replied. “You said I was selfish for taking the job. I said you were using the shop to keep everyone close. I was wrong to say it, but I was hurt.”</p>
+        <p class="story-paragraph">“You could have come back.”</p>
+        <p class="story-paragraph">“I could have.” Michael looked at him. “I was ashamed. I had sent money home, but it wasn’t enough to fix things. Then Dad died, and I told myself you didn’t want me there.”</p>
+        <p class="story-paragraph">Daniel’s jaw moved as if he wanted to answer, but no words came. Margaret was listening from the doorway. She had not meant to hear them, but neither son asked her to leave.</p>
+        <p class="story-paragraph">“I should have told you the truth,” she said. “Peter asked me not to turn his illness into a reason for you to give up your work. I agreed. Then I kept the rest from you because I was afraid you would blame each other.”</p>
+        <p class="story-paragraph">“We blamed each other anyway,” Michael said.</p>
+        <p class="story-paragraph">“Yes.” Margaret sat down slowly. “I was afraid you would both look at each other and see the worst thing you had done. I thought silence would keep you together. I can see now that it did not.”</p>
+        <p class="story-paragraph">Daniel looked at her. “You let me believe I was the only one who stayed.”</p>
+        <p class="story-paragraph">“You did stay,” she said. “You worked, and you cared for your father. That mattered. But Michael did not leave because he did not love us.”</p>
+        <p class="story-paragraph">Michael looked down at the table. “I did send money, but I didn’t call often. I could have found a way to come home for a weekend. I was angry, and I made the silence last.”</p>
+        <p class="story-paragraph">Daniel’s face softened, then tightened again. “I made it easy for you to stay away.”</p>
+        <p class="story-paragraph">They sat with those words. They did not take back the lost years. They did not change the last months of Peter’s life, or the lonely days that followed his death. But for once, no one tried to make the story simple.</p>
+        <p class="story-paragraph">That evening, they found Peter’s old work diary in the box. It listed appointments and small jobs, then stopped for two weeks. On the next page, in Peter’s uneven writing, was a note: Tell the boys I’m proud of them. Margaret turned the page and pressed it flat with her palm.</p>
+        <p class="story-paragraph">“He meant both of you,” she said.</p>
+        <p class="story-paragraph">“I know,” Michael replied.</p>
+        <p class="story-paragraph">Daniel wanted to say that knowing now was not the same as hearing it then. He kept the thought to himself. He was beginning to understand that truth did not arrive like a clean answer. Sometimes it came with another hurt inside it.</p>
+        <p class="story-paragraph">A few days later, Margaret had trouble getting up from the chair in the living room. She insisted it was only her leg, but Daniel called the doctor. The doctor said her strength had fallen and asked them to arrange more help at home.</p>
+        <p class="story-paragraph">They sat at the kitchen table to discuss the cost. Daniel had the bills and a notebook. Michael had looked up a care service in Bellford. The first visits were affordable, but more hours would take most of Margaret’s spare money.</p>
+        <p class="story-paragraph">“I can pay for the extra visits,” Michael said. “I have savings.”</p>
+        <p class="story-paragraph">Daniel shook his head. “We don’t know how long she’ll need them. We should sell the house before the bills become a problem.”</p>
+        <p class="story-paragraph">Margaret looked up. “I don’t want to sell.”</p>
+        <p class="story-paragraph">“You can’t manage here alone,” Daniel said. “And I can’t keep leaving work every time you feel unwell.”</p>
+        <p class="story-paragraph">“I’m not asking you to,” she replied. “I want to stay while I can.”</p>
+        <p class="story-paragraph">Michael leaned forward. “Then let’s try the care visits first. We can review it in a month.”</p>
+        <p class="story-paragraph">“With whose money?” Daniel asked. “Yours? You were away when we needed help. You don’t get to decide that paying for a few visits makes everything all right.”</p>
+        <p class="story-paragraph">Michael sat back. “I’m not trying to buy forgiveness.”</p>
+        <p class="story-paragraph">“I know,” Daniel said, but his voice was still hard. “I’m trying to stop us making another plan without thinking it through.”</p>
+        <p class="story-paragraph">Margaret pushed the papers away. “You are both talking as if I’m not here.”</p>
+        <p class="story-paragraph">The brothers stopped. Margaret’s eyes were bright, but her voice stayed steady. “I know I need help. I also know I’m not ready to leave this house. We will speak to the doctor again and find out what support is available. No one is selling anything today.”</p>
+        <p class="story-paragraph">Daniel closed the notebook. Michael looked at his hands. They had found the truth about the past, but the future was still a problem they had to face together.</p>
+
+        <h2 class="chapter-heading">10 A Place at the Table</h2>
+
+        <p class="story-paragraph">The following week, the doctor arranged for a nurse to visit Margaret and helped the family apply for support. The nurse showed Daniel and Michael how to make the stairs safer and explained what signs to watch for. Margaret listened carefully and asked practical questions.</p>
+        <p class="story-paragraph">The help would not cost as much as Daniel feared, but it would not be free. They agreed to use part of Margaret’s savings and share the rest. Michael would pay a set amount each month. Daniel would take her to appointments and check in after work. They would review the plan after six weeks.</p>
+        <p class="story-paragraph">“I don’t want you paying more than you can afford,” Margaret told Michael.</p>
+        <p class="story-paragraph">“I can afford this much,” he said. “If that changes, I’ll tell you.”</p>
+        <p class="story-paragraph">Daniel wrote the amount in his notebook. “And I’ll tell you if my hours at the shop change. No more guessing.”</p>
+        <p class="story-paragraph">Margaret studied both of them. “Good. I don’t want another family secret that starts as a kindness.”</p>
+        <p class="story-paragraph">There was a small smile in her voice, but none of them laughed. The words touched too close to what had happened.</p>
+        <p class="story-paragraph">That evening, they sat at the table for dinner. The meal was simple: soup, bread, and the last of the cheese. Michael had brought it from the city. Daniel had made the soup, and Margaret had cut the bread into thick pieces.</p>
+        <p class="story-paragraph">For a while, they spoke about the nurse’s visit and the weather. Then Michael asked Daniel how the shop was doing. Daniel told him that business was still quiet, but he had found a way to reduce the heating bill.</p>
+        <p class="story-paragraph">“You’ve kept it going all these years,” Michael said.</p>
+        <p class="story-paragraph">“I had help,” Daniel replied. “Mum helped with the accounts. And Dad taught me how to repair the old machines.”</p>
+        <p class="story-paragraph">“I should have come back more often,” Michael said.</p>
+        <p class="story-paragraph">Daniel put down his spoon. “Yes. You should have.”</p>
+        <p class="story-paragraph">Michael nodded. He did not offer an excuse. “I’m sorry I stayed away.”</p>
+        <p class="story-paragraph">Daniel took a breath. “I’m sorry I kept Dad’s message from you. I thought I was making a choice for him, but I was making it for all of us.”</p>
+        <p class="story-paragraph">Margaret reached across the table and touched the back of Daniel’s hand. “I’m sorry too.”</p>
+        <p class="story-paragraph">No one said they were finished being hurt. No one asked for a promise that everything would now be easy. They finished their meal and washed the dishes together.</p>
+        <p class="story-paragraph">Before Michael returned to the city, he helped Margaret sort the last papers in Peter’s box. They put bank letters in one folder and medical papers in another. Daniel found an old photograph of the brothers beside their father at the seaside. Michael was wearing a striped shirt, and Daniel had a bucket in one hand.</p>
+        <p class="story-paragraph">“I remember that day,” Michael said. “Dad let us stay too late, and Mum was angry because we missed the bus.”</p>
+        <p class="story-paragraph">“She made us walk half the way home,” Daniel said.</p>
+        <p class="story-paragraph">Margaret smiled. “You both complained the whole time.”</p>
+        <p class="story-paragraph">Daniel placed the photograph on the shelf above the kitchen table. It did not prove they had always been happy. It reminded them that they had been a family before the silence and the blame.</p>
+        <p class="story-paragraph">At the front door, Michael put on his coat. “I’ll come next Sunday. We can go through the care plan again.”</p>
+        <p class="story-paragraph">“Call first,” Daniel said. “I may have to work.”</p>
+        <p class="story-paragraph">“I will.” Michael paused. “And if you need help before then, tell me.”</p>
+        <p class="story-paragraph">Daniel held his brother’s gaze. “I will try.”</p>
+        <p class="story-paragraph">Michael left for the station. Daniel watched him walk down Mill Road, then shut the door against the cold. He did not feel that the years had been given back. Forgiveness did not make the old choices disappear. It only made room for new ones.</p>
+        <p class="story-paragraph">In the kitchen, Margaret was folding the clean tea towels. Daniel took one from her hands and put it in the drawer.</p>
+        <p class="story-paragraph">“You don’t have to do everything,” she said.</p>
+        <p class="story-paragraph">“I know,” Daniel answered. “But I can do this.”</p>
+        <p class="story-paragraph">They sat at the table for a little while. The house was still old, and the bills still needed paying. Margaret would need more help, and the brothers would not agree about every decision. But they had made a plan together, and they had said the hard things aloud.</p>
+        <p class="story-paragraph">When the clock reached nine, Daniel made tea. Margaret asked for hers without sugar. He remembered and brought it to her. Outside, the town grew quiet. Inside, the three of them had not repaired every part of their family, but they had stopped hiding from what needed repair.</p>
+
+        <h2 class="chapter-heading">11 The Years We Lost</h2>
+
+        <p class="story-paragraph">Daniel placed a brown envelope on the kitchen table. Margaret was asleep in the next room, and rain tapped against the window. Michael stood by the sink with his coat still on.</p>
+        <p class="story-paragraph">“There’s money in there,” Daniel said. “Enough to help with the roof and the care bills. I should have offered it before.”</p>
+        <p class="story-paragraph">Michael looked at the envelope but did not touch it. “You think this fixes things?”</p>
+        <p class="story-paragraph">“No. But it could make life easier.”</p>
+        <p class="story-paragraph">“You could have called,” Michael said. “You could have asked how Mum was. I don’t want money instead of respect.”</p>
+        <p class="story-paragraph">Daniel’s face tightened. “I know. I’m trying to do something useful.”</p>
+        <p class="story-paragraph">“Then listen before you decide what I need.” Michael pulled out a chair, though he remained standing behind it. “I’ve been here every day. I’m tired, and I’m worried. But I don’t want you to pay me to forgive you.”</p>
+        <p class="story-paragraph">Daniel put both hands on the table. “I’m not asking you to forgive me.”</p>
+        <p class="story-paragraph">They heard a thump from the next room. Michael moved first. Margaret was sitting on the floor beside her bed, pale and breathing fast. Her walking stick lay just beyond her hand.</p>
+        <p class="story-paragraph">“Mum?” Michael knelt beside her. “Can you hear me?”</p>
+        <p class="story-paragraph">Margaret nodded, but her eyes were frightened. Daniel called the emergency number and gave their address. He spoke slowly, then went to unlock the front door while Michael stayed with her.</p>
+        <p class="story-paragraph">“I feel strange,” Margaret whispered.</p>
+        <p class="story-paragraph">“The help is coming,” Michael said. He held her hand. Daniel came back and found a blanket. He asked questions the call handler needed answered, and Michael found the list of her medicines in the drawer.</p>
+        <p class="story-paragraph">The ambulance workers checked Margaret and took her to the nearby hospital for tests. Daniel rode with her. Michael followed in his own car after calling Laura, who was in the city. She promised to meet them there.</p>
+        <p class="story-paragraph">The doctors found that Margaret was dehydrated and had a low blood pressure reading. They kept her in overnight to watch her. Nothing had broken in the fall, but she would need more help at home. Daniel and Michael sat on either side of her bed while the nurse explained the plan.</p>
+        <p class="story-paragraph">“We can arrange someone to visit,” the nurse said. “You should also discuss how she’ll manage the stairs.”</p>
+        <p class="story-paragraph">“I can come over more often,” Daniel said.</p>
+        <p class="story-paragraph">Michael looked at him. “More often has to mean a real plan, not a promise made in a hospital.”</p>
+        <p class="story-paragraph">“That’s fair,” Daniel said. “I have a business trip next week. I can postpone it and ask my team to cover the first meetings.”</p>
+        <p class="story-paragraph">“You don’t have to give up your work,” Michael said. “But you do have to tell us what you can actually do.”</p>
+        <p class="story-paragraph">Daniel nodded. “I’ll work from Bellford two days a week. I can take Mum to appointments on those days, and I’ll arrange cover when I can’t.”</p>
+        <p class="story-paragraph">Margaret opened her eyes. “Don’t plan my whole life while I’m lying here.”</p>
+        <p class="story-paragraph">“We’re trying to help,” Michael said.</p>
+        <p class="story-paragraph">“Then ask me, too,” she replied. “I want help with the stairs. I don’t want to be treated like a parcel.”</p>
+        <p class="story-paragraph">The next morning, Laura arrived with coffee and a clean shirt for Margaret. She sat with her mother while the brothers went downstairs to the hospital café.</p>
+        <p class="story-paragraph">“I’m sorry I left you to carry so much,” Daniel said. “I told myself you were better at it. That was an excuse.”</p>
+        <p class="story-paragraph">Michael studied the paper cup in his hands. “I’m sorry I made every call a fight. I was angry, and I used Mum’s needs to keep you at a distance. You had a right to know what was happening.”</p>
+        <p class="story-paragraph">Neither man reached for the other. Their words did not remove the years between them, but they were true.</p>
+        <p class="story-paragraph">On the drive home, they remembered a day at the seaside when they were boys. Peter had taken them to the beach in an old car with a broken radio. A sudden shower had trapped the family in a small café. Peter made paper boats from napkins, and they sailed them in a puddle outside while Margaret laughed at their wet trousers.</p>
+        <p class="story-paragraph">“Dad let us get away with anything that day,” Michael said.</p>
+        <p class="story-paragraph">“He said it was a special holiday,” Daniel replied. “It was only one afternoon.”</p>
+        <p class="story-paragraph">“It felt like a whole week.”</p>
+        <p class="story-paragraph">They smiled, then fell quiet. The memory did not excuse Peter’s later silences, or their own. It gave them one good thing to keep.</p>
+        <p class="story-paragraph">At Margaret’s house, they sat with her and spoke about practical changes. She agreed to a rail by the stairs and a daily visit from a care worker. She refused to move into a home. Michael would still do the shopping, but Daniel would handle the appointments and the bills. Laura would call each evening.</p>
+        <p class="story-paragraph">Daniel took the envelope from his coat. “This is still here. It isn’t payment for anything. It’s my share of the roof cost. You can say no.”</p>
+        <p class="story-paragraph">Michael considered it. “I’ll look at the quote first. Then we can decide together.”</p>
+        <p class="story-paragraph">It was not acceptance, but it was not a refusal. Daniel put the envelope away.</p>
+        <p class="story-paragraph">That afternoon, Margaret asked for the box of family papers. Together they checked the old letters, house records, and Peter’s final bank statements. Daniel had found a note among them in which Peter explained that he had kept quiet about his illness because he feared becoming a burden. Michael had read it earlier but had not known what to do with it.</p>
+        <p class="story-paragraph">“He should have told us,” Margaret said. “I was angry with him. I’m still angry. But I wish we had spoken more plainly.”</p>
+        <p class="story-paragraph">Michael placed the note back in its folder. “We can keep it with the papers. Not as an answer. Just as part of what happened.”</p>
+        <p class="story-paragraph">Margaret nodded. “That is honest enough for now.”</p>
+
+        <h2 class="chapter-heading">12 The Years Remaining</h2>
+
+        <p class="story-paragraph">Three months later, Margaret could manage the stairs with the new rail. She still tired easily, and she disliked having a care worker in the house, but she had started to enjoy their morning chats. The worker, June, brought news from the town and never moved Margaret’s things without asking.</p>
+        <p class="story-paragraph">Daniel had postponed his trip and changed his work schedule. He spent two days a week in Bellford and took calls in the small room above the garage. The change had cost him a chance at one new contract. It had also made his life less hurried than he expected.</p>
+        <p class="story-paragraph">Michael continued to live in the house on Mill Road. He had asked Daniel to help compare prices for a stair lift, but he made the final choice himself. They found that a rail and a small lift chair would be enough for now.</p>
+        <p class="story-paragraph">“I don’t want you to think I’m asking you to take over,” Michael said while they measured the hallway.</p>
+        <p class="story-paragraph">“I don’t,” Daniel answered. “You asked for help with a decision. That’s different.”</p>
+        <p class="story-paragraph">They still disagreed about the money for the roof. Michael wanted to pay more of it himself. Daniel thought their father’s savings should cover part of the cost. They looked at the papers together and called the bank before making any choice. No one signed anything in anger.</p>
+        <p class="story-paragraph">The family papers were now in two labelled boxes. One held the house records and bills. The other held letters, photographs, and Peter’s note. Margaret kept both in her bedroom cupboard and asked the three of them before giving any papers away.</p>
+        <p class="story-paragraph">One Saturday, Daniel and Michael sat at the kitchen table with the old family photograph from the seaside. Peter stood behind them, young and smiling. Margaret was holding a towel over Michael’s head. Daniel had sand on his cheek.</p>
+        <p class="story-paragraph">“I thought I’d forgotten that day,” Michael said.</p>
+        <p class="story-paragraph">“Maybe you didn’t forget it,” Daniel replied. “Maybe it was just under everything else.”</p>
+        <p class="story-paragraph">Michael looked at the picture. “I’m not ready to say everything is fine.”</p>
+        <p class="story-paragraph">“I know.”</p>
+        <p class="story-paragraph">“But I can have lunch with you without keeping score.”</p>
+        <p class="story-paragraph">Daniel let out a breath. “I’d like that.”</p>
+        <p class="story-paragraph">In the weeks that followed, they practiced speaking before small problems grew large. When Margaret needed a new appointment, Daniel sent the time to both of them. When Michael could not cover a visit, he said so instead of waiting until he was angry. They sometimes misunderstood each other, but they called back and tried again.</p>
+        <p class="story-paragraph">Margaret did not pretend that the family was mended. One evening, as Laura helped her sort a drawer, she said, “I was lonely when you boys stopped speaking. I also let you believe I was all right when I wasn’t. I wanted to protect you, but I made it harder for you to help.”</p>
+        <p class="story-paragraph">Laura put a stack of old receipts down. “You can tell us now.”</p>
+        <p class="story-paragraph">“I will try,” Margaret said. “You must try, too.”</p>
+        <p class="story-paragraph">At the start of autumn, Bellford held its small town fair in the park. The family went together, though Margaret stayed only an hour. Laura bought a jar of honey. Michael ate a sausage roll while Daniel tried to win a soft toy at a stall and failed three times.</p>
+        <p class="story-paragraph">“You were always bad at throwing,” Michael said.</p>
+        <p class="story-paragraph">“I was better when you were small. You used to think I could do anything.”</p>
+        <p class="story-paragraph">“I was small,” Michael said, but he was smiling.</p>
+        <p class="story-paragraph">They walked home slowly. Margaret took Daniel’s arm on one side and Laura’s on the other. Michael carried the honey. At the gate, Margaret asked them to come for supper the next Sunday.</p>
+        <p class="story-paragraph">The following week, the meal was simple: soup, bread, and a cake from the bakery. Daniel arrived late because a work call had run over. He apologized without blaming the traffic. Michael had made extra soup, though he said it was only because the pot was large.</p>
+        <p class="story-paragraph">During supper, they spoke about ordinary things. Laura told them about a difficult customer at work. Margaret complained that June had put the tea towels in the wrong drawer. Michael described a small job he hoped to take on in town. Daniel asked questions and listened to the answers.</p>
+        <p class="story-paragraph">After the plates were cleared, Michael found Peter’s note in the folder. He read it once, then put it back. No one asked him to explain what it meant.</p>
+        <p class="story-paragraph">“We lost a lot of time,” Daniel said.</p>
+        <p class="story-paragraph">Michael looked at him. “We can’t get it back.”</p>
+        <p class="story-paragraph">“No.”</p>
+        <p class="story-paragraph">“But we don’t have to waste what’s left.”</p>
+        <p class="story-paragraph">Margaret reached across the table and touched each of their hands. She did not say that everything would be all right. She only said, “Then let’s keep talking.”</p>
+        <p class="story-paragraph">They agreed to meet again the next Sunday. It was not a promise to be perfect, or a way to erase what had happened. It was a plan for another meal, another honest conversation, and the years still ahead.</p>
+    </div>
+  </article>
+
+</main>
+
+<script>
+// Dynamic Metadata Loader
+(async function initMetadata() {
+  const jsonUrl = '../content/classic-16-b1.json';
+  let data = null;
+
+  try {
+    const res = await fetch(jsonUrl);
+    if (res.ok) {
+      data = await res.json();
+    }
+  } catch (err) {
+    console.warn('Could not fetch external JSON, using embedded fallback:', err);
+  }
+
+  // Fallback initial data in case fetch is blocked by file:// protocol
+  if (!data) {
+    data = {"id":"classic-16","title":"The Years We Lost","author":"T. R. Davis","level":"B1","genre":"classic","minutes":60,"vocab":7,"dateAdded":"2026-10-24","coverImage":"books/covers/classic-16.png","description":"","whatYouWillLearn":""};
+  }
+
+  const genreLabels = {
+    scifi: 'Sci-Fi & Future Worlds',
+    business: 'Business & Growth',
+    classic: 'Classic Literature',
+    daily: 'Daily Conversations',
+    healthy: 'Health & Wellness'
+  };
+
+  const level = (data.level || 'B1').toUpperCase();
+  const genreFormatted = genreLabels[data.genre] || (data.genre ? String(data.genre).toUpperCase() : 'General');
+  const author = data.author || 'Unknown Author';
+  const minutes = data.minutes ? data.minutes + ' min' : '5 min';
+  const vocabCount = typeof data.vocab === 'number' ? data.vocab : (Array.isArray(data.vocab) ? data.vocab.length : 0);
+
+  // Format date
+  let formattedDate = 'Recently';
+  if (data.dateAdded) {
+    try {
+      const d = new Date(data.dateAdded);
+      if (!isNaN(d.getTime())) {
+        formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    } catch (_) {}
+  }
+
+  // Calculate word count from document paragraphs
+  const paragraphs = document.querySelectorAll('p.story-paragraph');
+  let totalWords = 0;
+  paragraphs.forEach(p => {
+    const text = p.textContent.trim();
+    if (text) totalWords += text.split(/\s+/).length;
+  });
+
+  // Populate hero card
+  const titleEl = document.getElementById('bookDisplayTitle');
+  if (titleEl && data.title) titleEl.textContent = data.title;
+
+  const authorEl = document.getElementById('bookDisplayAuthor');
+  if (authorEl) authorEl.textContent = 'by ' + author;
+
+  const chipLevel = document.getElementById('chipLevel');
+  if (chipLevel) {
+    chipLevel.innerHTML = '<span class="level-dot"></span> Level ' + level;
+    chipLevel.style.color = 'var(--lvl-' + level + ')';
+    chipLevel.style.borderColor = 'var(--lvl-' + level + ')';
+  }
+
+  const chipGenre = document.getElementById('chipGenre');
+  if (chipGenre) chipGenre.textContent = genreFormatted;
+
+  const chipTime = document.getElementById('chipReadingTime');
+  if (chipTime) chipTime.textContent = '⏱ ' + minutes + ' read';
+
+  const chipDate = document.getElementById('chipDateAdded');
+  if (chipDate) chipDate.textContent = '📅 Added ' + formattedDate;
+
+  const chipVocab = document.getElementById('chipVocab');
+  if (chipVocab) chipVocab.textContent = '📚 ' + vocabCount + ' vocab items';
+
+  // Difficulty meter (1 to 6)
+  const LEVEL_SEGMENTS = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
+  const meterSegments = LEVEL_SEGMENTS[level] || 3;
+  const meterEl = document.getElementById('vocabMeter');
+  if (meterEl) {
+    let segHtml = '';
+    for (let i = 0; i < 6; i++) {
+      segHtml += '<i class="' + (i < meterSegments ? 'on' : '') + '"></i>';
+    }
+    meterEl.innerHTML = segHtml;
+  }
+
+  // Cover
+  const coverContainer = document.getElementById('heroCoverContainer');
+  if (coverContainer) {
+    if (data.coverImage) {
+      coverContainer.innerHTML = '<img src="../../' + data.coverImage.replace(/^\/?/, '') + '" alt="' + (data.title || '') + '" onerror="this.style.display=\'none\'">';
+    } else {
+      coverContainer.innerHTML = '<div class="hero-cover-fallback"><div class="hero-cover-title">' + (data.title || '') + '</div><div class="hero-cover-author">' + author + '</div></div>';
+    }
+  }
+
+  // Descriptions
+  const aboutText = data.description || 'Explore "' + (data.title || '') + '", an engaging ' + genreFormatted.toLowerCase() + ' story specifically leveled at the CEFR ' + level + ' proficiency tier.';
+  const learnText = data.whatYouWillLearn || 'Master ' + level + '-level grammar structures and vocabulary in authentic context. Designed for English learners wanting to improve vocabulary retention and fluency.';
+
+  const aboutEl = document.getElementById('aboutTextDisplay');
+  if (aboutEl) aboutEl.textContent = aboutText;
+
+  const learnEl = document.getElementById('learnTextDisplay');
+  if (learnEl) learnEl.textContent = learnText;
+
+  // Stats list
+  const statLevel = document.getElementById('statLevel');
+  if (statLevel) {
+    statLevel.textContent = 'CEFR ' + level;
+    statLevel.style.color = 'var(--lvl-' + level + ')';
+  }
+
+  const statAuthor = document.getElementById('statAuthor');
+  if (statAuthor) statAuthor.textContent = author;
+
+  const statGenre = document.getElementById('statGenre');
+  if (statGenre) statGenre.textContent = genreFormatted;
+
+  const statTime = document.getElementById('statTime');
+  if (statTime) statTime.textContent = minutes;
+
+  const statWordCount = document.getElementById('statWordCount');
+  if (statWordCount) statWordCount.textContent = totalWords.toLocaleString() + ' words';
+
+  const statVocab = document.getElementById('statVocab');
+  if (statVocab) statVocab.textContent = vocabCount.toLocaleString() + ' words';
+
+  const statDate = document.getElementById('statDateAdded');
+  if (statDate) statDate.textContent = formattedDate;
+})();
+</script>
+</body>
+</html>

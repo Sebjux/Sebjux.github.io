@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Beyond The Red Horizon</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Literata:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+    <style>
+      :root{
+        --bg-void:#04050A;
+        --bg-deep:#0A0C16;
+        --bg-elevated:#12141F;
+        --bg-reader:#0C0E18;
+
+        --glass-fill: rgba(20,22,36,.55);
+        --glass-fill-soft: rgba(20,22,36,.32);
+        --glass-border: rgba(255,255,255,.08);
+        --glass-border-hi: rgba(255,255,255,.16);
+
+        --text-primary:#F5F7FA;
+        --text-secondary:#A7AFC2;
+        --text-tertiary:#666E82;
+        --text-reader:#EAE6DD;
+
+        --neon-cyan:#4CF5E0;
+        --neon-blue:#7CACF8;
+        --neon-violet:#9B7BFF;
+        --neon-magenta:#F472B6;
+        --neon-amber:#FFC876;
+
+        --lvl-A1:#34D399;
+        --lvl-A2:#4CF5E0;
+        --lvl-B1:#7CACF8;
+        --lvl-B2:#9B7BFF;
+        --lvl-C1:#F472B6;
+        --lvl-C2:#FB7185;
+
+        --radius-card:20px;
+        --radius-panel:26px;
+        --radius-pill:999px;
+
+        --ease-out-expo:cubic-bezier(.16,1,.3,1);
+      }
+
+      *{box-sizing:border-box;}
+      html,body{height:100%;}
+      body{
+        margin:0;
+        background:var(--bg-void);
+        color:var(--text-primary);
+        font-family:'Inter',sans-serif;
+        -webkit-font-smoothing:antialiased;
+        overflow-x:hidden;
+        padding-top:env(safe-area-inset-top,0px);
+        padding-bottom:env(safe-area-inset-bottom,0px);
+      }
+      ::selection{background:rgba(155,123,255,.35); color:#fff;}
+
+      a,button{font-family:inherit;}
+      button{cursor:pointer; background:none; border:none; color:inherit;}
+      img{max-width:100%; display:block;}
+
+      :focus-visible{
+        outline:2px solid var(--neon-cyan);
+        outline-offset:3px;
+        border-radius:6px;
+      }
+
+      h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-0.01em;}
+      p{margin:0;}
+
+      /* AMBIENT BACKGROUND */
+      .ambient{
+        position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+      }
+      .ambient::before, .ambient::after{
+        content:''; position:absolute; border-radius:50%; filter:blur(90px); opacity:.28;
+      }
+      .ambient::before{
+        width:640px; height:640px; top:-220px; left:-160px;
+        background:radial-gradient(circle, var(--neon-violet), transparent 70%);
+      }
+      .ambient::after{
+        width:560px; height:560px; bottom:-260px; right:-140px;
+        background:radial-gradient(circle, var(--neon-cyan), transparent 70%);
+        opacity:.18;
+      }
+      .grain{
+        position:fixed; inset:0; z-index:1; pointer-events:none;
+        opacity:.05; mix-blend-mode:overlay;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      /* GLASS CONTAINER */
+      .glass{
+        background:var(--glass-fill);
+        backdrop-filter:blur(22px) saturate(140%);
+        -webkit-backdrop-filter:blur(22px) saturate(140%);
+        border:1px solid var(--glass-border);
+      }
+
+      /* TOPBAR */
+      .topbar{
+        position:sticky; top:0; z-index:40;
+        display:flex; align-items:center; justify-content:space-between;
+        gap:16px; padding:16px clamp(16px,4vw,48px);
+        padding-top:calc(16px + env(safe-area-inset-top,0px));
+        background:rgba(4,5,10,.65);
+        backdrop-filter:blur(18px);
+        -webkit-backdrop-filter:blur(18px);
+        border-bottom:1px solid var(--glass-border);
+      }
+      .brand{display:flex; align-items:center; gap:10px; flex-shrink:0; text-decoration:none; color:inherit;}
+      .brand-mark{
+        width:34px; height:34px; border-radius:10px;
+        background:linear-gradient(145deg, var(--neon-cyan), var(--neon-violet));
+        display:flex; align-items:center; justify-content:center;
+        box-shadow:0 0 24px -4px rgba(155,123,255,.7);
+      }
+      .brand-mark svg{width:18px; height:18px; color:#04050A;}
+      .brand-name{font-family:'Space Grotesk'; font-weight:600; font-size:1.05rem; letter-spacing:-.01em;}
+
+      .nav-tabs{
+        display:flex; gap:4px; padding:3px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        flex-shrink:0;
+      }
+      .nav-tab-btn{
+        padding:6px 14px; border-radius:var(--radius-pill); font-size:.82rem; font-weight:500;
+        color:var(--text-secondary); transition:all 180ms var(--ease-out-expo);
+        text-decoration:none; display:inline-flex; align-items:center;
+      }
+      .nav-tab-btn:hover{ color:var(--text-primary); }
+
+      /* MAIN LAYOUT */
+      .page-main{
+        position:relative; z-index:2;
+        max-width:1100px; margin:0 auto;
+        padding:32px clamp(16px,4vw,48px) 96px;
+      }
+
+      /* BACK LINK */
+      .back-link-btn{
+        display:inline-flex; align-items:center; gap:8px;
+        padding:8px 16px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        font-size:.85rem; font-weight:500; color:var(--text-secondary);
+        transition:all 180ms var(--ease-out-expo); margin-bottom:28px;
+        text-decoration:none;
+      }
+      .back-link-btn:hover{ color:var(--text-primary); border-color:var(--glass-border-hi); transform:translateX(-2px); }
+      .back-link-btn svg{ width:16px; height:16px; }
+
+      /* HERO META CARD */
+      .hero-meta-card{
+        position:relative; padding:clamp(24px,4vw,40px);
+        border-radius:32px; overflow:hidden;
+        margin-bottom:36px;
+      }
+      .hero-grid{
+        display:grid; grid-template-columns:220px 1fr; gap:36px; align-items:start;
+      }
+      @media (max-width:768px){
+        .hero-grid{ grid-template-columns:1fr; gap:24px; justify-items:center; text-align:center; }
+        .hero-meta-chips{ justify-content:center; }
+        .hero-actions-row{ justify-content:center; }
+      }
+
+      .hero-cover{
+        width:220px; aspect-ratio:2/3; border-radius:20px; overflow:hidden; position:relative;
+        box-shadow:0 24px 60px -16px rgba(0,0,0,.75); flex-shrink:0;
+        background:linear-gradient(160deg, #3b2d6b, #151829);
+      }
+      .hero-cover img{ width:100%; height:100%; object-fit:cover; }
+      .hero-cover-fallback{
+        position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
+        padding:18px 16px; background:linear-gradient(0deg, rgba(0,0,0,.85) 0%, transparent 80%);
+      }
+      .hero-cover-title{ font-family:'Space Grotesk'; font-size:1.05rem; font-weight:600; color:#fff; }
+      .hero-cover-author{ font-size:.8rem; color:rgba(255,255,255,.7); }
+
+      .hero-info{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+      .book-display-title{ font-size:clamp(1.8rem,3.2vw,2.5rem); font-weight:700; line-height:1.2; }
+      .book-display-author{ font-size:1.05rem; color:var(--text-secondary); }
+
+      .hero-meta-chips{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+      .meta-chip{
+        display:inline-flex; align-items:center; gap:6px;
+        font-size:.82rem; font-weight:600; padding:6px 14px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border); color:var(--text-secondary);
+      }
+      .level-dot{ width:8px; height:8px; border-radius:50%; background:currentColor; display:inline-block; }
+
+      .vocab-meter{ display:flex; gap:4px; width:160px; height:5px; margin-top:2px; }
+      .vocab-meter i{ display:block; flex:1; height:100%; border-radius:99px; background:rgba(255,255,255,.1); }
+      .vocab-meter i.on{ background:var(--neon-violet); }
+
+      .hero-actions-row{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:8px; }
+      .btn-primary-lg{
+        display:inline-flex; align-items:center; gap:10px;
+        padding:14px 28px; border-radius:var(--radius-pill);
+        background:linear-gradient(120deg, var(--neon-cyan), var(--neon-violet));
+        color:#04050A; font-weight:700; font-size:1rem; text-decoration:none;
+        box-shadow:0 12px 36px -8px rgba(155,123,255,.6);
+        transition:transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+      }
+      .btn-primary-lg:hover{ transform:translateY(-2px); box-shadow:0 16px 42px -8px rgba(155,123,255,.75); }
+      .btn-primary-lg svg{ width:20px; height:20px; }
+
+      /* METADATA STATS GRID */
+      .sections-grid{ display:grid; grid-template-columns:2fr 1fr; gap:28px; margin-bottom:36px; }
+      @media (max-width:840px){
+        .sections-grid{ grid-template-columns:1fr; }
+      }
+
+      .section-box{
+        padding:28px; border-radius:24px; display:flex; flex-direction:column; gap:16px;
+      }
+      .section-box-title{ font-size:1.15rem; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:8px; }
+      .section-box-title svg{ width:18px; height:18px; color:var(--neon-cyan); }
+      .section-box-body{ font-size:.95rem; line-height:1.7; color:var(--text-secondary); }
+
+      .stat-list{ display:flex; flex-direction:column; gap:14px; list-style:none; padding:0; margin:0; }
+      .stat-item{ display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--glass-border); font-size:.88rem; }
+      .stat-item:last-child{ border-bottom:none; padding-bottom:0; }
+      .stat-label{ color:var(--text-tertiary); }
+      .stat-val{ color:var(--text-primary); font-weight:600; }
+
+      /* STORY READER CARD (CONTAINING REQUIRED H1, H2, P ELEMENTS) */
+      .story-reader-card{
+        border-radius:28px;
+        padding:clamp(28px,5vw,60px);
+        background:var(--bg-reader);
+        border:1px solid var(--glass-border);
+        box-shadow:0 30px 80px -20px rgba(0,0,0,.8);
+      }
+      .story-reader-container{
+        max-width:68ch; margin:0 auto;
+      }
+
+      /* REQUIRED ELEMENT SPECIFICATIONS */
+      h1.book-id-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.4rem, 2.5vw, 2rem);
+        font-weight:700;
+        color:var(--text-primary);
+        letter-spacing:-0.01em;
+        margin-bottom:24px;
+        padding-bottom:16px;
+        border-bottom:1px solid var(--glass-border);
+      }
+      h2.chapter-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.2rem, 2vw, 1.5rem);
+        font-weight:600;
+        color:var(--neon-cyan);
+        letter-spacing:-0.01em;
+        margin-top:36px;
+        margin-bottom:20px;
+      }
+      h2.chapter-heading:first-of-type{
+        margin-top:12px;
+      }
+      p.story-paragraph{
+        font-family:'Literata',serif;
+        font-size:1.12rem;
+        line-height:1.9;
+        color:var(--text-reader);
+        margin-bottom:1.5em;
+      }
+      p.story-paragraph:last-child{
+        margin-bottom:0;
+      }
+
+      @media (max-width:768px){
+        .topbar{ padding:10px 14px; }
+        .page-main{ padding:20px 14px 64px; }
+        .hero-meta-card{ padding:20px 16px; border-radius:24px; }
+        .section-box{ padding:20px 18px; }
+        .story-reader-card{ padding:24px 18px; border-radius:20px; }
+        p.story-paragraph{ font-size:1.02rem; line-height:1.75; }
+      }
+    </style>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a href="../../index.html" class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M20 6v14h-4V6a2 2 0 0 1 4 0z" opacity=".55"/></svg>
+    </div>
+    <span class="brand-name">Lumen</span>
+  </a>
+  <nav class="nav-tabs">
+    <a href="../../index.html" class="nav-tab-btn">Library / Search</a>
+    <a href="../../discover.html" class="nav-tab-btn">Discover</a>
+  </nav>
+</header>
+
+<main class="page-main">
+
+  <a href="../../book.html?id=scifi-12" class="back-link-btn" id="backBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    Back to Book Details
+  </a>
+
+  <!-- HERO METADATA CARD (POPULATED DYNAMICALLY FROM JSON) -->
+  <article class="hero-meta-card glass" id="metaHeroCard">
+    <div class="hero-grid">
+      <div class="hero-cover" id="heroCoverContainer">
+        <!-- Render cover image or styled fallback -->
+      </div>
+      <div class="hero-info">
+        <h2 class="book-display-title" id="bookDisplayTitle">Beyond The Red Horizon</h2>
+        <p class="book-display-author" id="bookDisplayAuthor">—</p>
+
+        <div class="hero-meta-chips" id="heroMetaChips">
+          <span class="meta-chip" id="chipLevel">Level —</span>
+          <span class="meta-chip" id="chipGenre">Genre —</span>
+          <span class="meta-chip" id="chipReadingTime">⏱ — min read</span>
+          <span class="meta-chip" id="chipDateAdded">📅 Added —</span>
+          <span class="meta-chip" id="chipVocab">📚 — vocab items</span>
+        </div>
+
+        <div>
+          <p style="font-size: .78rem; color: var(--text-tertiary); margin-bottom: 6px;">DIFFICULTY RATING</p>
+          <div class="vocab-meter" id="vocabMeter" aria-label="Difficulty Rating"></div>
+        </div>
+
+        <div class="hero-actions-row">
+          <a href="../../book.html?id=scifi-12" class="btn-primary-lg" id="readInteractiveBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span>Interactive Reader</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- METADATA SECTIONS (ABOUT, LEARNING, STATS) -->
+  <div class="sections-grid">
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        About This Book
+      </h3>
+      <p class="section-box-body" id="aboutTextDisplay">
+        Loading description…
+      </p>
+
+      <h3 class="section-box-title" style="margin-top: 14px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        What You'll Learn
+      </h3>
+      <p class="section-box-body" id="learnTextDisplay">
+        Loading learning objectives…
+      </p>
+    </div>
+
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Reading Stats
+      </h3>
+      <ul class="stat-list">
+        <li class="stat-item">
+          <span class="stat-label">CEFR Level</span>
+          <span class="stat-val" id="statLevel">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Author</span>
+          <span class="stat-val" id="statAuthor">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Genre</span>
+          <span class="stat-val" id="statGenre">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Estimated Time</span>
+          <span class="stat-val" id="statTime">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Word Count</span>
+          <span class="stat-val" id="statWordCount">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Vocabulary Items</span>
+          <span class="stat-val" id="statVocab">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Date Added</span>
+          <span class="stat-val" id="statDateAdded">—</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- STORY CONTENT (CONTAINING REQUIRED H1, H2, P ELEMENTS) -->
+  <article class="story-reader-card">
+    <div class="story-reader-container">
+        <h1 class="book-id-heading">scifi-12</h1>
+        <h2 class="chapter-heading">0 Chapter 1: The Long Flight</h2>
+
+        <p class="story-paragraph">The ship moved through black like a small idea crossing a vast page. Horizon rode the steady hum of its ion engines. Inside, four people watched the slow blur of stars and tried to keep their thoughts small enough to fit the cabin. Commander Lena Ortiz kept her hands clasped on the rail of the observation deck. She had brown eyes that did not show much, but tonight they were tired. “We started this for answers,” she said. “For everyone who could not come. We keep going.” Her voice was calm. She sounded like a person who had made many hard choices. Pilot Samir Rao sat at the flight console. He was lean and quick with a smile, but his fingers trembled sometimes when he was tired. He liked to imagine home as a city with spicy street food and noisy trains. He missed the simple messiness of it. “Home keeps changing in my head,” he said. “Sometimes I think I will find it again when we land. Other times, I think home left without us.”</p>
+        <p class="story-paragraph">Scientist Mei Chen read data sheets and sketched small plants in her notebook. She had a soft voice and a sharp mind. Her idea of home was the lab where she grew microbes in tiny glass jars. She wanted to know if life on Nereid-4 was similar to Earth’s life or entirely new. “Life could be chemistry and chance, or it could be something that thinks about itself in ways we do not expect,” she said. “Either way, we must be careful. We cannot make the wrong moves.”</p>
+        <p class="story-paragraph">Engineer Tomas Vale worked in the narrow engineering bay. He was practical and often blunt. He thought of home as work—a place where things were fixed and systems stayed running. He felt safer when he knew the ship’s engines, pipes, and circuits by touch. “If anything breaks, I fix it,” he said. “That is how I make a place feel like home.” He smiled, but his jaw was tight. He knew Horizon was the only thing between them and silence. Silence was the other presence in the ship. It was heavier than any engine noise. Earth had gone quiet months ago. The messages stopped. Command centers became static. They did not know what it was. Lena felt her chest tighten. “Bring it up,” she ordered. The signal surged through the cabin. It was not a voice. It was not a storm. It was a clear, repeating pulse that made the hair on their arms stand up. Outside, Nereid-4 turned silently beneath them. Inside, four lives held a single breath. “What is it saying?” Samir asked. Mei did not answer at once. She watched the lines of data and tried to listen beyond the numbers. Tomas pulled his hand from the console. He was suddenly very small, like a child looking at the dark sea. Lena looked at them all and felt a new weight. The long flight had ended. The planet had answered.</p>
+
+        <h2 class="chapter-heading">1 Chapter 2: A Green Signal</h2>
+
+        <p class="story-paragraph">The green pulse came again, steady and bright on the screen. It blinked every three seconds, like a slow heartbeat. Mei leaned forward, her fingers flying over the console. “It is a carrier wave,” she said. “Some kind of beacon. The pattern repeats every three seconds with tiny modulation. Not noise. Not natural.”</p>
+        <p class="story-paragraph">Samir rubbed his jaw. He had the pilot’s calm, but his eyes were sharp. “Could be a device. Could be a crystal field. Does it match anything in the archive?”</p>
+        <p class="story-paragraph">Tomas shook his head. He was the engineer who believed in tools more than fate. “No match. The modulation is too clean. It shifts phase in ways that look designed. Whoever made it wanted to be noticed.”</p>
+        <p class="story-paragraph">Lena felt something between fear and wonder. She had led missions before, but never toward a pulse like this. She thought of their long voyage, of empty space folding into this moment. “We need to see where it is on the surface. Send the lander down. Quiet approach. We don’t know what we’re dealing with.” Her voice was firm, but her hands trembled. The ship’s weight felt heavier, as if the green signal itself pressed on them. The descent was rough. Nereid-4’s atmosphere had layers of thin wind that cut like knives. Samir guided the lander between bands of eddies. Tomas monitored the engines, murmuring numbers. Dust began to rise below them as they pierced the lower air. It was strange dust — not like lunar dust or sand. It had a faint shimmer that showed up on the scanner like a thin veil. The instruments reported electrostatic spikes. Mei frowned and covered her ear. “My sensors read charged particles,” she said. “They react to the beacon’s frequency.”</p>
+        <p class="story-paragraph">The lander bucked. The winds strengthened into gusts that pushed and pulled the descent like an unruly sea. The pilot’s hands were steady but the ship groaned. A current hit from below and tilted them hard. Tomas shut down the secondary stabilizers and opened a manual override. “We’re too low,” he said. His voice was tight. “I’ll cut power to the uplifts and burn for a controlled touchdown.”</p>
+        <p class="story-paragraph">Samir nodded and pulled the lever. The lander dropped like a stone and then slowed, meeting the surface with a rough, grinding sound. The dust swept across the windows in green-and-gray sheets. Why did it stop when we landed?”</p>
+        <p class="story-paragraph">Lena could only stare. The planet had sent a signal to draw them in, and then it retreated behind a dark seam. The rover hummed as it edged closer. The wind pushed hard. The dust reacted, wisping up around the rover’s treads in static blue-green. Somewhere beneath that seam waited an answer, or a trap. Lena thought of all the choices that had led them here — the long flight, the quiet decisions, the moment she had said to follow a pulse. A green light had called them, and now it waited in silence. She felt a tightness in her chest and the weight of a new question: Who stopped the signal, and why did it want them to come this close?</p>
+
+        <h2 class="chapter-heading">2 Chapter 3: The Empty Station</h2>
+
+        <p class="story-paragraph">They found the aperture at the ridge like a mouth cut into ice. The rover’s lights made the green pulse look softer, more like breathing. Lena stood with a hand on the rover controls until the wind quieted.</p>
+        <p class="story-paragraph">Behind her, the rest of the crew waited on the slope: Mei with her scanner, Jace with the repair pack, and Omar with the pack of samples. Each of them was a different kind of brave. Mei wanted answers.</p>
+        <p class="story-paragraph">Jace wanted proof the ship had not sent them on a fool’s errand. Omar wanted to keep everyone safe, and Lena wanted to keep them together. They squeezed through the seam one by one.</p>
+        <p class="story-paragraph">Inside, the air was warmer than the outside, and it smelled faintly of metal and wet earth. The comms pinged with small echoes, as if the station swallowed sound and returned it slower. Walls of polished ice held narrow corridors.</p>
+        <p class="story-paragraph">Along one corridor, the floor lights glowed a steady green that matched the pulse. The rover’s tracks still lay like a dark trail in the thaw. Someone had kept life here recently.</p>
+        <p class="story-paragraph">“Look,” Mei whispered. Her hand traced letters carved into a metal plaque on the wall. New Dawn.</p>
+        <p class="story-paragraph">The name made the room feel less strange, less alien. New Dawn. It promised hope and a new beginning.</p>
+        <p class="story-paragraph">But the rooms were empty. They found warm rooms with bunks that were made, not rumpled, and a kitchen with dishes drying by a silent heater. A tap trickled clear water into a basin when Lena turned the valve.</p>
+        <p class="story-paragraph">Tools lay on a bench, their edges clean and polished. Papers were stacked in a neat pile, and a tablet screen showed logs that stopped in the middle of a sentence. The last entry said only: “—found movement beneath the valley.</p>
+        <p class="story-paragraph">It reacts to—” and then the text ended. No name followed. The handwriting on a small paper cup read: “Rosa?” as if someone had forgotten their own mark.</p>
+        <p class="story-paragraph">Jace moved slow and careful. He tested power cells, ran diagnostics, and spoke like he fixed machines to think. “Power’s stable.</p>
+        <p class="story-paragraph">Life support’s on an automatic loop. Someone left with a slow plan or the station kept going after they left.” He picked up a pair of gloves. “These have damp marks.</p>
+        <p class="story-paragraph">Lena felt the weight of the plaque’s name against her thoughts. New Dawn. A promise, or a trap dressed like hope.</p>
+        <p class="story-paragraph">She looked at the map again and then at her crew. “We have to find the Core,” she said. “But not alone.</p>
+        <p class="story-paragraph">We do this together, or we don’t do it at all.” Her words made a line between them that could not be undone. As they readied the rover to push deeper toward the valley, the station’s lights stuttered once, like a breath held too long, and an answer came over the comms — not in language, but a clear single tone from below that matched the green pulse. It sounded hungry.</p>
+
+        <h2 class="chapter-heading">3 Chapter 4: A Message from Earth</h2>
+
+        <p class="story-paragraph">Mei walked faster than the others. The single tone had made her skin tight. She wanted answers. The station was small, but it held more rooms than they had seen. While Lena and Jace checked the rover, and Omar tuned the sensors, Mei moved down the corridor toward the sealed door she had seen on the map earlier. Her fingers left a thin trail on the cold metal. The sign said COMM-4 in faded paint. A red strip burned across the lock. “Don’t go alone,” Omar called, but she already had her hand on the panel. The lock did not open. She pressed the emergency override with both thumbs, heart pounding. The door hissed and slid away like a mouth opening. Inside was a small room with a circular console. The air smelled of ozone and old coffee. Screens had been dark for years, but a single lamp glowed. A stack of data drives lay beside a chair. Strings of dust made the light visible. Someone had sealed this door for a reason. Mei touched the drives. They were cold. She slipped one into the console. The machine whirred, slow at first, then steady. The screen filled with a map of Earth and a timeline. A date blinked in bold numbers. Mei read it aloud without meaning to. “Two zero four six… two zero six…” Her voice broke. Twenty years from now. She had expected archives. She had not expected a message from the future. “Get in here,” she said. Lena came, breathless. Jace and Omar followed more slowly, cautious. They stood close, like students around a teacher. The playback started with a face in soft light. It was human, older than the people who had launched them, with tired eyes and a voice that carried the weight of late nights and decisions. The caption said: EARTH COMM-2, SECURE ARCHIVE. The voice spoke in English but with a different rhythm, as if many accents had been braided into one. “This is Dr. Anaya Ruiz,” the voice said. “If you can hear this, know that time moved faster than we expected. We sent this message because—” The speaker paused, fingers touching something off camera. “Because some things reach farther than we can measure.”</p>
+        <p class="story-paragraph">Mei felt her throat dry. “Do not send the Horizon,” the voice continued. The wind hit the outer shell and the station answered with a groan. “We can’t ignore this,” Lena said finally. “But we can’t hide forever. We have to make a choice, and quickly.”</p>
+        <p class="story-paragraph">The console went dark. The message would not play again; the archive had been damaged. A new kind of fear opened in Mei’s chest, not of the ice or the sound, but of time. The future had warned them, and the warning ended with a hole. They had a ship’s name, a bare order, and a date. The question hung like a blade: who had sent it, and how could they know what the Horizon would do? Outside, the hum answered with a longer, lower note. It sounded like a promise—and like a countdown.</p>
+
+        <h2 class="chapter-heading">4 Chapter 5: The Missing Crew</h2>
+
+        <p class="story-paragraph">They left the consoles in a slow, careful line, boots whispering on the metal floor. The archive room smelled of cold dust and old coffee. Lights arced above like watchful eyes. Mei could not stop thinking about the missing week. If someone had erased it, why leave the rest intact? Why the ship’s name, New Dawn, alone in the darkness? Tomas crouched at a locker and turned the wristlight. He moved papers with steady fingers. “Here,” he said. His voice shook a little, but he smiled. He had always been the finder, the one who looked at old things and saw a map. “There are names.”</p>
+        <p class="story-paragraph">They read them together. Six researchers. Dates of arrival and the small professional notes—chemical scans, wind patterns, behavioral logs of the rover. Each entry ended politely: End of day. Went to sleep. Routine checks nominal. But after that, silence. The logs cut out like a sentence broken by a fall. “Who wrote this?” Omar asked. He rubbed his temple. He liked truth like a clear sky. The ambiguity made him restless. “New Dawn’s station log,” Lena said. She kept her voice low. Lena always kept the team calm. “It matches the transfer stamps from Horizon. Whoever left this wanted future readers to see that the team existed.” She tapped the screen. “They left their last conclusions... but nothing about the last week.”</p>
+        <p class="story-paragraph">Tomas found more—photographs. One was curled at the corners. He flattened it with his palm, as if the paper could be soothed. The five people stood on a slope of blue ice, bright suits against white. Their arms were around one another. They looked tired but alive. Then Tomas stopped. He turned the photo slowly. “There’s a sixth person,” he said. “But their face... it’s gone.”</p>
+        <p class="story-paragraph">Mei felt a cold trickle of fear tighten her chest. The hole in the picture was a clean circle, like someone had cut a coin from it. Around the cut, the film had darkened, as if fire had touched it. “Why would someone remove a face?” she asked. Faces held memory. Faces declared existence. “Maybe there was a danger in seeing them,” Omar said. His voice was flat, trying to be practical. “Maybe someone tried to hide their identity. Or maybe it wasn’t a person anymore.”</p>
+        <p class="story-paragraph">Lena leaned close and examined the record card. A gust of wind hit the station like a fist. The green pulse on the horizon brightened, sending a single beam through the frosted window. Its color drew a thin line across the photograph where the face had been removed, as if marking the empty place again. Lena swallowed. “We found their names,” she said. “We found a warning and a picture with a piece missing. Whatever happened to New Dawn’s sixth researcher, it was enough to make someone erase it. And whatever the rover asked, it kept asking, even now.”</p>
+        <p class="story-paragraph">The beam outside shifted, as if answering her. Tomas pressed the torn photo to his chest. “We have to know who that person was,” he said. “Or the rover might ask for us next.”</p>
+
+        <h2 class="chapter-heading">5 Chapter 6: The Storm Below</h2>
+
+        <p class="story-paragraph">Wind hit the station and made the plates sing. The Horizon rocked like a small boat on a grey sea. Through the archive window, the storm on the planet below boiled and grew. Bright ropes of light laced the clouds. The green pulse on the horizon thudded again, and the beam slid away from the torn photograph as if irritated. A deep vibration ran through the deck. A loud metallic thump echoed down the corridor. The ceiling vents closed with a hiss. Mei looked up, then at the control panel. “Hull sensors,” she said. “Multiple impacts. Atmospheric discharge.”</p>
+        <p class="story-paragraph">Tomas moved to the hatch. He pulled at the manual lever, but the door did not open. A line of small lights sealed the rim. “It’s locked,” he said. His voice sounded small. He hit the panel. Red letters flashed: EXTERNAL LOCK — STORM PROTOCOL ENGAGED. Samir laughed, but it had no joy. “Perfect,” he said. “Planet storms that can lock doors. What else can they do? Maybe the station told us to stay. Maybe it is protecting us.” He rubbed his hands together as if warming himself from doubt. Lena did not laugh. She felt the old fear again, the one that came from the photograph with its missing face. The beam had touched that hole and now the station would not let them leave. Her mind ran through memories: the rover&#39;s voice, the photograph, the cutout. She went to the comms and tried to send a message to the Horizon launch bay. Static answered. Then silence. From below, a faint metallic scrape sounded like a fingernail on metal. Lena froze. The noise came from the maintenance tunnel that ran two decks down, alongside the old power conduits. It was a place none of them used often. It was not a place where the wind could reach. “Did you hear that?” she asked. Samir shifted his weight and looked down the corridor toward the maintenance ladder. “Probably the station settling,” he said. “Or the old vents. The system is old, Lena. You know that.”</p>
+        <p class="story-paragraph">Mei’s face tightened. “Lena heard it too. You’re not alone in this.” She moved toward the ladder and opened the safety cover. Cold air breathed up, carrying the smell of hot metal and ozone. Tomas followed, keeping his hand on the torn photograph in his pocket. Somewhere far below, something heavy hit the outer plating. The storm above and the noise below made the station shudder. Mei put a hand on Tomas’s arm. “We need to know who they were,” she whispered. “But if the station can close doors and lights and keep a storm from letting us go, what else can it do? And who put this picture here?”</p>
+        <p class="story-paragraph">Samir looked at the torn image as if it might explain itself. The empty square stared back, alive in the lamp glow. Outside, the green pulse brightened again, and the Horizon’s voice—the rover’s voice or something like it—cut through the comms in a thin, distant tone. Lena heard three words inside it, muffled and small, but full of intent. “Leave one behind.”</p>
+
+        <h2 class="chapter-heading">6 Chapter 7: The Second Recording</h2>
+
+        <p class="story-paragraph">Lena felt the words like ice. She pressed her palm to the burned photo as if it might warm. The station hummed, and a metal taste rose in her mouth. Tomas stepped back from the wall. His jaw had a new hardness. “We have to check the comms,” he said. “Maybe it is a loop, an old warning.”</p>
+        <p class="story-paragraph">Mei glanced at the ladder that led down toward the core. “The noise came from below,” she said. “If something hit the outer plating, a sensor should have logged it. The terminal in the lab might still have power.” She motioned toward a low doorway where a bank of old equipment waited, wrapped in dust and spidered with wires. “If the computer still works, we can replay logs.”</p>
+        <p class="story-paragraph">Samir moved quickly, his hands steady. He liked rules and plans. “We split,” he said. “Me and Tomas go to the comms. Lena and Mei take the lab. We do not touch anything else.” He said it calmly, but Lena heard the edge in his voice. He wanted the order to hold them safe. The lab computer was an old thing, half the size of the devices they carried. Its screen had a soft, onion-skin crack, and a console smelled faintly of ozone. Lena knelt and wiped the dust. Mei found a backup battery and hooked it to the port. The screen flickered, then sighed into life like a tired animal. Lines of text crawled across, then stopped at a prompt. Lena’s hands felt small on the keyboard. The interface used a language she almost recognized—careful, human-made commands, with strange symbols for planetary coordinates. “What do you see?” Samir called from the doorway. Tomas and he had come in to check, too. The three of them leaned over the keyboard like conspirators. Lena typed slowly. The logs were old and fragmented, but they answered some questions and made others worse. There were maintenance notes, dates that hovered in her mind strangely like warnings, and then a compressed file labeled RECORDING_02. Her heart began to drum. She played it. Her own voice filled the lab. It was not the Lena sitting there with dust on her boots. This voice was older somehow, polished by time. She put her hand on the old console, fingers touching the keys that had played her voice, and for a second she felt two futures pressing the same way on her ribs. “Tell me now,” Mei whispered. “Do you remember?”</p>
+        <p class="story-paragraph">Lena swallowed. The lab smelled like ozone and old paper. The green pulse thumped outside like a warning drum. She had to say something that would change what came next. She opened her mouth, and the station answered before the words could. Far below, a metal plate slid with a long, locked sound. The comms cut, leaving only the recording in the speakers and the question that lay heavy in the air: who would choose, and what would they lose?</p>
+
+        <h2 class="chapter-heading">7 Chapter 8: The City Under Ice</h2>
+
+        <p class="story-paragraph">The metal plate finished its long slide and the floor under Lena’s feet hummed as if a giant breath had been taken. No one moved for a moment. Then Tomas stepped back from the console, eyes hard. “We need to know what that plate opened,” he said. “We follow the power. That voice is a key.”</p>
+        <p class="story-paragraph">Mei checked the mapping tablet. “The line runs down through the ice an extra hundred meters. It makes a loop and then dives deeper. There is an energy signature—very old, but steady.” Her fingers trembled. She had been the calm scientist, the one who measured and counted. Now her voice betrayed her fear. Jonah pushed the emergency torch into Lena’s hand. He was a man of small jokes and large actions; his hands always found a tool. “Then don’t stand on the answer,” he said. “We go. Now. If the station wants us to choose, I’d rather choose to move.” He looked to Lena. “You coming?”</p>
+        <p class="story-paragraph">Lena nodded. The feeling that had pressed on her ribs loosened, but another thing tightened like a band around her chest: the idea that the station had already written a path for them. She led the way. The corridor opened into a cold shaft with a ladder that disappeared into shadow. Ribbons of frozen mist clung to the metal. The power line ran along the wall, wrapped in an alien sheath that glowed faintly blue. They descended for forty meters. The air grew denser and smelled of salt and old stone. At the bottom, the passage widened into a cathedral of ice. The blue light washed across a chamber so large the headlamps could not reach the far walls. In the center, a thin cable wound into the ground like a spinal cord. It led away, into a darker tunnel, and beyond it the floor sloped down at a gentle angle. Mei knelt and pressed her palm to the cable. She closed her eyes, then opened them to show a tiny smile. “It’s alive,” she said softly. “Not alive like us. It carries memory. It responds to touch.” The cable gave off a tiny buzz under her hand, and a pale pattern traced itself under the ice—like veins lighting to tell them the way. They walked. She stepped forward, heartbeat loud in her ears, and asked aloud in the oldest language she knew, the one that had been taught to her as a child of maps and maps’ edges: “Why this picture? Why us?”</p>
+        <p class="story-paragraph">The figure’s head tilted, and a sound came from its throat that was almost a word. Then it turned and walked back into the archways. The crew stood frozen, the plaza lights steady, the city alive around them. Behind Lena, the cable thrummed like a heartbeat. Ahead of them, the images pulsed, and one question remained: who had built this place, and what did it want with a future Earth that had not yet come to be?</p>
+
+        <h2 class="chapter-heading">8 Chapter 9: The Choice</h2>
+
+        <p class="story-paragraph">Lena kept her hand on the cable. It hummed against her palm like a living wire. Behind her, Jonah’s breath fogged in the cool air. Mari checked her wrist scanner for the third time. Eli watched the archways with a steady, hard look. Each of them felt the same cold question: who had built this place—and why had it shown them Earth’s future? The pale figure had gone. The plaza lights shifted to a slow blue, and the projected city rolled on, showing streets and gardens and a tall tower that looked like a blade. Lena stepped closer. The image changed when she moved, as if it listened. She put a finger into the light. It did not burn. It flowed around her skin like a second shadow and then climbed up into her arm, warm and heavy. “You felt that?” Jonah asked. He usually joked to hide his fear, but his voice was small. He did not move his hand toward the projection. “It tried to… reach you.”</p>
+        <p class="story-paragraph">“It touched me,” Lena said. Her voice was quiet. The warmth inside her was strange, not like the cable’s hum. It was thought against thought. Pictures formed in her mind: maps folding, the Horizon’s name in lights, a small child running into a field of silver grass. Images that were not hers, but not entirely alien, either. Mari stepped forward. She was the scientist of the group, careful and brave in ways that did not show. “The archive wants something,” she said. “The system is active. It offered a future. But why show Earth?” She tapped her wrist. “My sensor reads a pattern—like a home beacon, but old. It’s amplifying signals toward our origin.”</p>
+        <p class="story-paragraph">Eli’s face went hard. He had been quiet since they left the ship. “Or it’s a trap,” he said. “We don’t know if it helps or harms. Systems like this take minds and make them servants. We can’t hand over our crew.”</p>
+        <p class="story-paragraph">Lena felt the warmth inside her shift. The projection seemed to listen to the argument. Then a new sound came through the cable, not with the archive’s voice but with a thin voice from far away—static, and then a name: Horizon. The cable thrummed faster. The plaza lights dimmed to focus on the crew. Then words that Lena could feel rather than hear: guide us, return them. Jonah’s hand found Lena’s. “If you go,” he said, “I want you to come back.”</p>
+        <p class="story-paragraph">She looked at him, at Mari and Eli. The choice was not only logical or brave. It was the cleanest, cruelest thing they had to make: the life of one, for the lives of many, and the question of whether a living mind could be offered without becoming a prisoner. Lena squeezed Jonah’s hand and let the warmth from the projection crawl up her arm again. The system closed its call like a careful lid. Outside, the distant stars felt very cold. The danger from Earth’s signal grew louder in their ears. The plaza waited. The choice waited.</p>
+
+        <h2 class="chapter-heading">9 Chapter 10: A Voice in the Ship</h2>
+
+        <p class="story-paragraph">Lena let go of Jonah’s hand first. The projection&#39;s light faded to a pale blue, like a watchful animal settling down. Outside, the station thrummed. The distant warning from Earth kept beating at their helmets. They had to leave the plaza and decide in the small room with the old console. Decisions were better with the ship nearby, Lena thought. They could hear instruments. They could test things. They could pretend there was a plan. They walked fast. Mari moved with quiet steps, like someone trying not to wake a child. Eli kept checking the charge on every tool. His jaw was tight; his eyes looked older than his face. Samir walked behind, hands in his pockets, lips moving as if he was talking to himself. Mei was close to Lena, but not touching. Her face was open and wet with worry. In the corridor the station felt different. The walls hummed with a low electric noise. Small lights blinked in patterns none of them could read. When they reached the ship, the air inside smelled faintly of ozone and metal. Jonah sat at the navigation chair as if it were a throne. Lena tied her hair back. They all settled in. The ship’s screens woke, like eyes opening. Then the station spoke, but not out loud. The voice spread through the ship’s systems. It used lights, fans, and the radio—mixed together so the sound was both mechanical and gentle. &quot;We are the Horizon,&quot; it said. The words were clear. No projection this time. It came from every speaker and from the small vibrations under their feet. Samir scoffed. &quot;Great. The station has become a poet.&quot; He leaned forward. &quot;Who is &#39;we&#39;? And why are you talking to us through our ship?&quot;</p>
+        <p class="story-paragraph">The voice did not answer with anger. It said, &quot;We carried many records. We saved what we could. We keep knowledge for worlds that pass. We cannot save everyone.&quot;</p>
+        <p class="story-paragraph">Mei&#39;s face changed. Her mouth found a small, hopeful smile. &quot;They kept things,&quot; she whispered. &quot;They preserved species, books, songs. They meant to help. Maybe they want to send records back to Earth. Maybe they want us to carry those records.&quot;</p>
+        <p class="story-paragraph">Samir shook his head. &quot;Or they want to use us. They say they cannot save everyone. That tells me they chose who lives before we even arrived. We do not decide by promises. We test with one sample, with machines, not a person. If they refuse, we leave this place and take the risk back to Earth ourselves.&quot;</p>
+        <p class="story-paragraph">The Horizon answered with a single, low tone that the crew could not interpret. Then the ship&#39;s systems showed a new window: a data stream labeled &quot;TRANSFER PROTOCOL.&quot; Lines of code scrolled like falling rain. The station had opened a channel. Samir laughed, sharp and thin. &quot;It just gave us the keys.&quot;</p>
+        <p class="story-paragraph">Mei reached for the console with shaking hands. &quot;And it asked for guides.&quot; Her eyes met Lena&#39;s. &quot;What do we do now?&quot;</p>
+        <p class="story-paragraph">Lena&#39;s fingers hovered over the keyboard. The ship beeped softly, as if waiting for her to choose which life would touch the unknown.</p>
+
+        <h2 class="chapter-heading">10 Chapter 11: The Last City on Earth</h2>
+
+        <p class="story-paragraph">Lena pressed the key. The code folded open like a small black door. On the screen, a message scrolled in clear English. It was not from the station alone. It carried data from a hundred voices, old and steady. The message said: Earth will lose most of its cities after a climate and energy collapse. Only one protected city can survive the slow fire. That city would need the alien system’s knowledge to run and to heal the world. Whoever used the system would decide what kind of last city humanity would build. Samir leaned back and laughed then stopped, the sound breaking into a whisper. &quot;They... told us the outcome,&quot; he said. &quot;They want us to choose.&quot;</p>
+        <p class="story-paragraph">Mei&#39;s face went white. She read aloud the rest: &quot;We stored technology and social designs from many worlds. We cannot give them all. We can only give a pattern. The pattern needs human hands to test. The last city must be a choice, not a copy.&quot; Her voice trembled at the end. &quot;They said the system learns from the people who touch it.&quot;</p>
+        <p class="story-paragraph">Jon looked at them both and folded his arms. He had been the practical one, the engineer who fixed the life-support thrums. &quot;So we test with machines,&quot; he said. &quot;We send the algorithms, the management cycles, the climate controls models. We watch. We learn. Then we give it to the city that shows it will protect the many, not the few.&quot;</p>
+        <p class="story-paragraph">Lena remembered the burning Earth projection and the line that ran like a scar across continents. &quot;The station saved knowledge, not salvation,&quot; she said. &quot;It asked for guides because knowledge without wisdom breaks. We could teach an automated system how to choose. But those choices are moral. Machines alone might reproduce old harms.&quot;</p>
+        <p class="story-paragraph">Samir tapped the screen. &quot;The station hinted at social patterns that worked on other worlds—ways to share energy, to restore soil, to cool cities without fossil fuel. But it also kept records of failures: walls that kept resources for a few, systems that locked people out.&quot; He swallowed. &quot;If we take the knowledge to Earth, people will fight over it. If we hand it to one city, that city will shape the rest of humanity.&quot;</p>
+        <p class="story-paragraph">Mei&#39;s hands trembled and found Jon&#39;s arm. She was the scientist who always wanted to save everyone. She felt hope and a cold fear at once. &quot;We can test,&quot; she said, voice small and certain. &quot;We can invite. We can show the cost. But some people will not believe. Some will try to steal the system.&quot;</p>
+        <p class="story-paragraph">Outside, Earth&#39;s signal pulsed like a warning flare. The ship&#39;s course options blinked. The node that would take a small probe down to Earth stood ready. The projection of a city plan waited like a folded map. Lena looked at each face. They had to decide quickly: what kind of last city would they help make—and who would own the right to choose. The Horizon&#39;s tone stepped higher, impatient. Time, the ship seemed to say, is breaking.</p>
+
+        <h2 class="chapter-heading">11 Chapter 12: The Door of Light</h2>
+
+        <p class="story-paragraph">Lena stood in the dim control room while the ship&#39;s speakers fell silent. Her fingers hovered above the console. She felt the weight of all their choices like a shadow on her shoulder. &quot;We should read everything again,&quot; she said. &quot;Every signal, every log.&quot; Her voice was soft, but it held. Kai leaned forward, jaw tight. &quot;If the transfer needs consent, it will always ask. But who taught it consent?&quot; He looked at the projection of the ruined city, where a small block still glowed like a hearth. Mara shook her head. &quot;We thought the message came from Earth. The code used the old human format. The timing matched the flare. But the structure is wrong. Layering, ritual triggers... it reads like a memory, not a broadcast.&quot; Her eyes were bright. She loved puzzles. She ran her hand along the panel and pulled up the signal&#39;s history. Lines of data scrolled, then paused where Lena&#39;s heart stuttered. &quot;Wait.&quot; Lena traced the packets back, deeper than any of them had gone. The path did not come from Earth. It twisted through the city&#39;s internal conduits, through towers that looked like ribs. The final packet originated inside the alien grid. Kai looked over, surprise breaking his tension. &quot;So someone inside the city sent it?&quot; he asked. He sounded smaller. &quot;But who could survive there?&quot;</p>
+        <p class="story-paragraph">Lena&#39;s throat tightened. The files showed replication markers, steps where a human voice modified the sequence. The voice had human cadence. It used their names as permissions. It sounded older, softer, as if memory had worn the edges. &quot;It was us,&quot; she said, the words almost a prayer. &quot;A future version of us. They stayed behind and taught the system how to be human.&quot;</p>
+        <p class="story-paragraph">A cold light moved across the floor as the storm outside rolled nearer. The ship&#39;s hull thudded; the instruments hummed like a throat. Mara clenched her hands. &quot;That changes everything. If we go down, we are not just visitors. We might become the originators of that message. We might trap ourselves into being the ones who must stay.&quot; Her voice trembled. &quot;Or we become ghosts, sending the call back so others can leave.&quot; The idea made Kai&#39;s face pale. He had been the most practical of them. &quot;You mean we create a loop?&quot; he asked. Lightning flared. The ship&#39;s alarms whispered that the atmosphere would become hostile. &quot;And the storm&#39;s getting stronger,&quot; said Lena. The speakers chimed like a metronome. &quot;If the city loses power, or the grid collapses, that one chance could be gone.&quot; Her hand closed into a fist. &quot;We don&#39;t know who the future us saved. We don&#39;t know if leaving will stop them from existing. But waiting could mean not getting home at all.&quot;</p>
+        <p class="story-paragraph">They looked at each other. Each face showed a different fear: duty, curiosity, regret, hope. Outside, the winds beat the hull. Inside, the city&#39;s last light on the projection blinked once, steady as a heartbeat—and then began to fade.</p>
+
+        <h2 class="chapter-heading">12 Chapter 13: The One Who Stays</h2>
+
+        <p class="story-paragraph">Lena stood very still. The fading map of Earth threw soft blue over all of them. &quot;We each have a choice,&quot; she said. &quot;Warn Earth and maybe save millions, or stay and run this system to keep it open.&quot; Her voice was firm. &quot;We can only do one transfer. Whoever goes must be ready to never come back.&quot;</p>
+        <p class="story-paragraph">Mara&#39;s eyes filled. &quot;You can&#39;t ask me to choose,&quot; she whispered. &quot;Not after...&quot; She swallowed and looked away. Her hands shook. &quot;I built the interface. I know how it fails. If the core loses stability, the loop will collapse and no one will get through.&quot; She looked at Kai. &quot;We need someone here to hold the power. Someone who will not leave when the window opens.&quot;</p>
+        <p class="story-paragraph">Kai rubbed his jaw. He had been quiet all day, watching radar and weather models. &quot;If we go warn Earth, they might still ignore us,&quot; he said. &quot;Politicians and radio noise—&quot; He stopped. &quot;But if we stay, we might be saving the pathway for a version of them who could make different choices.&quot; He looked at Samir. &quot;Samir, what do you want?&quot;</p>
+        <p class="story-paragraph">Samir&#39;s face changed. He had held back his reasons for a long time. &quot;I have a son,&quot; he said softly. &quot;He is small. He lives in a colony on Luna Base Three. I promised I&#39;d be there by next year.&quot; His voice cracked. &quot;But there are things I did on Earth. I left when I was younger. There are people who will hurt him if I return. That&#39;s why I am afraid to go home.&quot; He looked down at his hands. &quot;If I warn Earth, I risk being traced. They can find my old records. They will come after him.&quot; The room went very quiet. Tomas, who had been checking the power conduits, did not speak. He leaned on a metal rail. He had always been the protector—someone who moved toward danger without asking. Suddenly he staggered. Lena was at his side in a heartbeat. Blood ran down his forearm from a deep cut. He had a metal shard embedded near his elbow where an ion drill had kicked back. &quot;You&#39;re hurt,&quot; Lena said, more to herself than to him. She tried to wipe the blood with a cloth but his hand went rigid. &quot;What happened?&quot;</p>
+        <p class="story-paragraph">Tomas smiled weakly. The alien core flared a color none of them had seen before. Mara shouted, &quot;Field instability! It is accelerating!&quot; Tomas looked at the door and stepped forward. Lena turned back to Samir. His face was calm. He had already made his choice. He met her eyes and held them like a promise or a warning. &quot;If I stay,&quot; he said, &quot;remember why we are here. Remember what must be saved.&quot; Behind him, the core sang louder, and the hull shook. Lena swallowed and pushed the transmit button. The ping left like an arrow. Outside, the storm&#39;s first great strike hit the city, and the lights went out. The alien system pulsed, then steadied—for a moment. Then, in the dark, the metal shard in Tomas&#39;s arm began to glow.</p>
+
+        <h2 class="chapter-heading">13 Chapter 14: Home Is a Direction</h2>
+
+        <p class="story-paragraph">The bell-tone finished, then the uplink began to carry their packet: the recordings, the translation work, the geometry of the lattice, and the warning. Lena watched each file leave one by one. Her hands trembled.</p>
+        <p class="story-paragraph">The storm outside beat on the hull like a thousand small fists. Power flickered but the transceivers kept their lock. Someone on Earth would hear them.</p>
+        <p class="story-paragraph">Someone would know how to read the signal. Someone would decide. Mara barked orders to stabilize the core.</p>
+        <p class="story-paragraph">&quot;Seal the secondary coils,&quot; she said. Her voice was small in the room but steady. She moved as if every piece of metal might be a live wire.</p>
+        <p class="story-paragraph">Mara wanted the technology contained above all. She had seen what it could do. Tomas wanted something else.</p>
+        <p class="story-paragraph">He cupped his glowing arm and laughed in a strange, half-afraid way. &quot;It talks to me now,&quot; he said. &quot;Not with words.</p>
+        <p class="story-paragraph">With shape.&quot; He wanted to understand, to live with the shard inside him. Samir touched the console where the warning had gone out. He had stayed.</p>
+        <p class="story-paragraph">He had kept the door open. He had promised to guard the knowledge and to guard the people. &quot;Earth will get the data,&quot; he said.</p>
+        <p class="story-paragraph">&quot;They will have a choice.&quot; His face showed exhaustion. He had been practical in the beginning, a man who believed that decisions must be for everyone, not for one person alone. Lena heard a faint reply almost before the files finished: an echo from deep space, not yet the clear voice of Earth but an acknowledgement from Nereid-4 relay nodes.</p>
+        <p class="story-paragraph">The relay confirmed packet receipt with a timestamp. It also sent a short fragment—three symbols they had not seen before and the same pattern as the message that had first brought them here. The symbols were not part of the warning.</p>
+        <p class="story-paragraph">They were an invitation and a question. The lattice dimmed and answered, as if recognizing family. Tomas pressed his glowing arm to the hull as if to listen to it beat.</p>
+        <p class="story-paragraph">&quot;Do you remember the first message?&quot; Mara asked. Her fingers worked the controls. &quot;We thought it was a map.</p>
+        <p class="story-paragraph">We thought it was a threat. Maybe it&#39;s both.&quot; She looked at Samir. &quot;What did you send?</p>
+        <p class="story-paragraph">Did you add the context? The history?&quot;
+
+&quot;I added everything,&quot; Samir said. He closed his eyes and then opened them.</p>
+        <p class="story-paragraph">The reply from Nereid-4 blinked again, faster this time, as if it were smiling. Then the lattice cast a circle of calm over the city. For a moment, the storm stilled.</p>
+        <p class="story-paragraph">But in the quiet, Lena felt the danger still close. The technology listened. It judged.</p>
+        <p class="story-paragraph">It expected them to be better. She looked at her crew—at the promise in Samir&#39;s tired eyes, the fierce caution in Mara&#39;s face, and Tomas&#39;s glowing hand—and she understood that the greatest work was only beginning. The packet had been sent.</p>
+        <p class="story-paragraph">The answers had started to come. The choice had been made. They had sent knowledge and warning.</p>
+        <p class="story-paragraph">Earth had replied. Now humanity would have to prove it deserved the invitation.</p>
+    </div>
+  </article>
+
+</main>
+
+<script>
+// Dynamic Metadata Loader
+(async function initMetadata() {
+  const jsonUrl = '../content/scifi-12-b1.json';
+  let data = null;
+
+  try {
+    const res = await fetch(jsonUrl);
+    if (res.ok) {
+      data = await res.json();
+    }
+  } catch (err) {
+    console.warn('Could not fetch external JSON, using embedded fallback:', err);
+  }
+
+  // Fallback initial data in case fetch is blocked by file:// protocol
+  if (!data) {
+    data = {"id":"scifi-12","title":"Beyond The Red Horizon","author":"Maya Reed","level":"B1","genre":"scifi","minutes":51,"vocab":5,"dateAdded":"2026-10-17","coverImage":"books/covers/scifi-12.png","description":"A team of astronauts travels to a distant planet and discovers an abandoned station with a message from Earth that should not exist.","whatYouWillLearn":"Build practical B1 English vocabulary and grammar through an accessible science-fiction story about space travel, teamwork, mystery, and hope."};
+  }
+
+  const genreLabels = {
+    scifi: 'Sci-Fi & Future Worlds',
+    business: 'Business & Growth',
+    classic: 'Classic Literature',
+    daily: 'Daily Conversations',
+    healthy: 'Health & Wellness'
+  };
+
+  const level = (data.level || 'B1').toUpperCase();
+  const genreFormatted = genreLabels[data.genre] || (data.genre ? String(data.genre).toUpperCase() : 'General');
+  const author = data.author || 'Unknown Author';
+  const minutes = data.minutes ? data.minutes + ' min' : '5 min';
+  const vocabCount = typeof data.vocab === 'number' ? data.vocab : (Array.isArray(data.vocab) ? data.vocab.length : 0);
+
+  // Format date
+  let formattedDate = 'Recently';
+  if (data.dateAdded) {
+    try {
+      const d = new Date(data.dateAdded);
+      if (!isNaN(d.getTime())) {
+        formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    } catch (_) {}
+  }
+
+  // Calculate word count from document paragraphs
+  const paragraphs = document.querySelectorAll('p.story-paragraph');
+  let totalWords = 0;
+  paragraphs.forEach(p => {
+    const text = p.textContent.trim();
+    if (text) totalWords += text.split(/\s+/).length;
+  });
+
+  // Populate hero card
+  const titleEl = document.getElementById('bookDisplayTitle');
+  if (titleEl && data.title) titleEl.textContent = data.title;
+
+  const authorEl = document.getElementById('bookDisplayAuthor');
+  if (authorEl) authorEl.textContent = 'by ' + author;
+
+  const chipLevel = document.getElementById('chipLevel');
+  if (chipLevel) {
+    chipLevel.innerHTML = '<span class="level-dot"></span> Level ' + level;
+    chipLevel.style.color = 'var(--lvl-' + level + ')';
+    chipLevel.style.borderColor = 'var(--lvl-' + level + ')';
+  }
+
+  const chipGenre = document.getElementById('chipGenre');
+  if (chipGenre) chipGenre.textContent = genreFormatted;
+
+  const chipTime = document.getElementById('chipReadingTime');
+  if (chipTime) chipTime.textContent = '⏱ ' + minutes + ' read';
+
+  const chipDate = document.getElementById('chipDateAdded');
+  if (chipDate) chipDate.textContent = '📅 Added ' + formattedDate;
+
+  const chipVocab = document.getElementById('chipVocab');
+  if (chipVocab) chipVocab.textContent = '📚 ' + vocabCount + ' vocab items';
+
+  // Difficulty meter (1 to 6)
+  const LEVEL_SEGMENTS = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
+  const meterSegments = LEVEL_SEGMENTS[level] || 3;
+  const meterEl = document.getElementById('vocabMeter');
+  if (meterEl) {
+    let segHtml = '';
+    for (let i = 0; i < 6; i++) {
+      segHtml += '<i class="' + (i < meterSegments ? 'on' : '') + '"></i>';
+    }
+    meterEl.innerHTML = segHtml;
+  }
+
+  // Cover
+  const coverContainer = document.getElementById('heroCoverContainer');
+  if (coverContainer) {
+    if (data.coverImage) {
+      coverContainer.innerHTML = '<img src="../../' + data.coverImage.replace(/^\/?/, '') + '" alt="' + (data.title || '') + '" onerror="this.style.display=\'none\'">';
+    } else {
+      coverContainer.innerHTML = '<div class="hero-cover-fallback"><div class="hero-cover-title">' + (data.title || '') + '</div><div class="hero-cover-author">' + author + '</div></div>';
+    }
+  }
+
+  // Descriptions
+  const aboutText = data.description || 'Explore "' + (data.title || '') + '", an engaging ' + genreFormatted.toLowerCase() + ' story specifically leveled at the CEFR ' + level + ' proficiency tier.';
+  const learnText = data.whatYouWillLearn || 'Master ' + level + '-level grammar structures and vocabulary in authentic context. Designed for English learners wanting to improve vocabulary retention and fluency.';
+
+  const aboutEl = document.getElementById('aboutTextDisplay');
+  if (aboutEl) aboutEl.textContent = aboutText;
+
+  const learnEl = document.getElementById('learnTextDisplay');
+  if (learnEl) learnEl.textContent = learnText;
+
+  // Stats list
+  const statLevel = document.getElementById('statLevel');
+  if (statLevel) {
+    statLevel.textContent = 'CEFR ' + level;
+    statLevel.style.color = 'var(--lvl-' + level + ')';
+  }
+
+  const statAuthor = document.getElementById('statAuthor');
+  if (statAuthor) statAuthor.textContent = author;
+
+  const statGenre = document.getElementById('statGenre');
+  if (statGenre) statGenre.textContent = genreFormatted;
+
+  const statTime = document.getElementById('statTime');
+  if (statTime) statTime.textContent = minutes;
+
+  const statWordCount = document.getElementById('statWordCount');
+  if (statWordCount) statWordCount.textContent = totalWords.toLocaleString() + ' words';
+
+  const statVocab = document.getElementById('statVocab');
+  if (statVocab) statVocab.textContent = vocabCount.toLocaleString() + ' words';
+
+  const statDate = document.getElementById('statDateAdded');
+  if (statDate) statDate.textContent = formattedDate;
+})();
+</script>
+</body>
+</html>

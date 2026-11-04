@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>The Apartment Next Door</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Literata:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+    <style>
+      :root{
+        --bg-void:#04050A;
+        --bg-deep:#0A0C16;
+        --bg-elevated:#12141F;
+        --bg-reader:#0C0E18;
+
+        --glass-fill: rgba(20,22,36,.55);
+        --glass-fill-soft: rgba(20,22,36,.32);
+        --glass-border: rgba(255,255,255,.08);
+        --glass-border-hi: rgba(255,255,255,.16);
+
+        --text-primary:#F5F7FA;
+        --text-secondary:#A7AFC2;
+        --text-tertiary:#666E82;
+        --text-reader:#EAE6DD;
+
+        --neon-cyan:#4CF5E0;
+        --neon-blue:#7CACF8;
+        --neon-violet:#9B7BFF;
+        --neon-magenta:#F472B6;
+        --neon-amber:#FFC876;
+
+        --lvl-A1:#34D399;
+        --lvl-A2:#4CF5E0;
+        --lvl-B1:#7CACF8;
+        --lvl-B2:#9B7BFF;
+        --lvl-C1:#F472B6;
+        --lvl-C2:#FB7185;
+
+        --radius-card:20px;
+        --radius-panel:26px;
+        --radius-pill:999px;
+
+        --ease-out-expo:cubic-bezier(.16,1,.3,1);
+      }
+
+      *{box-sizing:border-box;}
+      html,body{height:100%;}
+      body{
+        margin:0;
+        background:var(--bg-void);
+        color:var(--text-primary);
+        font-family:'Inter',sans-serif;
+        -webkit-font-smoothing:antialiased;
+        overflow-x:hidden;
+        padding-top:env(safe-area-inset-top,0px);
+        padding-bottom:env(safe-area-inset-bottom,0px);
+      }
+      ::selection{background:rgba(155,123,255,.35); color:#fff;}
+
+      a,button{font-family:inherit;}
+      button{cursor:pointer; background:none; border:none; color:inherit;}
+      img{max-width:100%; display:block;}
+
+      :focus-visible{
+        outline:2px solid var(--neon-cyan);
+        outline-offset:3px;
+        border-radius:6px;
+      }
+
+      h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-0.01em;}
+      p{margin:0;}
+
+      /* AMBIENT BACKGROUND */
+      .ambient{
+        position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+      }
+      .ambient::before, .ambient::after{
+        content:''; position:absolute; border-radius:50%; filter:blur(90px); opacity:.28;
+      }
+      .ambient::before{
+        width:640px; height:640px; top:-220px; left:-160px;
+        background:radial-gradient(circle, var(--neon-violet), transparent 70%);
+      }
+      .ambient::after{
+        width:560px; height:560px; bottom:-260px; right:-140px;
+        background:radial-gradient(circle, var(--neon-cyan), transparent 70%);
+        opacity:.18;
+      }
+      .grain{
+        position:fixed; inset:0; z-index:1; pointer-events:none;
+        opacity:.05; mix-blend-mode:overlay;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      /* GLASS CONTAINER */
+      .glass{
+        background:var(--glass-fill);
+        backdrop-filter:blur(22px) saturate(140%);
+        -webkit-backdrop-filter:blur(22px) saturate(140%);
+        border:1px solid var(--glass-border);
+      }
+
+      /* TOPBAR */
+      .topbar{
+        position:sticky; top:0; z-index:40;
+        display:flex; align-items:center; justify-content:space-between;
+        gap:16px; padding:16px clamp(16px,4vw,48px);
+        padding-top:calc(16px + env(safe-area-inset-top,0px));
+        background:rgba(4,5,10,.65);
+        backdrop-filter:blur(18px);
+        -webkit-backdrop-filter:blur(18px);
+        border-bottom:1px solid var(--glass-border);
+      }
+      .brand{display:flex; align-items:center; gap:10px; flex-shrink:0; text-decoration:none; color:inherit;}
+      .brand-mark{
+        width:34px; height:34px; border-radius:10px;
+        background:linear-gradient(145deg, var(--neon-cyan), var(--neon-violet));
+        display:flex; align-items:center; justify-content:center;
+        box-shadow:0 0 24px -4px rgba(155,123,255,.7);
+      }
+      .brand-mark svg{width:18px; height:18px; color:#04050A;}
+      .brand-name{font-family:'Space Grotesk'; font-weight:600; font-size:1.05rem; letter-spacing:-.01em;}
+
+      .nav-tabs{
+        display:flex; gap:4px; padding:3px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        flex-shrink:0;
+      }
+      .nav-tab-btn{
+        padding:6px 14px; border-radius:var(--radius-pill); font-size:.82rem; font-weight:500;
+        color:var(--text-secondary); transition:all 180ms var(--ease-out-expo);
+        text-decoration:none; display:inline-flex; align-items:center;
+      }
+      .nav-tab-btn:hover{ color:var(--text-primary); }
+
+      /* MAIN LAYOUT */
+      .page-main{
+        position:relative; z-index:2;
+        max-width:1100px; margin:0 auto;
+        padding:32px clamp(16px,4vw,48px) 96px;
+      }
+
+      /* BACK LINK */
+      .back-link-btn{
+        display:inline-flex; align-items:center; gap:8px;
+        padding:8px 16px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        font-size:.85rem; font-weight:500; color:var(--text-secondary);
+        transition:all 180ms var(--ease-out-expo); margin-bottom:28px;
+        text-decoration:none;
+      }
+      .back-link-btn:hover{ color:var(--text-primary); border-color:var(--glass-border-hi); transform:translateX(-2px); }
+      .back-link-btn svg{ width:16px; height:16px; }
+
+      /* HERO META CARD */
+      .hero-meta-card{
+        position:relative; padding:clamp(24px,4vw,40px);
+        border-radius:32px; overflow:hidden;
+        margin-bottom:36px;
+      }
+      .hero-grid{
+        display:grid; grid-template-columns:220px 1fr; gap:36px; align-items:start;
+      }
+      @media (max-width:768px){
+        .hero-grid{ grid-template-columns:1fr; gap:24px; justify-items:center; text-align:center; }
+        .hero-meta-chips{ justify-content:center; }
+        .hero-actions-row{ justify-content:center; }
+      }
+
+      .hero-cover{
+        width:220px; aspect-ratio:2/3; border-radius:20px; overflow:hidden; position:relative;
+        box-shadow:0 24px 60px -16px rgba(0,0,0,.75); flex-shrink:0;
+        background:linear-gradient(160deg, #3b2d6b, #151829);
+      }
+      .hero-cover img{ width:100%; height:100%; object-fit:cover; }
+      .hero-cover-fallback{
+        position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
+        padding:18px 16px; background:linear-gradient(0deg, rgba(0,0,0,.85) 0%, transparent 80%);
+      }
+      .hero-cover-title{ font-family:'Space Grotesk'; font-size:1.05rem; font-weight:600; color:#fff; }
+      .hero-cover-author{ font-size:.8rem; color:rgba(255,255,255,.7); }
+
+      .hero-info{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+      .book-display-title{ font-size:clamp(1.8rem,3.2vw,2.5rem); font-weight:700; line-height:1.2; }
+      .book-display-author{ font-size:1.05rem; color:var(--text-secondary); }
+
+      .hero-meta-chips{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+      .meta-chip{
+        display:inline-flex; align-items:center; gap:6px;
+        font-size:.82rem; font-weight:600; padding:6px 14px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border); color:var(--text-secondary);
+      }
+      .level-dot{ width:8px; height:8px; border-radius:50%; background:currentColor; display:inline-block; }
+
+      .vocab-meter{ display:flex; gap:4px; width:160px; height:5px; margin-top:2px; }
+      .vocab-meter i{ display:block; flex:1; height:100%; border-radius:99px; background:rgba(255,255,255,.1); }
+      .vocab-meter i.on{ background:var(--neon-violet); }
+
+      .hero-actions-row{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:8px; }
+      .btn-primary-lg{
+        display:inline-flex; align-items:center; gap:10px;
+        padding:14px 28px; border-radius:var(--radius-pill);
+        background:linear-gradient(120deg, var(--neon-cyan), var(--neon-violet));
+        color:#04050A; font-weight:700; font-size:1rem; text-decoration:none;
+        box-shadow:0 12px 36px -8px rgba(155,123,255,.6);
+        transition:transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+      }
+      .btn-primary-lg:hover{ transform:translateY(-2px); box-shadow:0 16px 42px -8px rgba(155,123,255,.75); }
+      .btn-primary-lg svg{ width:20px; height:20px; }
+
+      /* METADATA STATS GRID */
+      .sections-grid{ display:grid; grid-template-columns:2fr 1fr; gap:28px; margin-bottom:36px; }
+      @media (max-width:840px){
+        .sections-grid{ grid-template-columns:1fr; }
+      }
+
+      .section-box{
+        padding:28px; border-radius:24px; display:flex; flex-direction:column; gap:16px;
+      }
+      .section-box-title{ font-size:1.15rem; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:8px; }
+      .section-box-title svg{ width:18px; height:18px; color:var(--neon-cyan); }
+      .section-box-body{ font-size:.95rem; line-height:1.7; color:var(--text-secondary); }
+
+      .stat-list{ display:flex; flex-direction:column; gap:14px; list-style:none; padding:0; margin:0; }
+      .stat-item{ display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--glass-border); font-size:.88rem; }
+      .stat-item:last-child{ border-bottom:none; padding-bottom:0; }
+      .stat-label{ color:var(--text-tertiary); }
+      .stat-val{ color:var(--text-primary); font-weight:600; }
+
+      /* STORY READER CARD (CONTAINING REQUIRED H1, H2, P ELEMENTS) */
+      .story-reader-card{
+        border-radius:28px;
+        padding:clamp(28px,5vw,60px);
+        background:var(--bg-reader);
+        border:1px solid var(--glass-border);
+        box-shadow:0 30px 80px -20px rgba(0,0,0,.8);
+      }
+      .story-reader-container{
+        max-width:68ch; margin:0 auto;
+      }
+
+      /* REQUIRED ELEMENT SPECIFICATIONS */
+      h1.book-id-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.4rem, 2.5vw, 2rem);
+        font-weight:700;
+        color:var(--text-primary);
+        letter-spacing:-0.01em;
+        margin-bottom:24px;
+        padding-bottom:16px;
+        border-bottom:1px solid var(--glass-border);
+      }
+      h2.chapter-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.2rem, 2vw, 1.5rem);
+        font-weight:600;
+        color:var(--neon-cyan);
+        letter-spacing:-0.01em;
+        margin-top:36px;
+        margin-bottom:20px;
+      }
+      h2.chapter-heading:first-of-type{
+        margin-top:12px;
+      }
+      p.story-paragraph{
+        font-family:'Literata',serif;
+        font-size:1.12rem;
+        line-height:1.9;
+        color:var(--text-reader);
+        margin-bottom:1.5em;
+      }
+      p.story-paragraph:last-child{
+        margin-bottom:0;
+      }
+
+      @media (max-width:768px){
+        .topbar{ padding:10px 14px; }
+        .page-main{ padding:20px 14px 64px; }
+        .hero-meta-card{ padding:20px 16px; border-radius:24px; }
+        .section-box{ padding:20px 18px; }
+        .story-reader-card{ padding:24px 18px; border-radius:20px; }
+        p.story-paragraph{ font-size:1.02rem; line-height:1.75; }
+      }
+    </style>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a href="../../index.html" class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M20 6v14h-4V6a2 2 0 0 1 4 0z" opacity=".55"/></svg>
+    </div>
+    <span class="brand-name">Lumen</span>
+  </a>
+  <nav class="nav-tabs">
+    <a href="../../index.html" class="nav-tab-btn">Library / Search</a>
+    <a href="../../discover.html" class="nav-tab-btn">Discover</a>
+  </nav>
+</header>
+
+<main class="page-main">
+
+  <a href="../../book.html?id=daily-14" class="back-link-btn" id="backBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    Back to Book Details
+  </a>
+
+  <!-- HERO METADATA CARD (POPULATED DYNAMICALLY FROM JSON) -->
+  <article class="hero-meta-card glass" id="metaHeroCard">
+    <div class="hero-grid">
+      <div class="hero-cover" id="heroCoverContainer">
+        <!-- Render cover image or styled fallback -->
+      </div>
+      <div class="hero-info">
+        <h2 class="book-display-title" id="bookDisplayTitle">The Apartment Next Door</h2>
+        <p class="book-display-author" id="bookDisplayAuthor">—</p>
+
+        <div class="hero-meta-chips" id="heroMetaChips">
+          <span class="meta-chip" id="chipLevel">Level —</span>
+          <span class="meta-chip" id="chipGenre">Genre —</span>
+          <span class="meta-chip" id="chipReadingTime">⏱ — min read</span>
+          <span class="meta-chip" id="chipDateAdded">📅 Added —</span>
+          <span class="meta-chip" id="chipVocab">📚 — vocab items</span>
+        </div>
+
+        <div>
+          <p style="font-size: .78rem; color: var(--text-tertiary); margin-bottom: 6px;">DIFFICULTY RATING</p>
+          <div class="vocab-meter" id="vocabMeter" aria-label="Difficulty Rating"></div>
+        </div>
+
+        <div class="hero-actions-row">
+          <a href="../../book.html?id=daily-14" class="btn-primary-lg" id="readInteractiveBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span>Interactive Reader</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- METADATA SECTIONS (ABOUT, LEARNING, STATS) -->
+  <div class="sections-grid">
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        About This Book
+      </h3>
+      <p class="section-box-body" id="aboutTextDisplay">
+        Loading description…
+      </p>
+
+      <h3 class="section-box-title" style="margin-top: 14px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        What You'll Learn
+      </h3>
+      <p class="section-box-body" id="learnTextDisplay">
+        Loading learning objectives…
+      </p>
+    </div>
+
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Reading Stats
+      </h3>
+      <ul class="stat-list">
+        <li class="stat-item">
+          <span class="stat-label">CEFR Level</span>
+          <span class="stat-val" id="statLevel">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Author</span>
+          <span class="stat-val" id="statAuthor">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Genre</span>
+          <span class="stat-val" id="statGenre">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Estimated Time</span>
+          <span class="stat-val" id="statTime">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Word Count</span>
+          <span class="stat-val" id="statWordCount">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Vocabulary Items</span>
+          <span class="stat-val" id="statVocab">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Date Added</span>
+          <span class="stat-val" id="statDateAdded">—</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- STORY CONTENT (CONTAINING REQUIRED H1, H2, P ELEMENTS) -->
+  <article class="story-reader-card">
+    <div class="story-reader-container">
+        <h1 class="book-id-heading">daily-14</h1>
+        <h2 class="chapter-heading">0 A New Address</h2>
+
+        <p class="story-paragraph">The old town looked especially friendly on a sunny Saturday. Small shops stood along the narrow streets, and flower boxes filled the windows. Daniel Carter and his wife, Emma, stopped outside a tall cream-coloured building with green shutters.</p>
+        <p class="story-paragraph">“This is it,” Emma said. “Our first home.”</p>
+        <p class="story-paragraph">Daniel looked up at the windows. “And our first home with no lift.”</p>
+        <p class="story-paragraph">They had rented the apartment on the third floor. It had two rooms, a small kitchen and a narrow balcony. The building was old, but the rent was within their budget. It also had a quiet courtyard at the back, which Emma liked.</p>
+        <p class="story-paragraph">Their friend Mark was waiting by the door with a handcart. His partner, Sophie, was upstairs with their young child, Leo. They lived on the floor above Daniel and Emma.</p>
+        <p class="story-paragraph">“You brought everything you own?” Mark asked as he looked at the boxes.</p>
+        <p class="story-paragraph">“Not everything,” Daniel said. “Only the things we use.”</p>
+        <p class="story-paragraph">Emma smiled. “And a box of cups that Daniel says we never use.”</p>
+        <p class="story-paragraph">“We may need them one day,” he replied.</p>
+        <p class="story-paragraph">The front door opened into a hallway with a patterned tile floor. A wooden staircase went up beside the mailboxes. Its steps made a different sound under every foot. Daniel carried a box marked BOOKS and learned this before he reached the first landing.</p>
+        <p class="story-paragraph">“Careful,” Mark called. “That step makes a noise like a duck.”</p>
+        <p class="story-paragraph">It did. The sound made Emma laugh, though Daniel was trying not to drop the box.</p>
+        <p class="story-paragraph">Their apartment door was painted blue. Inside, the rooms were bright but not large. There was a little space by the front door for coats and shoes. The kitchen window looked down into the shared courtyard, where a bicycle leaned against the wall.</p>
+        <p class="story-paragraph">Emma began to open boxes. She put plates on the kitchen shelves and arranged her books by subject. Daniel unfolded a paper plan and measured the sitting room.</p>
+        <p class="story-paragraph">“The table should go here,” he said. “Then we can walk through without hitting it.”</p>
+        <p class="story-paragraph">“I thought it would look better near the window.”</p>
+        <p class="story-paragraph">Daniel checked the measurements again. “It might block the cupboard.”</p>
+        <p class="story-paragraph">“We can try both places.”</p>
+        <p class="story-paragraph">They tried. The table near the window blocked the cupboard, and the table in Daniel’s place made the room feel like a small office. In the end, they put it in the middle and agreed to move it again when the sofa arrived.</p>
+        <p class="story-paragraph">That evening they sat on the floor and ate bread, cheese and tomatoes from two plates. The sofa was still with the delivery company, and their chairs were inside a box that they could not find.</p>
+        <p class="story-paragraph">“This is not how I imagined our first dinner,” Emma said.</p>
+        <p class="story-paragraph">“It is better than eating from the floor with no table,” Daniel replied.</p>
+        <p class="story-paragraph">Emma looked at the half-empty room. “I like it here. We can walk to school and to your office. There’s a bakery around the corner.”</p>
+        <p class="story-paragraph">“And our monthly costs are still possible,” Daniel said. “If we are careful.”</p>
+        <p class="story-paragraph">They had made a budget together: rent, electricity, water, food and a small amount for repairs or surprises. Daniel liked a clear plan. Emma liked a little space in it for life to happen.</p>
+        <p class="story-paragraph">A soft noise came from the hallway. Someone was climbing the stairs, slowly. A moment later, a woman with silver hair appeared at their open door.</p>
+        <p class="story-paragraph">“I’m Mrs Wilson,” she said. “I live on the first floor. I brought you the number for the building manager. The doorbell sometimes sticks.”</p>
+        <p class="story-paragraph">“That’s kind of you,” Emma said, taking the small card.</p>
+        <p class="story-paragraph">Mrs Wilson looked at the boxes. “Moving day. I hope the stairs have been polite.”</p>
+        <p class="story-paragraph">“One step sounds like a duck,” Daniel said.</p>
+        <p class="story-paragraph">“Ah, the third step. It has been doing that for years.” Mrs Wilson smiled. “Welcome to the building.”</p>
+
+        <h2 class="chapter-heading">1 The First Night</h2>
+
+        <p class="story-paragraph">By half past ten, Daniel and Emma had found their chairs. They had also found the box of cups, though neither of them needed one. The room was still full of boxes, but at least they could sit down.</p>
+        <p class="story-paragraph">Emma made tea. Daniel checked the front door twice and put the rent papers in a folder.</p>
+        <p class="story-paragraph">“You can stop checking,” Emma said. “The door is locked.”</p>
+        <p class="story-paragraph">“I like to be sure.”</p>
+        <p class="story-paragraph">“You were sure the first time.”</p>
+        <p class="story-paragraph">They were getting ready for bed when music began through the wall. It was loud enough for them to hear the words of the song. A cheerful guitar played over and over.</p>
+        <p class="story-paragraph">Daniel looked at the clock. “It’s nearly eleven.”</p>
+        <p class="story-paragraph">Emma listened for a moment. “Maybe it will stop soon.”</p>
+        <p class="story-paragraph">It did not stop. Daniel walked into the hallway and stood by the next door. He raised his hand to knock, then lowered it.</p>
+        <p class="story-paragraph">“Let’s speak to him in the morning,” Emma said from their doorway. “It’s our first night. We don’t know his usual routine.”</p>
+        <p class="story-paragraph">“The usual routine should not include a concert at this hour.”</p>
+        <p class="story-paragraph">“You can ask him without starting an argument.”</p>
+        <p class="story-paragraph">Daniel returned to the bedroom. The music continued for another twenty minutes. At last, the room went quiet. Emma fell asleep quickly. Daniel lay awake, thinking about the building rules and whether the other tenants followed them.</p>
+        <p class="story-paragraph">In the morning, he found two problems before breakfast. The kitchen tap dripped into the sink. In the sitting room, a dark damp patch showed near the wall that they shared with the next apartment.</p>
+        <p class="story-paragraph">“We should tell Mr Harris,” Daniel said. “And ask about quiet hours.”</p>
+        <p class="story-paragraph">Emma turned the tap handle gently. The dripping slowed, then started again. “We should tell him about the tap. But perhaps we can speak to our neighbour first.”</p>
+        <p class="story-paragraph">They took a small plate and walked next door. Daniel knocked. A moment later, the door opened. A tall older man stood there in a blue shirt. A radio played softly behind him.</p>
+        <p class="story-paragraph">“Good morning,” Emma said. “We’re Daniel and Emma. We’ve just moved in next door.”</p>
+        <p class="story-paragraph">“Ah! Welcome,” he said. “I’m Novak. People call me Mr Novak.”</p>
+        <p class="story-paragraph">Daniel began carefully. “We wanted to ask about the music last night. It was quite loud for us.”</p>
+        <p class="story-paragraph">Mr Novak looked surprised. “Was it? I had it on while I put a shelf together. I didn’t notice the time.”</p>
+        <p class="story-paragraph">“We could hear it through the wall,” Daniel said.</p>
+        <p class="story-paragraph">Mr Novak put a hand behind his ear. “My hearing is not what it used to be. I often keep the radio louder than I mean to. I can turn it down at night.”</p>
+        <p class="story-paragraph">He did not sound angry. He sounded embarrassed. Emma noticed a half-built shelf and several screws on the floor behind him.</p>
+        <p class="story-paragraph">“Thank you,” she said. “We’re still getting used to the building too.”</p>
+        <p class="story-paragraph">Mr Novak gave them a warm smile. “And I’m still getting used to my ears.”</p>
+        <p class="story-paragraph">They introduced themselves properly and spoke for a few minutes. Mr Novak had lived there for many years. He liked making small repairs, though, he said, “I must remember not to repair things after ten.”</p>
+        <p class="story-paragraph">“We also have a dripping tap and a damp mark,” Daniel said. “Do you know who we should call?”</p>
+        <p class="story-paragraph">“Mr Harris, the landlord. He usually sends Peter for repairs. Peter knows every pipe in this building.”</p>
+        <p class="story-paragraph">Back in their apartment, Daniel wrote down the problems. Emma looked at the list.</p>
+        <p class="story-paragraph">“You wrote ‘noise’ in capital letters.”</p>
+        <p class="story-paragraph">“It was useful information.”</p>
+        <p class="story-paragraph">“Perhaps. But we can start with ‘tap, damp wall, music conversation.’”</p>
+        <p class="story-paragraph">Daniel changed the list. He still wanted clear rules, but he had seen that Mr Novak was not trying to upset them. The next step was to contact the landlord and find out what could be done.</p>
+
+        <h2 class="chapter-heading">2 A Damp Surprise</h2>
+
+        <p class="story-paragraph">Daniel sent Mr Harris a short email with a photograph of the damp patch and a description of the dripping tap. He added that they would be grateful if someone could look at both problems soon.</p>
+        <p class="story-paragraph">Emma read it before he sent it. “That sounds polite.”</p>
+        <p class="story-paragraph">“It is also clear,” Daniel said. “We need both things repaired.”</p>
+        <p class="story-paragraph">Mr Harris replied that afternoon. He thanked them for telling him and said Peter would visit on Tuesday. He also asked them not to paint over the damp patch. He wanted Peter to find where the water was coming from.</p>
+        <p class="story-paragraph">Daniel wrote Tuesday on the calendar. Emma wrote “Peter” beside it and drew a tiny picture of a hammer.</p>
+        <p class="story-paragraph">On Monday evening, the couple went downstairs to the shared rubbish area. It was in a small room beside the courtyard. There were separate bins for paper, glass and general rubbish. A notice explained the rules in three languages.</p>
+        <p class="story-paragraph">Daniel held a bag of paper while Emma looked for the paper bin.</p>
+        <p class="story-paragraph">“This room is tidier than our apartment,” she said.</p>
+        <p class="story-paragraph">A man came through the courtyard carrying a box. “You must be the new neighbours,” he said. “I’m Peter.”</p>
+        <p class="story-paragraph">He worked as a repair worker for Mr Harris and lived nearby. Peter set down the box and showed them the bins. Then he noticed Daniel’s note in his hand.</p>
+        <p class="story-paragraph">“Is that about the tap?” he asked.</p>
+        <p class="story-paragraph">“And the damp patch,” Daniel said.</p>
+        <p class="story-paragraph">Peter frowned a little. “A wall can look damp for a few reasons. The tap may be separate. I’ll check them both.”</p>
+        <p class="story-paragraph">“Could it be a large problem?” Emma asked.</p>
+        <p class="story-paragraph">“It might be a small leak. I won’t know until I look.” Peter gave a small shrug. “Old buildings like to keep a few secrets.”</p>
+        <p class="story-paragraph">That night, the music next door stayed low. Daniel heard it only when he stood in the hallway. He was about to mention it to Emma when he remembered that Mr Novak had turned it down as promised.</p>
+        <p class="story-paragraph">On Tuesday, Peter arrived with a tool bag. He checked the kitchen tap first. He turned the handle, listened, and looked under the sink.</p>
+        <p class="story-paragraph">“The washer is worn,” he said. “That is an easy repair.”</p>
+        <p class="story-paragraph">“Excellent,” Daniel replied. “And the wall?”</p>
+        <p class="story-paragraph">Peter moved a small cupboard away from the damp patch. The mark was larger behind it. He pressed the wall gently and checked the pipe that ran along the corner.</p>
+        <p class="story-paragraph">“I need more time to find the cause,” he said. “I can come back tomorrow with a small camera for the pipe.”</p>
+        <p class="story-paragraph">Daniel’s face tightened. “Can’t you repair it today?”</p>
+        <p class="story-paragraph">“If I guess, I may make it worse. I don’t want to cut into the wall until I know where the water is coming from.”</p>
+        <p class="story-paragraph">Emma touched Daniel’s arm. “It makes sense to check first.”</p>
+        <p class="story-paragraph">Peter replaced the tap washer. The drip stopped. Then he explained that he would need permission to look at the pipes behind part of the wall. Mr Harris would arrange it if the test showed a leak.</p>
+        <p class="story-paragraph">When Peter left, Daniel stood in the kitchen and turned the tap on and off. It worked perfectly.</p>
+        <p class="story-paragraph">“One problem solved,” Emma said.</p>
+        <p class="story-paragraph">“One,” Daniel agreed. He looked at the damp mark. “I thought the wall would be fixed today.”</p>
+        <p class="story-paragraph">“We know more than we did yesterday,” she said. “That counts.”</p>
+        <p class="story-paragraph">A little later, Sophie came down from the floor above. She had Leo in one arm and a folded blanket in the other.</p>
+        <p class="story-paragraph">“Sorry if he runs around,” she said. “He has discovered that the hallway makes a wonderful echo.”</p>
+        <p class="story-paragraph">Leo made a soft, proud noise.</p>
+        <p class="story-paragraph">“We understand,” Emma said. “We’re still learning how sound travels in this building.”</p>
+        <p class="story-paragraph">Sophie smiled with relief. “We try to keep him quiet after his bedtime, but some nights are harder than others.”</p>
+        <p class="story-paragraph">Daniel nodded. The building’s problems were not only about broken taps. Everyone had different routines, and the old walls carried more sound than he had expected.</p>
+
+        <h2 class="chapter-heading">3 The Courtyard Meeting</h2>
+
+        <p class="story-paragraph">Peter returned the next morning with a small camera. He removed a panel near the kitchen pipe and looked inside. Daniel stood beside him, trying not to ask a question every few seconds.</p>
+        <p class="story-paragraph">At last Peter stepped back. “I found a slow leak in a pipe behind the wall. It is not coming from your tap. The joint is old.”</p>
+        <p class="story-paragraph">“Can you fix it?” Emma asked.</p>
+        <p class="story-paragraph">“Yes, but I need to open a small part of the wall. Mr Harris has approved it. I’ll come on Friday.”</p>
+        <p class="story-paragraph">Daniel glanced at the damp patch. “Could the repair wait until next week?”</p>
+        <p class="story-paragraph">“It could, but I would not advise it. The leak is small, but the wall needs to dry after the repair.”</p>
+        <p class="story-paragraph">Emma arranged for one of them to work from home on Friday. Daniel wrote down the time and asked Peter to send a message if he was delayed.</p>
+        <p class="story-paragraph">“Good plan,” Peter said. “And I’ll bring a cloth for the dust.”</p>
+        <p class="story-paragraph">When he left, Emma opened the kitchen window. The room smelled a little of wet plaster.</p>
+        <p class="story-paragraph">That evening, Mr Novak knocked on their door. He held a small box of biscuits.</p>
+        <p class="story-paragraph">“A welcome gift,” he said. “And an apology for the music. I have put a mark on the radio. After ten, it stays below this line.”</p>
+        <p class="story-paragraph">Daniel accepted the box. “That is helpful. Thank you.”</p>
+        <p class="story-paragraph">Mr Novak looked at the kitchen. “Peter is working on the pipe?”</p>
+        <p class="story-paragraph">“On Friday,” Emma said.</p>
+        <p class="story-paragraph">“Good. I used to do small repairs in this building, but plumbing is not my best skill. I once repaired a bathroom tap and made it point at the ceiling.”</p>
+        <p class="story-paragraph">“Did it work?” Daniel asked.</p>
+        <p class="story-paragraph">“It worked very well as a small fountain.”</p>
+        <p class="story-paragraph">They all laughed. Mr Novak said he could lend them a fan to help dry the room after Peter’s repair. Daniel hesitated. He did not want to seem unfriendly, but he also did not want anyone to work on the wall without the landlord’s agreement.</p>
+        <p class="story-paragraph">“The repair itself is for Peter,” Daniel said. “But a fan would be useful afterwards, if you don’t need it.”</p>
+        <p class="story-paragraph">“It is just sitting in my cupboard,” Mr Novak said. “You can borrow it.”</p>
+        <p class="story-paragraph">The next day, Mrs Wilson invited several neighbours to meet in the courtyard. She wanted to talk about the rubbish area. Some people left bags beside the bins when the containers were full. The bags sometimes tore, and birds made a mess.</p>
+        <p class="story-paragraph">“I’m not asking anyone to do everything perfectly,” Mrs Wilson said. “But we need a plan for busy days.”</p>
+        <p class="story-paragraph">Mark and Sophie joined them with Leo in his pushchair. Mark said he sometimes came home late from work and did not know which bin had space. Sophie explained that carrying a baby and a rubbish bag down the stairs was not easy.</p>
+        <p class="story-paragraph">Mr Novak offered to put a simple sign on the inside of the rubbish-room door, showing the collection days. Daniel suggested a short note in the building’s message box for everyone.</p>
+        <p class="story-paragraph">“We could also agree not to leave bags on the floor,” Emma said. “If a bin is full, we can bring the bag back and try again later.”</p>
+        <p class="story-paragraph">Sophie nodded. “That is fair, as long as people know which day the bins are emptied.”</p>
+        <p class="story-paragraph">Mrs Wilson wrote down the idea. Nobody solved the whole problem in five minutes, but they agreed on the next step: check the collection days and put up a clear notice.</p>
+        <p class="story-paragraph">As they went inside, Daniel noticed that the meeting had been easier than he expected.</p>
+        <p class="story-paragraph">“People have reasons for what they do,” Emma said.</p>
+        <p class="story-paragraph">“Yes,” Daniel replied. “Though I still think the rubbish bags should not be left on the floor.”</p>
+        <p class="story-paragraph">“That is a useful rule,” she said. “You can put it on the notice without using capital letters.”</p>
+        <p class="story-paragraph">“I make no promise.”</p>
+
+        <h2 class="chapter-heading">4 Friday Repairs</h2>
+
+        <p class="story-paragraph">Peter arrived on Friday morning, exactly when he said he would. He covered the kitchen floor and the cupboard with a cloth. Daniel stood nearby with his list, while Emma moved the breakfast things out of the way.</p>
+        <p class="story-paragraph">“I’ll try to keep the dust in this area,” Peter said. “But old plaster has its own ideas.”</p>
+        <p class="story-paragraph">He opened a small part of the wall and repaired the leaking joint. The work took longer than he expected. Once, he stopped to call Mr Harris and explain that the pipe had been in worse condition behind the wall.</p>
+        <p class="story-paragraph">Daniel heard the word “extra” and looked worried.</p>
+        <p class="story-paragraph">“Is this going to cost us?” he asked after Peter ended the call.</p>
+        <p class="story-paragraph">“No,” Peter said. “The pipe is part of the building. Mr Harris will pay for the repair. I wanted to tell him before I did more work.”</p>
+        <p class="story-paragraph">Daniel felt his shoulders relax. “Thank you for checking.”</p>
+        <p class="story-paragraph">By lunchtime, the leak was fixed. Peter left the wall open so it could dry before he filled and painted it. The kitchen looked untidy, but the tap still worked and the pipe was no longer wet.</p>
+        <p class="story-paragraph">“That is progress,” Emma said.</p>
+        <p class="story-paragraph">“It is a hole in the wall,” Daniel replied.</p>
+        <p class="story-paragraph">“A hole with no leak.”</p>
+        <p class="story-paragraph">Mr Novak brought over his fan that afternoon. He helped them set it at a safe distance from the open wall. He did not touch the pipes or tools.</p>
+        <p class="story-paragraph">“I’ve learned that I should ask before helping,” he said.</p>
+        <p class="story-paragraph">“We appreciate you asking,” Emma told him.</p>
+        <p class="story-paragraph">While the wall dried, the neighbours put their rubbish notice in the shared room. Mark and Sophie checked the collection days with Mrs Wilson, and the sign showed which bins were emptied on Monday and Thursday.</p>
+        <p class="story-paragraph">They added one more line: If a bin is full, please take your bag home and try again later.</p>
+        <p class="story-paragraph">Daniel read it twice. There were no capital letters. He accepted this.</p>
+        <p class="story-paragraph">Over the next few days, the tap stayed dry. The wall felt less cold, and the dark patch slowly became lighter. Daniel still checked it each morning, but he no longer sent Mr Harris a message every day.</p>
+        <p class="story-paragraph">Mr Novak kept his radio below the marked line in the evenings. One night, a song was still a little louder than the rest. Daniel heard it through the wall. He waited, then knocked.</p>
+        <p class="story-paragraph">Mr Novak opened the door quickly. “Too loud?”</p>
+        <p class="story-paragraph">“A little,” Daniel said. “Could you turn it down one step?”</p>
+        <p class="story-paragraph">“Of course.” Mr Novak lowered the sound. “My ears say this is quiet. The wall seems to disagree.”</p>
+        <p class="story-paragraph">“The wall has strong opinions,” Daniel said.</p>
+        <p class="story-paragraph">Mr Novak laughed and turned the radio down again. Daniel went back to his apartment feeling better than he had after the first night.</p>
+        <p class="story-paragraph">On Sunday, Emma and Daniel carried the small table out to the balcony. They tried it there and found that it left too little room to pass. They brought it back in and placed it near the window, but moved the chairs so the cupboard could still open.</p>
+        <p class="story-paragraph">“A compromise,” Emma said.</p>
+        <p class="story-paragraph">“The table is near the window, and the cupboard opens,” Daniel replied. “This is a successful plan.”</p>
+        <p class="story-paragraph">They ate lunch at the table. Through the open window, they heard ordinary sounds: footsteps on the stairs, a child laughing upstairs and someone closing the rubbish-room door in the courtyard.</p>
+        <p class="story-paragraph">That evening, Sophie and Mark came down with a small cake to thank them for being patient with Leo’s running. They stayed for tea. Mrs Wilson passed through the hallway and joined them for a few minutes. Mr Novak came too, carrying his own cup.</p>
+        <p class="story-paragraph">They talked about work, school and the old building. Nobody agreed on everything. Mark liked to open the courtyard windows, while Mrs Wilson worried about cold air. Daniel liked clear rules, and Emma liked friendly conversations. But they found ways to speak and listen.</p>
+        <p class="story-paragraph">Before bed, Daniel looked at the repair list. The tap was fixed. The pipe was fixed. The wall still needed its final repair, but Peter had arranged a date with Mr Harris.</p>
+        <p class="story-paragraph">“Not bad for our first week,” Emma said.</p>
+        <p class="story-paragraph">Daniel folded the list and put it in the drawer. “Not bad. And the neighbours are not as difficult as a dripping tap.”</p>
+        <p class="story-paragraph">“A dripping tap can be very difficult,” Emma said.</p>
+        <p class="story-paragraph">They laughed, then turned off the light. The building settled around them with its old wooden steps and quiet pipes. Next door, the radio stayed low.</p>
+
+        <h2 class="chapter-heading">5 A Quiet Morning</h2>
+
+        <p class="story-paragraph">On Monday morning, Daniel woke before his alarm. He lay still and listened. From the flat above came a short scrape, then three heavy steps. After that, something rolled across the floor.</p>
+        <p class="story-paragraph">He looked at the clock. It was six fifteen.</p>
+        <p class="story-paragraph">Emma pulled the blanket over her head. “Perhaps they are moving a piano,” she said.</p>
+        <p class="story-paragraph">“A very small piano,” Daniel replied. “They moved it across the room yesterday too.”</p>
+        <p class="story-paragraph">The noise stopped. Daniel tried to sleep again, but a door closed upstairs. Then came the sound of water running. He sat up with a sigh.</p>
+        <p class="story-paragraph">“It is early,” Emma said, still under the blanket. “But people have to get ready for work.”</p>
+        <p class="story-paragraph">“I know. I am not asking them to stay in bed. I just want to understand why everything has to be so loud.”</p>
+        <p class="story-paragraph">At breakfast, they heard another scrape overhead. Daniel put down his cup harder than he meant to.</p>
+        <p class="story-paragraph">“I’ll speak to Mr Novak,” he said.</p>
+        <p class="story-paragraph">Emma looked at him. “Maybe wait until after work. We don’t know what is happening up there.”</p>
+        <p class="story-paragraph">Daniel wanted to answer, but the sound of rolling furniture came again. His patience had already become thin. He went into the hallway and climbed the stairs.</p>
+        <p class="story-paragraph">Mr Novak opened his door wearing a shirt and one slipper. Behind him, a chair stood on its side in the middle of the room. A small table was pushed against the wall.</p>
+        <p class="story-paragraph">“Good morning,” Daniel said. “Could you please stop moving furniture before six in the morning?”</p>
+        <p class="story-paragraph">Mr Novak blinked. “Before six? I did not know the time. I was looking for my keys.”</p>
+        <p class="story-paragraph">“It is a very loud way to look for keys.” Daniel heard how sharp his voice sounded, but he did not stop. “It happens every day. We have to work too.”</p>
+        <p class="story-paragraph">For a moment, neither man spoke. Then Mr Novak’s face became tired rather than angry.</p>
+        <p class="story-paragraph">“I am sorry about the chair,” he said. “My daughter came early to take it to her new room. She had to leave for work. We tried to move it quietly.”</p>
+        <p class="story-paragraph">Daniel looked at the chair. One leg had a piece of cloth tied around it. “I see.”</p>
+        <p class="story-paragraph">“I have a bad knee,” Mr Novak added. “Sometimes I walk heavily. I will be more careful in the morning.”</p>
+        <p class="story-paragraph">Daniel felt his face grow warm. “I could have asked more politely. I’m sorry. I have been tired.”</p>
+        <p class="story-paragraph">“We are both tired,” Mr Novak said. “That is no reason to shout in the stairs.”</p>
+        <p class="story-paragraph">They agreed that furniture could be moved later in the day when possible. Mr Novak would put felt pads under the chair legs. Daniel went downstairs, embarrassed but relieved that the talk had not become a fight.</p>
+        <p class="story-paragraph">At home, Emma was washing their breakfast plates. “How did it go?” she asked.</p>
+        <p class="story-paragraph">“I was too harsh. But we talked.”</p>
+        <p class="story-paragraph">“Good,” she said. She paused, then looked at the calendar on the wall. “There is something I should have told you.”</p>
+        <p class="story-paragraph">Daniel waited.</p>
+        <p class="story-paragraph">“The music last night was Sophie’s. She asked if she could practise for a small concert. I said yes, but I didn’t ask when she would stop.”</p>
+        <p class="story-paragraph">“You told me Mr Novak was making noise.”</p>
+        <p class="story-paragraph">“I thought he was. Then Sophie said it was her music. I didn’t want to make it awkward, so I didn’t tell you.”</p>
+        <p class="story-paragraph">Daniel leaned against the kitchen table. “I complained about the wrong person.”</p>
+        <p class="story-paragraph">“Not all the noise was hers,” Emma said. “And she did turn it down when I asked. I should have been clear.”</p>
+        <p class="story-paragraph">They called Sophie, who lived across the courtyard with her brother, Mark. She answered with music playing quietly in the background.</p>
+        <p class="story-paragraph">“I’m sorry,” Sophie said. “I was practising the same part again and again. I can use headphones for some of it. For the rest, I’ll practise after work, not late.”</p>
+        <p class="story-paragraph">Mark came to the phone. “I built a low shelf for her music books,” he said. “I may have made some noise carrying it upstairs on Saturday. I should have told you.”</p>
+        <p class="story-paragraph">“Thanks for explaining,” Daniel said. “We are trying to understand the sounds before we complain about them.”</p>
+        <p class="story-paragraph">That evening, Mark brought felt pads for Mr Novak’s chair and a small packet of them for Daniel and Emma too. They sat together in the courtyard while he fixed the pads to the kitchen chairs.</p>
+        <p class="story-paragraph">“It is strange,” Emma said. “The building makes every little sound seem bigger.”</p>
+        <p class="story-paragraph">Mark nodded. “The floors carry sound, and the hallway carries voices. I once thought someone was arguing in the flat above. They were only watching a football match.”</p>
+        <p class="story-paragraph">Mrs Wilson came through the courtyard with a bag of groceries. “Was that the match when the whole building cheered?” she asked. “I thought my radio had broken.”</p>
+        <p class="story-paragraph">Everyone laughed. Even Mr Novak, who had come down to collect a parcel, smiled.</p>
+        <p class="story-paragraph">The next morning, Daniel heard footsteps above at six twenty. They were still loud, but there was no scraping chair. He woke for a moment, then turned over and went back to sleep.</p>
+        <p class="story-paragraph">It was not silence, and nobody expected the old building to become silent. But people had begun to ask questions before deciding who was at fault.</p>
+
+        <h2 class="chapter-heading">6 The Leak Under the Sink</h2>
+
+        <p class="story-paragraph">On Wednesday, Emma opened the cupboard under the kitchen sink and found a damp cloth. She had left it there after cleaning, she thought. But when she picked it up, the bottom of the cupboard was wet.</p>
+        <p class="story-paragraph">“Daniel?” she called.</p>
+        <p class="story-paragraph">He came from the next room with a book in his hand. Emma pointed to the water. Together they took out a bottle of washing liquid and two old pans.</p>
+        <p class="story-paragraph">A thin line of water ran down the back of the cupboard from the tap above. It was not a lot, but the wood had begun to swell near the pipe.</p>
+        <p class="story-paragraph">“We should dry it and call Mr Harris,” Daniel said. “This might have been happening for some time.”</p>
+        <p class="story-paragraph">Emma pressed a finger against the damp wood. It felt soft. “I use the tap every day. Maybe I left it running too strongly.”</p>
+        <p class="story-paragraph">“A tap should work without damaging a cupboard.”</p>
+        <p class="story-paragraph">“Maybe. But perhaps I splashed water over the edge. We should be honest.”</p>
+        <p class="story-paragraph">Daniel put the pans in the sink. He was worried about repair costs, but also about the cupboard becoming worse. They dried the area and placed a bowl under the pipe.</p>
+        <p class="story-paragraph">Mr Harris answered the phone that afternoon. He listened carefully and said Peter, the building’s repair worker, could come the next morning.</p>
+        <p class="story-paragraph">“Please don’t try to take the pipe apart,” Mr Harris said. “Peter has the right tools. I’ll also check the heating while he is there.”</p>
+        <p class="story-paragraph">Daniel looked at the radiator in the living room. It was warm at the top but cold near the floor. The flat had been chilly even when they turned the heating up.</p>
+        <p class="story-paragraph">“Good,” he said. “We have noticed that too.”</p>
+        <p class="story-paragraph">Peter arrived at nine with a toolbox and a small light. He was a quiet man with silver hair and a careful way of speaking. First, he checked the tap and the pipe under the sink.</p>
+        <p class="story-paragraph">“The seal here is old,” he said. “It has dried and moved out of place. Water has been coming through slowly.”</p>
+        <p class="story-paragraph">Mr Harris stood beside him. “The cupboard is part of the rented flat. We need to know if the water damage came from careless use.”</p>
+        <p class="story-paragraph">Emma looked uncomfortable. “I may have splashed water over the sink edge. I didn’t notice the leak.”</p>
+        <p class="story-paragraph">Peter shook his head. “A little water on the sink would not make this line. The seal is old. But this small mark here,” he said, pointing to a wet patch beside a bottle, “may be from a spill. It is not a serious problem.”</p>
+        <p class="story-paragraph">Mr Harris examined the wood. “Some of the damage is old, then.”</p>
+        <p class="story-paragraph">“Yes,” Peter said. “The back panel was already weak. I can replace the seal today. The cupboard may need a new panel later, but it does not need a full repair now.”</p>
+        <p class="story-paragraph">Daniel felt his shoulders relax. “We have been worried we might be blamed for all of it.”</p>
+        <p class="story-paragraph">“It is fair to ask about the cause,” Mr Harris replied. “It is also fair to look at what was here before the tenants arrived. I should have asked Peter to inspect it when you first told me about the damp.”</p>
+        <p class="story-paragraph">Peter changed the seal and tested the tap several times. Then he opened the radiator valve and let air out. The radiator made a low hiss.</p>
+        <p class="story-paragraph">“There is a lot of air in the system,” he explained. “That can stop it heating properly. I’ll check the other radiators too. The building’s heating system is old, but it is working. It needs attention.”</p>
+        <p class="story-paragraph">The radiator became warmer from top to bottom. Daniel held his hand near it and smiled.</p>
+        <p class="story-paragraph">“That is better,” Emma said. “Not like a summer day, but better.”</p>
+        <p class="story-paragraph">“I’ll write a report,” Peter said. “The tap seal is old. The cupboard damage began before today, though water from the sink may have made one small patch worse. The heating needs regular care.”</p>
+        <p class="story-paragraph">Mr Harris thanked him. He also promised to check the cupboard panel and discuss the cost of replacing it with the owner.</p>
+        <p class="story-paragraph">After the repair, Emma made tea. She and Daniel sat at the kitchen table with their bank statements.</p>
+        <p class="story-paragraph">They had been saving for a short holiday by the sea. They were also saving for a new dining table because their current one rocked whenever they wrote at it.</p>
+        <p class="story-paragraph">“If we have to pay for the panel, the holiday may have to wait,” Daniel said.</p>
+        <p class="story-paragraph">“We don’t know the cost yet,” Emma replied. “Let’s not decide before we hear.”</p>
+        <p class="story-paragraph">“I don’t want us to pay for an old problem.”</p>
+        <p class="story-paragraph">“Neither do I. But I don’t want to argue about every small mark either.”</p>
+        <p class="story-paragraph">Daniel looked down at the bank statement. “You’re right. I’m thinking about the money and getting angry before anything has happened.”</p>
+        <p class="story-paragraph">Emma reached across the table. “And I should have told you sooner that I was worried I had caused the water.”</p>
+        <p class="story-paragraph">They agreed to keep a simple list of repairs and save the dates of messages to Mr Harris. That way, they could explain what they had noticed without guessing or blaming each other.</p>
+        <p class="story-paragraph">Later, Mrs Wilson met Emma in the hallway. Emma told her the tap had been repaired.</p>
+        <p class="story-paragraph">“Peter fixed my radiator last winter,” Mrs Wilson said. “He found that my curtain was covering the heat. I had blamed the whole heating system.”</p>
+        <p class="story-paragraph">Emma laughed. “I don’t think our curtains are that thick.”</p>
+        <p class="story-paragraph">The kitchen cupboard still needed a new panel, and the holiday money was still uncertain. But the leak had stopped, the radiator was warmer, and they had a clearer idea of what was theirs to solve.</p>
+
+        <h2 class="chapter-heading">7 A Bill and a Plan</h2>
+
+        <p class="story-paragraph">The next week, Mr Harris sent Daniel an email. The owner would pay for the new cupboard panel because the wood had been weak before Daniel and Emma moved in. The tenants would pay a small amount for the part of the panel damaged by the bottle spill.</p>
+        <p class="story-paragraph">Daniel read the message twice. The amount was not large, but it arrived beside an electricity bill that was higher than they expected.</p>
+        <p class="story-paragraph">“We can pay it,” he said, “but that is less money for the holiday.”</p>
+        <p class="story-paragraph">Emma was standing by the old dining table, trying to stop it from rocking. She pushed a folded piece of paper under one leg.</p>
+        <p class="story-paragraph">“The table can wait,” she said. “A holiday would be good for us.”</p>
+        <p class="story-paragraph">“I thought you wanted a proper table.”</p>
+        <p class="story-paragraph">“I do. But we can keep this one for a few more months.”</p>
+        <p class="story-paragraph">Daniel sat down. One of the table legs moved, and his cup shook.</p>
+        <p class="story-paragraph">“I thought we had agreed to buy a table before winter.”</p>
+        <p class="story-paragraph">“We did. But we didn’t know about the cupboard or the bill.”</p>
+        <p class="story-paragraph">They both fell quiet. Their plans had seemed simple when they made them in spring. Now every repair changed the numbers.</p>
+        <p class="story-paragraph">“I don’t want every extra cost to become a choice between us,” Emma said.</p>
+        <p class="story-paragraph">“It isn’t,” Daniel answered. “I’m just trying to be careful.”</p>
+        <p class="story-paragraph">“So am I.”</p>
+        <p class="story-paragraph">That evening, they invited Sophie and Mark to share dinner. Sophie brought bread from the bakery where she worked. Mark brought a small wooden box of tools, because he had promised to tighten the loose table leg.</p>
+        <p class="story-paragraph">“I can help with the table,” he said. “I cannot promise it will look beautiful.”</p>
+        <p class="story-paragraph">“It already has a paper under one leg,” Daniel said. “You can only improve it.”</p>
+        <p class="story-paragraph">Mark checked the leg and found that one screw had come loose. He tightened it, then moved the paper. The table stood still.</p>
+        <p class="story-paragraph">“That may save us a few euros,” Emma said.</p>
+        <p class="story-paragraph">“The grand repair is complete,” Mark said. “Please do not tell Peter.”</p>
+        <p class="story-paragraph">They laughed. Then Sophie asked about the cupboard.</p>
+        <p class="story-paragraph">Emma explained that the old seal had leaked and that she may have made one small mark worse. Sophie listened without taking sides.</p>
+        <p class="story-paragraph">“At my old flat, I was afraid to report a problem,” she said. “I thought the landlord would blame me. So I waited too long, and a small leak became a bigger one.”</p>
+        <p class="story-paragraph">“That is what we were trying to avoid,” Daniel said. “But I was ready to blame Mr Harris before Peter had checked anything.”</p>
+        <p class="story-paragraph">“People worry about different things,” Mark said. “The owner worries about costs. You worry about your savings. Mr Harris has to speak for the owner and keep the building in good shape. Nobody has the whole picture at first.”</p>
+        <p class="story-paragraph">The next morning, a new notice appeared on the hallway board. Peter would visit on Friday to check the heating again. Residents should move shoes and boxes away from the radiators and report any cold rooms.</p>
+        <p class="story-paragraph">Mr Novak was reading the notice when Daniel came downstairs.</p>
+        <p class="story-paragraph">“I put my boots beside the radiator,” Mr Novak said. “I thought they would dry there. Perhaps they stopped the heat from moving.”</p>
+        <p class="story-paragraph">“That may not help,” Daniel said.</p>
+        <p class="story-paragraph">“My knee is better this week,” Mr Novak said. “I can carry them to my flat.”</p>
+        <p class="story-paragraph">Mrs Wilson joined them, holding a small shopping bag. “I keep a basket of gloves near my radiator,” she said. “I’ll move it too.”</p>
+        <p class="story-paragraph">Nobody made a speech about being a good neighbour. They simply went to move their things.</p>
+        <p class="story-paragraph">Later, Peter checked Daniel and Emma’s radiator once more. It was warm, though not as hot as the one in his workshop. He said the building system needed a longer-term check, but he did not find a new fault in their flat.</p>
+        <p class="story-paragraph">“At least we know what is happening,” Emma said after he left.</p>
+        <p class="story-paragraph">“And what is not happening,” Daniel replied. “Our flat is not falling apart.”</p>
+        <p class="story-paragraph">They sat at the table with a notebook and wrote down their monthly costs. They chose to keep saving for the holiday, but to wait before buying new furniture. They also set aside a small amount for unexpected bills.</p>
+        <p class="story-paragraph">“It is not much,” Emma said.</p>
+        <p class="story-paragraph">“It is a start,” Daniel replied. “If the cupboard panel costs more than we expect, we can talk again.”</p>
+        <p class="story-paragraph">“And if the holiday costs more than we expect, we can take fewer days.”</p>
+        <p class="story-paragraph">“You are very good at making a plan smaller.”</p>
+        <p class="story-paragraph">“I work in a bakery. We cut cakes into smaller pieces all the time.”</p>
+        <p class="story-paragraph">Daniel laughed. “That is not the same.”</p>
+        <p class="story-paragraph">“No, but it works.”</p>
+        <p class="story-paragraph">Their choice did not solve every worry. The heating would need more attention, and the cupboard panel had not arrived. But they had made the decision together instead of keeping quiet and guessing what the other person wanted.</p>
+
+        <h2 class="chapter-heading">8 The Courtyard Table</h2>
+
+        <p class="story-paragraph">On Friday afternoon, Mrs Wilson came to Daniel and Emma’s door. She held a sheet of paper with a list of names and times.</p>
+        <p class="story-paragraph">“The rubbish area is getting crowded,” she said. “People leave boxes beside the bins, and the paper bin is often full. I thought we could make a simple plan.”</p>
+        <p class="story-paragraph">Daniel followed her into the hallway. The rubbish area was shared by everyone in the building. It stood beyond the courtyard wall, with three large bins and a small place for glass.</p>
+        <p class="story-paragraph">A cardboard box lay beside the paper bin. It was open, and a piece of packing paper had blown across the ground.</p>
+        <p class="story-paragraph">“That box was mine,” Mark said, appearing from the stairs. “I thought it would fit inside. It did not.”</p>
+        <p class="story-paragraph">“It happens to all of us,” Mrs Wilson said. “We just need to fold the boxes before we put them in.”</p>
+        <p class="story-paragraph">Mr Novak came down carrying a bag. “I can help cut large boxes when I have time,” he offered.</p>
+        <p class="story-paragraph">“And I can write the collection days on the notice board,” Emma said.</p>
+        <p class="story-paragraph">Daniel looked at the overflowing bin. “We should also leave the door shut. The wind brings rubbish back into the courtyard.”</p>
+        <p class="story-paragraph">They talked there for a few minutes, each person offering a small idea. No one suggested that one neighbour was responsible for everything.</p>
+        <p class="story-paragraph">Then Peter arrived to look at the heating. He checked the radiators in the hall and asked people to tell him if a room stayed cold after the weekend.</p>
+        <p class="story-paragraph">“The system is old, but it can work better if we keep the radiators clear,” he said. “I’ll report the larger building work to Mr Harris.”</p>
+        <p class="story-paragraph">The notice board now held three pieces of paper: the heating check, rubbish collection days, and a note asking residents to fold their boxes.</p>
+        <p class="story-paragraph">That evening, the neighbours gathered around the courtyard table. Mark had tightened one loose leg and covered a rough corner with a strip of smooth wood. The table was not new, but it felt steady.</p>
+        <p class="story-paragraph">Sophie brought a small speaker. “I can play music quietly while we eat, if nobody minds,” she said.</p>
+        <p class="story-paragraph">Mr Novak smiled. “As long as it is not a piano before six.”</p>
+        <p class="story-paragraph">“I cannot promise anything about the piano,” Sophie said. “I don’t own one.”</p>
+        <p class="story-paragraph">Everyone laughed. Daniel noticed that the joke worked because they had spoken honestly earlier. It did not hide a complaint; it made the old one feel smaller.</p>
+        <p class="story-paragraph">They ate bread, cheese, salad, and a cake from Sophie’s bakery. Mrs Wilson spoke about the town’s autumn market. Mr Novak told them where to find the best apples.</p>
+        <p class="story-paragraph">For a while, Daniel forgot about bills and repairs. Then Mr Harris arrived with a note about the cupboard panel. The owner had agreed to replace it, and Daniel and Emma would pay only the small amount for the bottle mark.</p>
+        <p class="story-paragraph">“That is fair,” Emma said after reading it.</p>
+        <p class="story-paragraph">Daniel agreed. He had expected a longer argument, but the report from Peter had made the facts clear.</p>
+        <p class="story-paragraph">Mr Harris sat at the end of the table. “I should have arranged the first inspection sooner,” he said. “I was busy with two other flats, but you were right to report the damp.”</p>
+        <p class="story-paragraph">“And we should have told you as soon as we saw it,” Daniel said. “We waited a day because we thought it was only a wet cloth.”</p>
+        <p class="story-paragraph">Nobody was perfect, but each person had made a small step.</p>
+        <p class="story-paragraph">After dinner, Sophie played a gentle song. The sound reached the open windows of the flats, but it was low and lasted only a few minutes. When she finished, she turned the speaker off without being asked.</p>
+        <p class="story-paragraph">“Thank you,” Daniel said.</p>
+        <p class="story-paragraph">“Thank you for not coming upstairs with a complaint,” she replied.</p>
+        <p class="story-paragraph">“I was going to,” he said, “but Emma stopped me.”</p>
+        <p class="story-paragraph">Emma raised an eyebrow. “I did not stop you. I asked you to listen first.”</p>
+        <p class="story-paragraph">“That is a better way to say it.”</p>
+        <p class="story-paragraph">The next morning, Daniel woke when Mr Novak walked upstairs. The steps were still clear through the ceiling. Daniel looked at the clock: six thirty. He was annoyed, but he remembered that Mr Novak had a bad knee and had already tried to be careful.</p>
+        <p class="story-paragraph">He made coffee instead of going into the hallway. When he later met Mr Novak by the stairs, he asked how his knee was.</p>
+        <p class="story-paragraph">“Better,” Mr Novak said. “And the chair stays in place now. The felt pads work well.”</p>
+        <p class="story-paragraph">Daniel told him the early steps had woken him. “I know you have to get ready,” he added. “Could you keep the heavier things for later, when you can?”</p>
+        <p class="story-paragraph">“Yes,” Mr Novak said. “I can do that.”</p>
+        <p class="story-paragraph">In the afternoon, Daniel and Emma walked through the town centre. They looked at the train times for the coast and chose a short trip for the following month. They would stay one night rather than two.</p>
+        <p class="story-paragraph">“A smaller holiday,” Emma said, “but still a holiday.”</p>
+        <p class="story-paragraph">“And we can buy a table after we have saved again.”</p>
+        <p class="story-paragraph">At home, they found a message from Peter. The cupboard panel would be fitted on Tuesday. He also planned to check the heating once more after the work in the building system.</p>
+        <p class="story-paragraph">Emma put the message on the notice board beside their calendar. The old building still made noise. The hallway still carried voices, and the radiators still needed care. But the neighbours were learning which problems needed a worker, which needed a clear conversation, and which could be solved with a piece of folded paper under a table leg.</p>
+        <p class="story-paragraph">Daniel looked at the steady table and smiled. “It is not new, but it holds the cake.”</p>
+        <p class="story-paragraph">“That is the most important test,” Emma said.</p>
+        <p class="story-paragraph">From the courtyard came the sound of Mr Novak speaking to Mrs Wilson. Someone closed the rubbish-area door. A moment later, the building was quiet again—not perfectly quiet, but comfortable enough for an ordinary evening.</p>
+
+        <h2 class="chapter-heading">9 A Letter to Mr Harris</h2>
+
+        <p class="story-paragraph">On Monday evening, Daniel sat at the small table in the kitchen. The courtyard table was still downstairs, but the weather had turned cold. Emma made tea while he looked at a sheet of paper.</p>
+        <p class="story-paragraph">“I’m going to write to Mr Harris,” Daniel said. “A proper letter, not another quick message.”</p>
+        <p class="story-paragraph">Emma put two cups on the table. “That sounds fair. What will you say?”</p>
+        <p class="story-paragraph">Daniel had already made a list. It included the noise after quiet hours, the damp place near their bedroom window, and the loose kitchen cupboard door. He also wanted to mention the state of the building. The paint in the hallway was peeling, and the rubbish area was often messy.</p>
+        <p class="story-paragraph">“If we put everything in one letter, he may think we are blaming him for the whole building,” Emma said.</p>
+        <p class="story-paragraph">“But these are real problems.”</p>
+        <p class="story-paragraph">“Yes. We just need to be clear about what we want.”</p>
+        <p class="story-paragraph">Daniel rubbed out his first sentence. He had written, ‘You have failed to look after this apartment.’ It sounded strong, but perhaps too strong.</p>
+        <p class="story-paragraph">He tried again. He wrote that he and Emma liked living in the building and wanted to find a practical way to deal with several problems. He described the damp patch and included the date when they had first noticed it. He asked for the cupboard door to be repaired. Then he explained that loud voices and moving furniture had sometimes continued after the agreed quiet time.</p>
+        <p class="story-paragraph">“Should we say who made the noise?” Emma asked.</p>
+        <p class="story-paragraph">“Not unless we know for sure.”</p>
+        <p class="story-paragraph">That was true. Sometimes the sound seemed to come from the apartment above them. At other times it travelled through the old walls, and they could not tell where it began.</p>
+        <p class="story-paragraph">Daniel added a request for a meeting. Before he sent the letter, he read it aloud. Emma listened with her hands around her cup.</p>
+        <p class="story-paragraph">“It is clear,” she said. “Maybe the last part could say we want a solution, not an argument.”</p>
+        <p class="story-paragraph">He added that sentence. Then he took a picture of the damp patch and sent the letter by email.</p>
+        <p class="story-paragraph">Mr Harris replied the next afternoon. His message was short. He said that the building was old, that repairs cost money, and that tenants also had responsibilities. He did not answer Daniel’s question about the damp.</p>
+        <p class="story-paragraph">Daniel read the message twice. “He thinks we are asking for a new building.”</p>
+        <p class="story-paragraph">“We aren’t,” Emma said. “Maybe he is worried about the cost. He owns the place, but that doesn’t mean he has a lot of spare money.”</p>
+        <p class="story-paragraph">Daniel knew that was possible. Still, he felt that Mr Harris had not listened. He wrote back and asked if they could meet in the building’s entrance hall on Wednesday. Mr Harris agreed.</p>
+        <p class="story-paragraph">On Wednesday, they met near the letter boxes. Mr Harris arrived in a dark coat, carrying a folder. He was not an angry-looking man, but his mouth was tight.</p>
+        <p class="story-paragraph">“I have read your list,” he said. “Some things are urgent. Some are the usual problems in an old building.”</p>
+        <p class="story-paragraph">“We understand that the building is old,” Daniel replied. “But the damp is getting larger.”</p>
+        <p class="story-paragraph">“I cannot repair every mark on a wall as soon as someone sees it.”</p>
+        <p class="story-paragraph">Emma stepped forward. “We don’t expect that. We want to know where the water is coming from.”</p>
+        <p class="story-paragraph">For a moment, nobody spoke. Daniel had wanted to explain more, but the words felt difficult now. He could describe the problems, yet he could not say what mattered most to them. He looked at Emma, hoping she would help.</p>
+        <p class="story-paragraph">“We need a safe, dry home,” she said at last. “And we need to know when repairs can happen. We can be flexible about the date.”</p>
+        <p class="story-paragraph">Mr Harris opened his folder. “I can ask a repair worker to look at the wall. But I can’t promise to repaint the whole apartment.”</p>
+        <p class="story-paragraph">“We didn’t ask for that,” Daniel said, then heard the sharpness in his voice.</p>
+        <p class="story-paragraph">Mr Harris closed the folder. “I think we should talk about the building rules as well. Noise, rubbish, and shared spaces are not only my responsibility.”</p>
+        <p class="story-paragraph">A door opened upstairs. Mrs Wilson came down the stairs with a basket of clean clothes.</p>
+        <p class="story-paragraph">“I heard the word ‘rules’,” she said. “That often means we need tea.”</p>
+        <p class="story-paragraph">Nobody laughed at first. Then Mr Harris gave a small smile, and the tension eased a little. They agreed to meet again with the other neighbours. There was still no answer about the water, but at least the conversation had not ended with a slammed door.</p>
+
+        <h2 class="chapter-heading">10 The Cost of Staying</h2>
+
+        <p class="story-paragraph">That night, Daniel and Emma sat on the floor beside a box they had not yet unpacked. The meeting with Mr Harris had left them tired.</p>
+        <p class="story-paragraph">“Maybe we should look for another apartment,” Daniel said.</p>
+        <p class="story-paragraph">Emma pulled a blanket over her knees. “I have thought about it.”</p>
+        <p class="story-paragraph">They opened a website and searched for homes in the town. The first apartment looked bright and modern, with a small balcony. The rent was much higher than theirs. It also asked for a deposit equal to three months of rent.</p>
+        <p class="story-paragraph">“We would need to pay for a moving van too,” Emma said. “And we might have to pay to leave this place early.”</p>
+        <p class="story-paragraph">Daniel closed the page. “It would be difficult.”</p>
+        <p class="story-paragraph">“Not impossible,” she said. “But we shouldn’t move only because we had one bad meeting.”</p>
+        <p class="story-paragraph">They made a list of the good things about the building. It was near the bus stop and the market. The courtyard had a tree that gave shade in summer. Mrs Wilson was kind, and Mr Novak had helped them with the kitchen tap. Sophie and Mark had been welcoming, even when they were tired.</p>
+        <p class="story-paragraph">The list did not make the damp disappear, but it reminded them that their home was more than its problems.</p>
+        <p class="story-paragraph">The next morning, Mrs Wilson knocked on their door. She had heard they were thinking about moving, though neither Daniel nor Emma remembered telling her.</p>
+        <p class="story-paragraph">“News travels through old walls,” she said. “Sometimes faster than sound.”</p>
+        <p class="story-paragraph">She invited them to sit with her in the courtyard. The air was cool, and a few yellow leaves lay on the stone path.</p>
+        <p class="story-paragraph">“I have lived here for twenty-two years,” Mrs Wilson said. “The building has had good years and difficult years. The roof was repaired about ten years ago. The pipes in the back wall were changed, but not all of them. Some of the smaller pipes are older than I am.”</p>
+        <p class="story-paragraph">“Do you know who repaired them?” Daniel asked.</p>
+        <p class="story-paragraph">“A man called Peter did some of the work. He lives on the top floor now. He knows where the shut-off valves are, though he is not a professional repair worker.”</p>
+        <p class="story-paragraph">Mrs Wilson told them that the rubbish area had once been much worse. The neighbours had made a simple schedule for cleaning it, but people stopped following it after a few months. She also remembered a time when loud music had caused trouble.</p>
+        <p class="story-paragraph">“The people who played it worked late shifts,” she said. “They were not trying to upset anyone. They simply slept at different times.”</p>
+        <p class="story-paragraph">Daniel thought of Sophie and Mark. Mark sometimes left early for work, while their young child could wake in the night. Each apartment had its own hard parts.</p>
+        <p class="story-paragraph">Later, Daniel and Emma spoke with Sophie and Mark near the stairs. Sophie held their child, who was half asleep against her shoulder.</p>
+        <p class="story-paragraph">“We heard there may be a meeting,” Sophie said. “We want to come, but we can’t promise to stay long.”</p>
+        <p class="story-paragraph">“That’s fine,” Emma replied. “We know evenings are difficult for you.”</p>
+        <p class="story-paragraph">Mark looked embarrassed. “Sometimes we move chairs late. Our child is asleep, and we think we are being quiet. But these floors make every small sound travel.”</p>
+        <p class="story-paragraph">“We also hear noise sometimes,” Daniel said. “We don’t always know where it comes from.”</p>
+        <p class="story-paragraph">Mark nodded. “I start work before seven. I worry about making breakfast and waking everyone. Then I get home tired and forget to be careful.”</p>
+        <p class="story-paragraph">Sophie said that their child sometimes cried at night. “We can’t always stop that. But we can try to keep doors from banging, and we can put soft pads under the chairs.”</p>
+        <p class="story-paragraph">“That would help,” Emma said. “And we can tell you if something is especially difficult for us, instead of keeping quiet until we are angry.”</p>
+        <p class="story-paragraph">On their way upstairs, Daniel and Emma met Mr Novak carrying a small tool bag. He lived on the ground floor and often fixed simple things for himself.</p>
+        <p class="story-paragraph">“I heard about the damp wall,” he said. “There may be a pipe behind it. I can look at the outside corner, but Mr Harris should arrange the repair if a pipe is damaged.”</p>
+        <p class="story-paragraph">“We don’t want you to take on too much,” Emma said.</p>
+        <p class="story-paragraph">“I won’t,” Mr Novak answered. “I know the difference between helping and pretending to be a plumber.”</p>
+        <p class="story-paragraph">The remark made them laugh. He offered to show them where the water valve was, just in case it was needed. Daniel thanked him.</p>
+        <p class="story-paragraph">That evening, Daniel and Emma looked at the apartment search page again. The bright home was still there, but they did not open it this time.</p>
+        <p class="story-paragraph">“Let’s try to make this place work,” Emma said. “At least while we find out what can be repaired.”</p>
+        <p class="story-paragraph">Daniel agreed. Staying did not mean accepting every problem. It meant giving the neighbours and Mr Harris a chance to make a plan. They would still leave one day if the home became impossible, but the cost of moving was not their only reason to decide.</p>
+
+        <h2 class="chapter-heading">11 Water in the Courtyard</h2>
+
+        <p class="story-paragraph">On Friday morning, Emma heard a steady trickle while she was taking a bag of rubbish downstairs. It came from the shared rubbish area, behind the large bins.</p>
+        <p class="story-paragraph">She moved one bin and saw water running along the floor. A thin stream came from a pipe near the wall. The ground was wet, and the water had reached the edge of the courtyard.</p>
+        <p class="story-paragraph">Emma called Daniel. He came down with a towel, though they both knew it could not stop much water.</p>
+        <p class="story-paragraph">“Should we turn off the valve?” he asked.</p>
+        <p class="story-paragraph">“Mr Novak showed us where it is.”</p>
+        <p class="story-paragraph">They went to the small cupboard by the entrance. The valve was stiff. Daniel tried to turn it, but it did not move.</p>
+        <p class="story-paragraph">Mrs Wilson came out of her apartment when she heard them. “Don’t force it,” she warned. “We don’t want a broken valve as well.”</p>
+        <p class="story-paragraph">She called Mr Harris, while Emma knocked on the doors of the nearest apartments. Peter came down from the top floor wearing house shoes and a shirt with a coffee stain on it.</p>
+        <p class="story-paragraph">“I know the main valve,” he said. “But we need to make sure we turn off the right one.”</p>
+        <p class="story-paragraph">Mr Novak arrived a moment later. He had been taking bread out of the oven and had put on a coat over his apron. He looked at the water, then at the pipe.</p>
+        <p class="story-paragraph">“This may be connected to the old washing area,” he said. “Peter, can you show us the valve?”</p>
+        <p class="story-paragraph">Peter led them through a narrow door beside the stairs. They found a row of old pipes and two metal handles. He explained that one stopped water to the back part of the building.</p>
+        <p class="story-paragraph">Mr Novak checked with Mrs Wilson before turning it. When he did, the trickle slowed, then stopped.</p>
+        <p class="story-paragraph">“Good,” Daniel said. “Now we only need to clean up the water.”</p>
+        <p class="story-paragraph">That was easier to say than to do. The floor was slippery, and the water had spread under the bins. Sophie arrived with Mark, who brought a mop from their apartment. Their child watched from the open doorway, holding a small toy car.</p>
+        <p class="story-paragraph">“I can move the bins,” Mark said. “You tell me where to put them.”</p>
+        <p class="story-paragraph">“Not in the courtyard path,” Mrs Wilson replied. “People need to pass there.”</p>
+        <p class="story-paragraph">Mark shifted them near the wall. Sophie and Emma used old towels to push the water toward the drain. Daniel carried wet cardboard to the rubbish area outside. Mr Novak stood by the pipe and made sure no more water appeared.</p>
+        <p class="story-paragraph">Mr Harris arrived with a repair worker about twenty minutes later. He looked surprised to see so many people there.</p>
+        <p class="story-paragraph">“The water is off,” Daniel told him. “Peter found the right valve. We haven’t tried to repair the pipe ourselves.”</p>
+        <p class="story-paragraph">Mr Harris nodded. He seemed relieved. The repair worker looked at the pipe and said it should be changed soon. He could make a safe temporary repair, but the building needed a new section.</p>
+        <p class="story-paragraph">“Can it wait until next week?” Mr Harris asked.</p>
+        <p class="story-paragraph">“I can stop it from leaking today,” the worker said. “But I wouldn’t leave it for long. The pipe is weak.”</p>
+        <p class="story-paragraph">Mr Harris looked at the damp floor and the people holding mops. “All right. Do the temporary repair now. Then send me a price for the new section.”</p>
+        <p class="story-paragraph">The worker began. Everyone stepped back to give him space. While they waited, Mark wiped water from the path. Sophie kept their child away from the wet area. The child drove the toy car along a dry line between the door and a flower pot.</p>
+        <p class="story-paragraph">“The car is taking the safe road,” Emma said.</p>
+        <p class="story-paragraph">“It knows better than I do,” Mark replied. “It doesn’t try to drive over the wet floor.”</p>
+        <p class="story-paragraph">After the repair, the worker turned the water on again. The pipe stayed dry. Mr Novak checked the floor near it, and Peter watched the handle on the valve.</p>
+        <p class="story-paragraph">Mr Harris thanked them for acting quickly. “I’ll arrange the new pipe,” he said. “It may cost more than the repair I expected.”</p>
+        <p class="story-paragraph">“At least we know where the leak is,” Mrs Wilson said.</p>
+        <p class="story-paragraph">Nobody argued about that. They had all seen the water, and they had all helped to stop it from spreading.</p>
+        <p class="story-paragraph">The rubbish area was not clean yet. Wet cardboard had stuck to one bin, and the towels needed washing. Still, the courtyard path was safe. Mark carried the last bin back while Daniel held the door.</p>
+        <p class="story-paragraph">“I’m sorry about the mess,” Mark said.</p>
+        <p class="story-paragraph">“We made it together,” Daniel replied. “We can clean it together too.”</p>
+        <p class="story-paragraph">Sophie smiled. “That sounds like a rule we might actually follow.”</p>
+        <p class="story-paragraph">As the neighbours went back upstairs, Mr Novak stayed to check that the temporary repair was holding. Daniel watched him for a moment. The building still had old pipes, thin walls, and bills to pay. But when the problem had become clear, people had worked beside each other instead of waiting for someone else to act.</p>
+
+        <h2 class="chapter-heading">12 A List on the Wall</h2>
+
+        <p class="story-paragraph">On Sunday afternoon, the neighbours met in the entrance hall. Mrs Wilson had brought a notebook. Mr Harris had brought the repair worker’s price for replacing the damaged pipe.</p>
+        <p class="story-paragraph">“The pipe work is the first job,” Mr Harris said. “It has to be done before the water causes more damage.”</p>
+        <p class="story-paragraph">Daniel was glad to hear this, but he also wanted to talk about the damp patch in his apartment. He waited for a quiet moment, then raised it.</p>
+        <p class="story-paragraph">“The leak in the rubbish area may be connected to the wet wall near our bedroom,” Mr Novak said. “The repair worker should check both places when he returns.”</p>
+        <p class="story-paragraph">“That would be useful,” Emma said.</p>
+        <p class="story-paragraph">Mr Harris wrote it down. “I can ask him. But I still need to understand which things are urgent and which can wait.”</p>
+        <p class="story-paragraph">Mrs Wilson opened her notebook. “Then let’s make a list. We can add the jobs, the quiet hours, and the work everyone can do in the shared areas.”</p>
+        <p class="story-paragraph">The first part went smoothly. They agreed that the pipe needed a proper repair. Mr Harris would ask for a date from the repair worker. They also agreed that Daniel and Emma would send him a picture if the damp patch changed.</p>
+        <p class="story-paragraph">Then they moved to the quiet hours. Sophie said their child usually went to bed at eight. Mark left early for work, so he often had to use the kitchen before seven.</p>
+        <p class="story-paragraph">“We can say no loud music or moving furniture after ten,” Daniel suggested. “And before seven in the morning.”</p>
+        <p class="story-paragraph">“What counts as moving furniture?” Mark asked. “Sometimes we need to move a chair to clean.”</p>
+        <p class="story-paragraph">“Cleaning is different from dragging a table across the floor,” Mrs Wilson said.</p>
+        <p class="story-paragraph">Mr Harris looked unsure. “It is hard to make a rule for every sound.”</p>
+        <p class="story-paragraph">Emma wanted to help, but she could not find a simple answer. She thought about saying that they mainly needed people to be careful, not silent. Then the conversation moved on before she spoke.</p>
+        <p class="story-paragraph">Mr Novak suggested soft pads under chairs. Mark said he could put them on his chairs that day. Sophie offered to tell the neighbours if the child was crying for a long time, though everyone said she did not need to explain every normal sound.</p>
+        <p class="story-paragraph">They agreed to try quiet hours from ten at night until seven in the morning. Everyone could still use their homes, but they would try to avoid loud work and heavy furniture during those times.</p>
+        <p class="story-paragraph">The shared rubbish area caused more disagreement. Mrs Wilson wanted each apartment to take turns sweeping it. Daniel thought people should also flatten boxes before putting them in the bins.</p>
+        <p class="story-paragraph">“Some boxes are difficult to fold,” Peter said. “The paper bin fills up quickly.”</p>
+        <p class="story-paragraph">“Then we need to take full boxes to the collection point,” Daniel replied.</p>
+        <p class="story-paragraph">“That is easy to say if you have a free afternoon,” Peter said. “Some of us work long hours.”</p>
+        <p class="story-paragraph">Mark nodded. He often came home tired, and he did not want another job waiting for him every week.</p>
+        <p class="story-paragraph">Mrs Wilson tapped her notebook. “No one should have to do all of it. We can make a simple plan, but it has to fit real lives.”</p>
+        <p class="story-paragraph">They made a first attempt. Each apartment would check the rubbish area once a month. Residents would close the bin lids, flatten boxes when possible, and report a full bin rather than leaving bags on the floor.</p>
+        <p class="story-paragraph">“What about cleaning the floor?” Sophie asked. “A monthly turn is not enough if something spills.”</p>
+        <p class="story-paragraph">“The person who sees a spill can clean it,” Daniel said.</p>
+        <p class="story-paragraph">Peter frowned. “That can become unfair. The same person may always be the one who notices.”</p>
+        <p class="story-paragraph">The room grew quiet. Daniel understood that Peter was not refusing to help. He was worried about a plan that looked equal on paper but became unequal in practice.</p>
+        <p class="story-paragraph">Emma took a breath. This time, she spoke before the conversation moved on.</p>
+        <p class="story-paragraph">“Maybe we can keep the monthly turn, but make it small. The person checks the bins and sweeps once. If there is a large spill or a broken pipe, we tell everyone instead of expecting one person to fix it.”</p>
+        <p class="story-paragraph">Mr Novak nodded. “And no one should try to repair pipes alone. We call Mr Harris or a repair worker.”</p>
+        <p class="story-paragraph">Mr Harris looked at him. “That is a good point.”</p>
+        <p class="story-paragraph">They wrote Emma’s idea in the notebook, though Mark said they should try it for one month and then change it if it did not work. Everyone agreed.</p>
+        <p class="story-paragraph">The list was not perfect. They still disagreed about early morning sounds, and nobody knew how much the pipe repair would cost. But they had written down the urgent jobs, the quiet hours, and a first plan for the shared rubbish area.</p>
+        <p class="story-paragraph">Mrs Wilson copied the list onto a sheet of paper and pinned it beside the letter boxes. Sophie read it while holding her child. Mark added the date of his turn with the rubbish area. Daniel and Emma went upstairs together.</p>
+        <p class="story-paragraph">“You said what we needed,” Daniel told Emma.</p>
+        <p class="story-paragraph">“Not perfectly,” she said. “But I said it.”</p>
+        <p class="story-paragraph">“That is a good start.”</p>
+        <p class="story-paragraph">From the hallway came the soft sound of Mark fitting pads under a chair. It moved once, then stopped. Emma smiled. The building was still old, and the list might need changes. For now, though, the neighbours had a plan they had made together.</p>
+
+        <h2 class="chapter-heading">13 Getting Ready to Talk</h2>
+
+        <p class="story-paragraph">The list on the wall had been there for three days. It was written in blue pen and divided into two parts: “Needs attention soon” and “Can wait.” Daniel had made the first version, but Emma had moved several things after asking the other tenants. The loose step near the entrance was urgent. So was the pipe that had leaked under their sink. The cracked paint in the hallway could wait.</p>
+        <p class="story-paragraph">On Thursday evening, Daniel stood in the hallway with a notebook. Mr Novak came down the stairs carrying a small box of tools. “You are still adding to the list?” he asked. “I thought the list was finished.”</p>
+        <p class="story-paragraph">“It is,” Daniel said. “I’m checking the dates and asking who saw each problem.”</p>
+        <p class="story-paragraph">Mr Novak looked at the notebook. “Good. Last time, we all spoke at once. Mr Harris could not understand what mattered most.” He pointed to the step. “I nearly fell there on Monday. My knee is better now, but I do not want another test.”</p>
+        <p class="story-paragraph">Daniel wrote down the date. “Thank you. I should have asked you before I said that the step was only a little loose.”</p>
+        <p class="story-paragraph">Mr Novak gave him a small smile. “That is a useful sentence. You can say it again at the meeting.”</p>
+        <p class="story-paragraph">Emma was in the courtyard with Sophie and Mrs Wilson. They were checking the list too. Sophie had a baby asleep in a pram beside her, and she spoke quietly.</p>
+        <p class="story-paragraph">“I want the front door to close properly,” she said. “It sometimes stays open. I worry about the baby’s things, and I also worry about strangers coming in.”</p>
+        <p class="story-paragraph">“That belongs under urgent,” Emma said. “I didn’t know it was happening so often.”</p>
+        <p class="story-paragraph">Mrs Wilson folded her arms. “I have asked for that door to be fixed before. But I also know the building costs money. I do not want Mr Harris to hear only a list of demands.”</p>
+        <p class="story-paragraph">Emma nodded. She was used to making people happy by saying yes. When Mrs Wilson asked if she could take notes at the meeting, Emma almost agreed before remembering that she had a late work call.</p>
+        <p class="story-paragraph">“I can help prepare the papers,” she said, “but I can’t take the notes during the meeting. I have a call at six.”</p>
+        <p class="story-paragraph">“That is fair,” Mrs Wilson replied. “I can take notes.”</p>
+        <p class="story-paragraph">Mark and Peter came through the courtyard gate carrying a short wooden board. Peter was the repair worker Mr Harris had sent to look at the building. He had come early to check the loose step, but he did not have the right screws with him.</p>
+        <p class="story-paragraph">“I measured it,” Peter said. “I can make it safe tomorrow. The board underneath is sound, but the screws are old.”</p>
+        <p class="story-paragraph">Daniel looked at him. “Can you also fix the front door?”</p>
+        <p class="story-paragraph">Peter shook his head. “I need to see the door before I promise. A door can look simple and hide a bigger problem. I will check it after the meeting.”</p>
+        <p class="story-paragraph">Mark gave a short laugh. “That is better than my plan. I was going to hold it shut with a flowerpot.”</p>
+        <p class="story-paragraph">“Please don’t,” Peter said. “The flowerpot may win, but the door will not.”</p>
+        <p class="story-paragraph">That evening, Daniel and Emma put the papers on their kitchen table. There were photographs of the step, the door, the pipe and a dark patch on the courtyard wall. They had written down when each problem appeared and what had already been tried.</p>
+        <p class="story-paragraph">Daniel placed another note beside the photographs. It said, “Noise: ask before making assumptions.”</p>
+        <p class="story-paragraph">Emma read it. “Is that for the meeting or for you?”</p>
+        <p class="story-paragraph">“Both,” he said. “I blamed Sophie for the late noise last week. It was Mark moving a cupboard.”</p>
+        <p class="story-paragraph">“I was there,” Emma said. “You were tired and worried. But you could have asked first.”</p>
+        <p class="story-paragraph">Daniel sighed. “I know. I want to say that at the meeting.”</p>
+        <p class="story-paragraph">Emma touched his hand. “I’ll say that I agreed to too many things because I wanted everyone to be pleased. Then I got upset when I couldn’t do them.”</p>
+        <p class="story-paragraph">They checked the papers once more. The meeting would not make the building perfect. Still, for the first time, they felt ready to speak about its problems without turning them into a fight.</p>
+
+        <h2 class="chapter-heading">14 The Second Meeting</h2>
+
+        <p class="story-paragraph">On Saturday afternoon, the tenants met in the courtyard. Mr Harris arrived with a folder and a worried look. He owned the building, but he also worked full-time in a shop across town. He looked tired before anyone had spoken.</p>
+        <p class="story-paragraph">Mrs Wilson welcomed him and showed him the two parts of the list. “We have tried to separate what is urgent from what can wait,” she said. “We also have photographs and dates.”</p>
+        <p class="story-paragraph">Daniel passed the papers around. “I want to explain one thing first. I called the step a small problem before I knew Mr Novak had nearly fallen. I was wrong to decide before asking.”</p>
+        <p class="story-paragraph">Mr Novak nodded. “It is not a disaster, but it needs fixing soon.”</p>
+        <p class="story-paragraph">Emma spoke next. “I also want to say that I have sometimes agreed to help before checking my time. Then I felt annoyed with people, even though I had said yes.”</p>
+        <p class="story-paragraph">“That sounds familiar,” Mark said. “I told everyone I could paint the hallway, then remembered I work every Saturday.”</p>
+        <p class="story-paragraph">A few people laughed. It eased the tight feeling in the courtyard.</p>
+        <p class="story-paragraph">Mr Harris studied the photographs. “I can see the step and the leak are real problems. The front door is important too. But I need to be honest. I have paid for the roof and the heating system this year. There is not a lot left in my repair budget.”</p>
+        <p class="story-paragraph">Sophie looked down at her baby’s pram. “I understand that things cost money. I am worried about the door because it is sometimes open at night.”</p>
+        <p class="story-paragraph">“That is a fair worry,” Mr Harris said. “I did not know it was happening often. Peter can check it today. If it only needs an adjustment, it should not cost much. If it needs a new lock, I will need a price first.”</p>
+        <p class="story-paragraph">Peter opened his folder. “I can give you the price before I do extra work. The step is simpler. I brought the right screws, so I can repair it after we finish.”</p>
+        <p class="story-paragraph">Daniel pointed to the courtyard wall. “The dark patch is from rain. It looks bad, but we don’t know if it is dangerous.”</p>
+        <p class="story-paragraph">“I’ll ask someone to check it next month,” Mr Harris said. “It can wait unless it gets bigger.”</p>
+        <p class="story-paragraph">Mrs Wilson wrote down each decision. The tenants agreed to keep the shared rubbish area tidy and not leave bags beside the bins. Mr Harris agreed to arrange the step repair and the door check. Peter would look at the wall when he returned for another job.</p>
+        <p class="story-paragraph">“What about the pipe under Daniel and Emma’s sink?” Sophie asked.</p>
+        <p class="story-paragraph">“That has been repaired,” Emma said. “Peter changed the worn part last week. We should have told everyone sooner, but we were busy.”</p>
+        <p class="story-paragraph">Peter smiled. “It was a small part. The water should be fine now.”</p>
+        <p class="story-paragraph">“It is,” Daniel said. “And the tap no longer makes a noise like a duck with a cold.”</p>
+        <p class="story-paragraph">Mark looked pleased. “That was my favourite building sound.”</p>
+        <p class="story-paragraph">Mr Harris laughed with them. Then he said, “I cannot promise that every repair will happen at once. But I can promise to answer the list and tell you when I have news. I also need you to tell me early when something goes wrong.”</p>
+        <p class="story-paragraph">“That seems reasonable,” Mrs Wilson said. The others agreed.</p>
+        <p class="story-paragraph">Before the meeting ended, Daniel looked at Mr Harris. “I thought you did not care about the building. I was wrong to decide that without asking.”</p>
+        <p class="story-paragraph">Mr Harris was quiet for a moment. “I thought the tenants only noticed problems when they wanted me to pay for something. I was wrong about that too. You have kept the courtyard clean and made a useful list.”</p>
+        <p class="story-paragraph">Emma smiled. Neither apology solved the building’s problems, but it changed the way they looked at each other.</p>
+        <p class="story-paragraph">When the meeting was over, Peter carried his tools to the entrance. Mark offered to hold the door while he worked. Sophie took her pram inside, and Mrs Wilson put the notes in a clear folder.</p>
+        <p class="story-paragraph">“A meeting with no shouting,” Mark said. “We should write it down as a new building record.”</p>
+        <p class="story-paragraph">“Let’s wait until we see the repair bill,” Peter replied.</p>
+        <p class="story-paragraph">Everyone laughed again. The step was still loose, but now there was a plan and a date.</p>
+
+        <h2 class="chapter-heading">15 A New Noise Agreement</h2>
+
+        <p class="story-paragraph">The next problem came that evening. Mark was moving a heavy cupboard from his bedroom to the sitting room. He had planned to do it on Sunday, but his cousin was coming to stay, and he needed to clear the room before she arrived.</p>
+        <p class="story-paragraph">The cupboard scraped across the floor above Daniel and Emma’s apartment. Daniel stopped reading. He looked at the ceiling and felt his old anger return.</p>
+        <p class="story-paragraph">“It’s Mark,” he said. “He always makes noise when we are trying to rest.”</p>
+        <p class="story-paragraph">Emma closed her book. “You don’t know that he planned it to bother us. Why not ask him?”</p>
+        <p class="story-paragraph">Daniel stood still. Then he went upstairs instead of banging on the ceiling. Mark opened the door with a red face and a cloth in his hand.</p>
+        <p class="story-paragraph">“I’m sorry,” Mark said. “I thought it would take two minutes. It has taken twenty.”</p>
+        <p class="story-paragraph">“We can hear it clearly,” Daniel said. “Could you stop for tonight and tell us next time you need to move something?”</p>
+        <p class="story-paragraph">“Yes. I should have sent a message.” Mark looked embarrassed. “I’ll ask Peter for help tomorrow. Two people can move it without dragging it.”</p>
+        <p class="story-paragraph">On Sunday, the tenants met briefly in the hallway. Mrs Wilson had written a noise agreement on a sheet of paper. It was not a list of strict rules, she explained. It was a way to help people plan and show respect.</p>
+        <p class="story-paragraph">They agreed that quiet hours would be from ten at night until seven in the morning on weekdays, and from eleven until eight at weekends. They would keep music and television low during those hours.</p>
+        <p class="story-paragraph">“I play the violin,” Sophie said. “The baby is asleep by eight, so I usually practise in the afternoon. But sometimes I need to practise before a lesson.”</p>
+        <p class="story-paragraph">“That is fine,” Mr Novak said. “Just let us know if it will be longer than usual.”</p>
+        <p class="story-paragraph">“And repairs?” Daniel asked.</p>
+        <p class="story-paragraph">They agreed that noisy repairs should happen between nine in the morning and six in the evening. If a repair could not wait, the person doing it should tell the neighbours when possible.</p>
+        <p class="story-paragraph">Mark raised his hand. “What about dropping a pan?”</p>
+        <p class="story-paragraph">“That is allowed,” Mrs Wilson said. “But only one pan at a time.”</p>
+        <p class="story-paragraph">Emma looked at the paper. “I want to add that people can say no if they are too busy to help. We should not expect a neighbour to fix everything.”</p>
+        <p class="story-paragraph">Mrs Wilson nodded. “Good point. I have asked people to help before checking whether they had time.”</p>
+        <p class="story-paragraph">“I can help with small things,” Peter said. “But I am not always available. I have other jobs, and I need proper payment for repair work.”</p>
+        <p class="story-paragraph">Mr Harris agreed. “We should not ask him to work for free just because he lives here.”</p>
+        <p class="story-paragraph">Emma felt pleased that she had spoken clearly. In the past, she might have kept quiet and then worried about how much work she had taken on.</p>
+        <p class="story-paragraph">Daniel read the agreement once more. “It does not promise silence.”</p>
+        <p class="story-paragraph">“No,” said Mr Novak. “Silence is for libraries and people who have lost their keys in the snow.”</p>
+        <p class="story-paragraph">Mark looked at the old wooden front door. “I have done both.”</p>
+        <p class="story-paragraph">They signed the paper and pinned it beside the list of repairs. The agreement did not make every sound disappear. A child ran across the hallway that afternoon. Someone dropped a spoon in the kitchen. But the noises felt less like personal messages and more like ordinary life.</p>
+        <p class="story-paragraph">That evening, Sophie sent a message to the building group. She needed to practise a difficult piece for twenty minutes at six the next day. Daniel answered that it was fine.</p>
+        <p class="story-paragraph">At six, the violin began. The music was not perfect, but it was quiet enough. Daniel listened while he made tea. Emma hummed a few notes, then stopped because she did not know the tune.</p>
+        <p class="story-paragraph">When the music ended, Sophie came downstairs with a small plate of biscuits. “Thank you for being patient,” she said.</p>
+        <p class="story-paragraph">“Thank you for asking first,” Daniel replied.</p>
+        <p class="story-paragraph">He noticed how different those words felt from his old complaints. Asking did not always make a problem easy, but it gave people a chance to explain. The building still had thin walls, busy neighbours and an old door. It also had a new agreement, and people who were beginning to trust it.</p>
+
+        <h2 class="chapter-heading">16 A Difficult Conversation</h2>
+
+        <p class="story-paragraph">Peter repaired the step on Monday morning. He fixed the board with four new screws and tested it by standing on it twice. Mr Novak watched from the entrance.</p>
+        <p class="story-paragraph">“It feels steady,” Mr Novak said.</p>
+        <p class="story-paragraph">“Good,” Peter replied. “Please tell Mr Harris if it moves again. Don’t wait until it becomes a bigger problem.”</p>
+        <p class="story-paragraph">Peter also checked the front door. The lock worked, but the door did not close well because one hinge had moved. He adjusted it and showed Sophie how to pull it gently until it clicked.</p>
+        <p class="story-paragraph">“No flowerpot needed,” Mark said, passing through with a shopping bag.</p>
+        <p class="story-paragraph">“Not unless you want a very expensive flowerpot,” Peter answered.</p>
+        <p class="story-paragraph">Later that day, Emma found a message from Mr Harris. He wanted to know if the tenants could help clear the shared rubbish area on Saturday. Some boxes had been left beside the bins, and the collection workers could not reach the larger containers.</p>
+        <p class="story-paragraph">Emma read the message twice. She wanted to answer that she could help, but she already had plans to visit her sister. She put her phone down and told Daniel.</p>
+        <p class="story-paragraph">“I can go for an hour,” Daniel said. “Do you want to come?”</p>
+        <p class="story-paragraph">“I want to help, but I can’t this Saturday. I promised my sister.”</p>
+        <p class="story-paragraph">Daniel looked surprised. “That’s all right. I’ll go with Mark.”</p>
+        <p class="story-paragraph">Emma waited for him to complain, but he did not. She felt proud of herself for saying what she could and could not do.</p>
+        <p class="story-paragraph">She sent a message to the group: “I can’t come on Saturday, but I can bring strong rubbish bags on Friday.” Mrs Wilson answered with a thank-you.</p>
+        <p class="story-paragraph">On Friday evening, a small argument began in the hallway. Daniel had moved the rubbish bags near the entrance so he could carry them down in the morning. Mrs Wilson came out of her apartment and saw them.</p>
+        <p class="story-paragraph">“We agreed not to leave rubbish in the hallway,” she said. “Someone could trip.”</p>
+        <p class="story-paragraph">Daniel was tired from work. “I’m only leaving them here for one night. It’s easier than carrying them twice.”</p>
+        <p class="story-paragraph">“But the agreement is for everyone,” Mrs Wilson replied. “If one person does it, other people may do the same.”</p>
+        <p class="story-paragraph">Emma came out after hearing their voices. “Daniel, she is right about the hallway.”</p>
+        <p class="story-paragraph">Daniel’s face tightened. “I am trying to help. I thought you would support me.”</p>
+        <p class="story-paragraph">“I do support you,” Emma said, “but I can still disagree.”</p>
+        <p class="story-paragraph">The words came out sharper than she wanted. Daniel picked up the bags and carried them to their kitchen. Mrs Wilson returned to her apartment without saying more.</p>
+        <p class="story-paragraph">Inside, Daniel set the bags down. “I’m sorry I spoke to her like that,” he said. “I felt as if she thought I was careless.”</p>
+        <p class="story-paragraph">Emma sat beside him. “I’m sorry I answered so quickly in front of her. I could have talked to you first. But I don’t want to say yes just to avoid an argument.”</p>
+        <p class="story-paragraph">“You shouldn’t have to,” Daniel said. “I was annoyed, and I made it your problem.”</p>
+        <p class="story-paragraph">They agreed to leave the bags in their kitchen until morning. Then they went back into the hallway together. Mrs Wilson opened her door as they reached it.</p>
+        <p class="story-paragraph">“I’m sorry I sounded like a police officer,” she said. “I was worried someone might fall. I should have said that.”</p>
+        <p class="story-paragraph">Daniel explained why he had moved the bags. “I was trying to make tomorrow easier, not ignore the agreement.”</p>
+        <p class="story-paragraph">“I understand,” Mrs Wilson said. “The rubbish area is close. One trip in the morning is probably better.”</p>
+        <p class="story-paragraph">The three of them smiled awkwardly. The argument was small, but the apology mattered. Daniel had asked what was wrong instead of deciding what Mrs Wilson thought. Emma had made her choice clear. They had not agreed about every feeling, but they had listened.</p>
+
+        <h2 class="chapter-heading">17 Tea in the Courtyard</h2>
+
+        <p class="story-paragraph">On Saturday morning, Mark and Daniel cleared the shared rubbish area. They put the boxes into the correct bins and swept the ground. Mr Harris came by with a new sign asking people to flatten boxes before putting them out.</p>
+        <p class="story-paragraph">“This sign is clear,” Mark said. “Unlike my cupboard instructions.”</p>
+        <p class="story-paragraph">“Your cupboard instructions were a drawing of a chair,” Daniel said.</p>
+        <p class="story-paragraph">“It was a very good drawing.”</p>
+        <p class="story-paragraph">The work took less than an hour. When they finished, the bins were easy to reach, and the courtyard looked brighter. Mr Harris thanked them and said he would pay for a proper clean of the area next month.</p>
+        <p class="story-paragraph">He also told Daniel that the dark patch on the courtyard wall had not grown. A builder would check the rainwater pipe when he came to look at the roof. It was not an urgent danger, but it should not be forgotten.</p>
+        <p class="story-paragraph">In the afternoon, Peter returned to test the kitchen tap in Daniel and Emma’s apartment. He turned it on, listened, and smiled when it made no strange sound.</p>
+        <p class="story-paragraph">“A quiet tap,” Emma said. “I didn’t know I could be so pleased about one.”</p>
+        <p class="story-paragraph">Peter checked beneath the sink too. The pipe was dry. “It is working as it should. Keep the space clear so you can see if there is a leak.”</p>
+        <p class="story-paragraph">Daniel nodded. “We will. And next time we see water, we’ll report it early.”</p>
+        <p class="story-paragraph">“That is the best repair plan,” Peter said. “Notice it, tell someone, and don’t try to fix a large problem with a tea towel.”</p>
+        <p class="story-paragraph">Emma looked at the tea towel hanging by the sink. “It did its best.”</p>
+        <p class="story-paragraph">“It has earned a rest,” Peter said.</p>
+        <p class="story-paragraph">That evening, Mrs Wilson brought tea into the courtyard. Mark carried out a plate of biscuits, Sophie brought fruit, and Mr Novak placed two old chairs near the wall. Mr Harris stayed for a cup, though he said he could only remain for a little while.</p>
+        <p class="story-paragraph">The courtyard was not a perfect place to eat. One chair wobbled, and a pigeon watched the biscuits with great interest. The building’s paint was still cracked, and the front door needed more work before it closed every time.</p>
+        <p class="story-paragraph">But the step was safe. The tap worked. The rubbish area was clean, and the repair list had dates beside several jobs.</p>
+        <p class="story-paragraph">Sophie talked about a music lesson she had enjoyed. Mark described his cousin’s visit and admitted that the cupboard had taken three people to move. Mrs Wilson offered to lend him a book about furniture, but he said he was afraid it might explain how to build a chair.</p>
+        <p class="story-paragraph">At nine, Sophie looked at her watch. “I should go in. I need to put the baby to bed.” She collected her things and thanked everyone for the tea.</p>
+        <p class="story-paragraph">The music agreement did not mean that no one could play. It meant that people gave notice and kept the sound low at night. The repair agreement did not make every job easy. It helped them plan and tell one another what was happening.</p>
+        <p class="story-paragraph">When Daniel and Emma went upstairs, they remembered their first night in the apartment. Then, every sound had felt strange: the door closing, feet on the stairs, a tap in another home. Daniel had thought that a quiet home was something a person either had or did not have.</p>
+        <p class="story-paragraph">Now he knew that quiet could mean different things to different people. It could mean music played earlier, a repair announced before it began, or a neighbour asking before making a complaint.</p>
+        <p class="story-paragraph">Emma leaned against the kitchen counter. “It isn’t perfect,” she said.</p>
+        <p class="story-paragraph">“No,” Daniel replied. He turned on the tap. Water ran smoothly into the sink. “But it feels like home.”</p>
+        <p class="story-paragraph">From the courtyard came Mark’s voice saying goodbye to Mr Novak. A door clicked shut, then footsteps crossed the hall. Daniel smiled. The building was still old, and its people still made mistakes. But they were learning how to live beside one another—with care, clear words and room for compromise.</p>
+    </div>
+  </article>
+
+</main>
+
+<script>
+// Dynamic Metadata Loader
+(async function initMetadata() {
+  const jsonUrl = '../content/daily-14-b1.json';
+  let data = null;
+
+  try {
+    const res = await fetch(jsonUrl);
+    if (res.ok) {
+      data = await res.json();
+    }
+  } catch (err) {
+    console.warn('Could not fetch external JSON, using embedded fallback:', err);
+  }
+
+  // Fallback initial data in case fetch is blocked by file:// protocol
+  if (!data) {
+    data = {"id":"daily-14","title":"The Apartment Next Door","author":"T. R. Davis","level":"B1","genre":"daily","minutes":60,"vocab":7,"dateAdded":"2026-10-25","coverImage":"books/covers/daily-14.png","description":"","whatYouWillLearn":""};
+  }
+
+  const genreLabels = {
+    scifi: 'Sci-Fi & Future Worlds',
+    business: 'Business & Growth',
+    classic: 'Classic Literature',
+    daily: 'Daily Conversations',
+    healthy: 'Health & Wellness'
+  };
+
+  const level = (data.level || 'B1').toUpperCase();
+  const genreFormatted = genreLabels[data.genre] || (data.genre ? String(data.genre).toUpperCase() : 'General');
+  const author = data.author || 'Unknown Author';
+  const minutes = data.minutes ? data.minutes + ' min' : '5 min';
+  const vocabCount = typeof data.vocab === 'number' ? data.vocab : (Array.isArray(data.vocab) ? data.vocab.length : 0);
+
+  // Format date
+  let formattedDate = 'Recently';
+  if (data.dateAdded) {
+    try {
+      const d = new Date(data.dateAdded);
+      if (!isNaN(d.getTime())) {
+        formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    } catch (_) {}
+  }
+
+  // Calculate word count from document paragraphs
+  const paragraphs = document.querySelectorAll('p.story-paragraph');
+  let totalWords = 0;
+  paragraphs.forEach(p => {
+    const text = p.textContent.trim();
+    if (text) totalWords += text.split(/\s+/).length;
+  });
+
+  // Populate hero card
+  const titleEl = document.getElementById('bookDisplayTitle');
+  if (titleEl && data.title) titleEl.textContent = data.title;
+
+  const authorEl = document.getElementById('bookDisplayAuthor');
+  if (authorEl) authorEl.textContent = 'by ' + author;
+
+  const chipLevel = document.getElementById('chipLevel');
+  if (chipLevel) {
+    chipLevel.innerHTML = '<span class="level-dot"></span> Level ' + level;
+    chipLevel.style.color = 'var(--lvl-' + level + ')';
+    chipLevel.style.borderColor = 'var(--lvl-' + level + ')';
+  }
+
+  const chipGenre = document.getElementById('chipGenre');
+  if (chipGenre) chipGenre.textContent = genreFormatted;
+
+  const chipTime = document.getElementById('chipReadingTime');
+  if (chipTime) chipTime.textContent = '⏱ ' + minutes + ' read';
+
+  const chipDate = document.getElementById('chipDateAdded');
+  if (chipDate) chipDate.textContent = '📅 Added ' + formattedDate;
+
+  const chipVocab = document.getElementById('chipVocab');
+  if (chipVocab) chipVocab.textContent = '📚 ' + vocabCount + ' vocab items';
+
+  // Difficulty meter (1 to 6)
+  const LEVEL_SEGMENTS = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
+  const meterSegments = LEVEL_SEGMENTS[level] || 3;
+  const meterEl = document.getElementById('vocabMeter');
+  if (meterEl) {
+    let segHtml = '';
+    for (let i = 0; i < 6; i++) {
+      segHtml += '<i class="' + (i < meterSegments ? 'on' : '') + '"></i>';
+    }
+    meterEl.innerHTML = segHtml;
+  }
+
+  // Cover
+  const coverContainer = document.getElementById('heroCoverContainer');
+  if (coverContainer) {
+    if (data.coverImage) {
+      coverContainer.innerHTML = '<img src="../../' + data.coverImage.replace(/^\/?/, '') + '" alt="' + (data.title || '') + '" onerror="this.style.display=\'none\'">';
+    } else {
+      coverContainer.innerHTML = '<div class="hero-cover-fallback"><div class="hero-cover-title">' + (data.title || '') + '</div><div class="hero-cover-author">' + author + '</div></div>';
+    }
+  }
+
+  // Descriptions
+  const aboutText = data.description || 'Explore "' + (data.title || '') + '", an engaging ' + genreFormatted.toLowerCase() + ' story specifically leveled at the CEFR ' + level + ' proficiency tier.';
+  const learnText = data.whatYouWillLearn || 'Master ' + level + '-level grammar structures and vocabulary in authentic context. Designed for English learners wanting to improve vocabulary retention and fluency.';
+
+  const aboutEl = document.getElementById('aboutTextDisplay');
+  if (aboutEl) aboutEl.textContent = aboutText;
+
+  const learnEl = document.getElementById('learnTextDisplay');
+  if (learnEl) learnEl.textContent = learnText;
+
+  // Stats list
+  const statLevel = document.getElementById('statLevel');
+  if (statLevel) {
+    statLevel.textContent = 'CEFR ' + level;
+    statLevel.style.color = 'var(--lvl-' + level + ')';
+  }
+
+  const statAuthor = document.getElementById('statAuthor');
+  if (statAuthor) statAuthor.textContent = author;
+
+  const statGenre = document.getElementById('statGenre');
+  if (statGenre) statGenre.textContent = genreFormatted;
+
+  const statTime = document.getElementById('statTime');
+  if (statTime) statTime.textContent = minutes;
+
+  const statWordCount = document.getElementById('statWordCount');
+  if (statWordCount) statWordCount.textContent = totalWords.toLocaleString() + ' words';
+
+  const statVocab = document.getElementById('statVocab');
+  if (statVocab) statVocab.textContent = vocabCount.toLocaleString() + ' words';
+
+  const statDate = document.getElementById('statDateAdded');
+  if (statDate) statDate.textContent = formattedDate;
+})();
+</script>
+</body>
+</html>
