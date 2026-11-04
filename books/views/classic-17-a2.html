@@ -2,368 +2,909 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>A Winter Without Hope</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Literata:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+    <style>
+      :root{
+        --bg-void:#04050A;
+        --bg-deep:#0A0C16;
+        --bg-elevated:#12141F;
+        --bg-reader:#0C0E18;
+
+        --glass-fill: rgba(20,22,36,.55);
+        --glass-fill-soft: rgba(20,22,36,.32);
+        --glass-border: rgba(255,255,255,.08);
+        --glass-border-hi: rgba(255,255,255,.16);
+
+        --text-primary:#F5F7FA;
+        --text-secondary:#A7AFC2;
+        --text-tertiary:#666E82;
+        --text-reader:#EAE6DD;
+
+        --neon-cyan:#4CF5E0;
+        --neon-blue:#7CACF8;
+        --neon-violet:#9B7BFF;
+        --neon-magenta:#F472B6;
+        --neon-amber:#FFC876;
+
+        --lvl-A1:#34D399;
+        --lvl-A2:#4CF5E0;
+        --lvl-B1:#7CACF8;
+        --lvl-B2:#9B7BFF;
+        --lvl-C1:#F472B6;
+        --lvl-C2:#FB7185;
+
+        --radius-card:20px;
+        --radius-panel:26px;
+        --radius-pill:999px;
+
+        --ease-out-expo:cubic-bezier(.16,1,.3,1);
+      }
+
+      *{box-sizing:border-box;}
+      html,body{height:100%;}
+      body{
+        margin:0;
+        background:var(--bg-void);
+        color:var(--text-primary);
+        font-family:'Inter',sans-serif;
+        -webkit-font-smoothing:antialiased;
+        overflow-x:hidden;
+        padding-top:env(safe-area-inset-top,0px);
+        padding-bottom:env(safe-area-inset-bottom,0px);
+      }
+      ::selection{background:rgba(155,123,255,.35); color:#fff;}
+
+      a,button{font-family:inherit;}
+      button{cursor:pointer; background:none; border:none; color:inherit;}
+      img{max-width:100%; display:block;}
+
+      :focus-visible{
+        outline:2px solid var(--neon-cyan);
+        outline-offset:3px;
+        border-radius:6px;
+      }
+
+      h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-0.01em;}
+      p{margin:0;}
+
+      /* AMBIENT BACKGROUND */
+      .ambient{
+        position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+      }
+      .ambient::before, .ambient::after{
+        content:''; position:absolute; border-radius:50%; filter:blur(90px); opacity:.28;
+      }
+      .ambient::before{
+        width:640px; height:640px; top:-220px; left:-160px;
+        background:radial-gradient(circle, var(--neon-violet), transparent 70%);
+      }
+      .ambient::after{
+        width:560px; height:560px; bottom:-260px; right:-140px;
+        background:radial-gradient(circle, var(--neon-cyan), transparent 70%);
+        opacity:.18;
+      }
+      .grain{
+        position:fixed; inset:0; z-index:1; pointer-events:none;
+        opacity:.05; mix-blend-mode:overlay;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      /* GLASS CONTAINER */
+      .glass{
+        background:var(--glass-fill);
+        backdrop-filter:blur(22px) saturate(140%);
+        -webkit-backdrop-filter:blur(22px) saturate(140%);
+        border:1px solid var(--glass-border);
+      }
+
+      /* TOPBAR */
+      .topbar{
+        position:sticky; top:0; z-index:40;
+        display:flex; align-items:center; justify-content:space-between;
+        gap:16px; padding:16px clamp(16px,4vw,48px);
+        padding-top:calc(16px + env(safe-area-inset-top,0px));
+        background:rgba(4,5,10,.65);
+        backdrop-filter:blur(18px);
+        -webkit-backdrop-filter:blur(18px);
+        border-bottom:1px solid var(--glass-border);
+      }
+      .brand{display:flex; align-items:center; gap:10px; flex-shrink:0; text-decoration:none; color:inherit;}
+      .brand-mark{
+        width:34px; height:34px; border-radius:10px;
+        background:linear-gradient(145deg, var(--neon-cyan), var(--neon-violet));
+        display:flex; align-items:center; justify-content:center;
+        box-shadow:0 0 24px -4px rgba(155,123,255,.7);
+      }
+      .brand-mark svg{width:18px; height:18px; color:#04050A;}
+      .brand-name{font-family:'Space Grotesk'; font-weight:600; font-size:1.05rem; letter-spacing:-.01em;}
+
+      .nav-tabs{
+        display:flex; gap:4px; padding:3px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        flex-shrink:0;
+      }
+      .nav-tab-btn{
+        padding:6px 14px; border-radius:var(--radius-pill); font-size:.82rem; font-weight:500;
+        color:var(--text-secondary); transition:all 180ms var(--ease-out-expo);
+        text-decoration:none; display:inline-flex; align-items:center;
+      }
+      .nav-tab-btn:hover{ color:var(--text-primary); }
+
+      /* MAIN LAYOUT */
+      .page-main{
+        position:relative; z-index:2;
+        max-width:1100px; margin:0 auto;
+        padding:32px clamp(16px,4vw,48px) 96px;
+      }
+
+      /* BACK LINK */
+      .back-link-btn{
+        display:inline-flex; align-items:center; gap:8px;
+        padding:8px 16px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        font-size:.85rem; font-weight:500; color:var(--text-secondary);
+        transition:all 180ms var(--ease-out-expo); margin-bottom:28px;
+        text-decoration:none;
+      }
+      .back-link-btn:hover{ color:var(--text-primary); border-color:var(--glass-border-hi); transform:translateX(-2px); }
+      .back-link-btn svg{ width:16px; height:16px; }
+
+      /* HERO META CARD */
+      .hero-meta-card{
+        position:relative; padding:clamp(24px,4vw,40px);
+        border-radius:32px; overflow:hidden;
+        margin-bottom:36px;
+      }
+      .hero-grid{
+        display:grid; grid-template-columns:220px 1fr; gap:36px; align-items:start;
+      }
+      @media (max-width:768px){
+        .hero-grid{ grid-template-columns:1fr; gap:24px; justify-items:center; text-align:center; }
+        .hero-meta-chips{ justify-content:center; }
+        .hero-actions-row{ justify-content:center; }
+      }
+
+      .hero-cover{
+        width:220px; aspect-ratio:2/3; border-radius:20px; overflow:hidden; position:relative;
+        box-shadow:0 24px 60px -16px rgba(0,0,0,.75); flex-shrink:0;
+        background:linear-gradient(160deg, #3b2d6b, #151829);
+      }
+      .hero-cover img{ width:100%; height:100%; object-fit:cover; }
+      .hero-cover-fallback{
+        position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
+        padding:18px 16px; background:linear-gradient(0deg, rgba(0,0,0,.85) 0%, transparent 80%);
+      }
+      .hero-cover-title{ font-family:'Space Grotesk'; font-size:1.05rem; font-weight:600; color:#fff; }
+      .hero-cover-author{ font-size:.8rem; color:rgba(255,255,255,.7); }
+
+      .hero-info{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+      .book-display-title{ font-size:clamp(1.8rem,3.2vw,2.5rem); font-weight:700; line-height:1.2; }
+      .book-display-author{ font-size:1.05rem; color:var(--text-secondary); }
+
+      .hero-meta-chips{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+      .meta-chip{
+        display:inline-flex; align-items:center; gap:6px;
+        font-size:.82rem; font-weight:600; padding:6px 14px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border); color:var(--text-secondary);
+      }
+      .level-dot{ width:8px; height:8px; border-radius:50%; background:currentColor; display:inline-block; }
+
+      .vocab-meter{ display:flex; gap:4px; width:160px; height:5px; margin-top:2px; }
+      .vocab-meter i{ display:block; flex:1; height:100%; border-radius:99px; background:rgba(255,255,255,.1); }
+      .vocab-meter i.on{ background:var(--neon-violet); }
+
+      .hero-actions-row{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:8px; }
+      .btn-primary-lg{
+        display:inline-flex; align-items:center; gap:10px;
+        padding:14px 28px; border-radius:var(--radius-pill);
+        background:linear-gradient(120deg, var(--neon-cyan), var(--neon-violet));
+        color:#04050A; font-weight:700; font-size:1rem; text-decoration:none;
+        box-shadow:0 12px 36px -8px rgba(155,123,255,.6);
+        transition:transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+      }
+      .btn-primary-lg:hover{ transform:translateY(-2px); box-shadow:0 16px 42px -8px rgba(155,123,255,.75); }
+      .btn-primary-lg svg{ width:20px; height:20px; }
+
+      /* METADATA STATS GRID */
+      .sections-grid{ display:grid; grid-template-columns:2fr 1fr; gap:28px; margin-bottom:36px; }
+      @media (max-width:840px){
+        .sections-grid{ grid-template-columns:1fr; }
+      }
+
+      .section-box{
+        padding:28px; border-radius:24px; display:flex; flex-direction:column; gap:16px;
+      }
+      .section-box-title{ font-size:1.15rem; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:8px; }
+      .section-box-title svg{ width:18px; height:18px; color:var(--neon-cyan); }
+      .section-box-body{ font-size:.95rem; line-height:1.7; color:var(--text-secondary); }
+
+      .stat-list{ display:flex; flex-direction:column; gap:14px; list-style:none; padding:0; margin:0; }
+      .stat-item{ display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--glass-border); font-size:.88rem; }
+      .stat-item:last-child{ border-bottom:none; padding-bottom:0; }
+      .stat-label{ color:var(--text-tertiary); }
+      .stat-val{ color:var(--text-primary); font-weight:600; }
+
+      /* STORY READER CARD (CONTAINING REQUIRED H1, H2, P ELEMENTS) */
+      .story-reader-card{
+        border-radius:28px;
+        padding:clamp(28px,5vw,60px);
+        background:var(--bg-reader);
+        border:1px solid var(--glass-border);
+        box-shadow:0 30px 80px -20px rgba(0,0,0,.8);
+      }
+      .story-reader-container{
+        max-width:68ch; margin:0 auto;
+      }
+
+      /* REQUIRED ELEMENT SPECIFICATIONS */
+      h1.book-id-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.4rem, 2.5vw, 2rem);
+        font-weight:700;
+        color:var(--text-primary);
+        letter-spacing:-0.01em;
+        margin-bottom:24px;
+        padding-bottom:16px;
+        border-bottom:1px solid var(--glass-border);
+      }
+      h2.chapter-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.2rem, 2vw, 1.5rem);
+        font-weight:600;
+        color:var(--neon-cyan);
+        letter-spacing:-0.01em;
+        margin-top:36px;
+        margin-bottom:20px;
+      }
+      h2.chapter-heading:first-of-type{
+        margin-top:12px;
+      }
+      p.story-paragraph{
+        font-family:'Literata',serif;
+        font-size:1.12rem;
+        line-height:1.9;
+        color:var(--text-reader);
+        margin-bottom:1.5em;
+      }
+      p.story-paragraph:last-child{
+        margin-bottom:0;
+      }
+
+      @media (max-width:768px){
+        .topbar{ padding:10px 14px; }
+        .page-main{ padding:20px 14px 64px; }
+        .hero-meta-card{ padding:20px 16px; border-radius:24px; }
+        .section-box{ padding:20px 18px; }
+        .story-reader-card{ padding:24px 18px; border-radius:20px; }
+        p.story-paragraph{ font-size:1.02rem; line-height:1.75; }
+      }
+    </style>
 </head>
 <body>
-    <h1>classic-17</h1>
-    <h2>0 The Last Day at the Workshop</h2>
 
-    <p>The winter of 1898 was the coldest Anna Miller had ever known. Snow covered the roofs and the narrow streets of Bellford, a small city in northern Europe. The river was frozen near its banks. In the poor part of town, smoke rose from only a few chimneys.</p>
-    <p>Anna was twenty-four years old. She worked as a seamstress in a small workshop on Mill Street. Each day, she sat beside a window and sewed shirts and dresses. The window had a crack in it, so cold air came into the room. Anna kept her coat on while she worked.</p>
-    <p>The workshop belonged to Mr Dale. He was a thin man with a dark beard. He walked between the tables and watched the workers. That morning, he stopped beside Anna.</p>
-    <p>“The shop will close tonight,” he said. “I have no more orders.”</p>
-    <p>The women stopped sewing. Anna looked at the basket of clothes beside her. She had worked hard, but she did not have enough money saved.</p>
-    <p>“When will you open again?” she asked.</p>
-    <p>Mr Dale shook his head. “I do not know. I am sorry.”</p>
-    <p>Anna carried her sewing things home in a small cloth bag. Her room was above a baker’s shop, at the end of a poor street. It was one small room with a bed, a chair, and a little iron stove. The baker had no bread to give her. He had closed his shop early because there was no coal for the oven.</p>
-    <p>Anna looked into her coal bucket. It was empty. She had one small piece of bread and a little tea. She put a few coins on the table and counted them twice. They were not enough to pay the rent.</p>
-    <p>Her landlord, Mr Pike, came to her door that afternoon. He wore a warm brown coat and carried a walking stick.</p>
-    <p>“The rent is due tomorrow,” he said.</p>
-    <p>“I have lost my work,” Anna replied. “Could I pay you next week?”</p>
-    <p>Mr Pike looked at the cold room. “I need the money, Miss Miller. You must leave tomorrow if you cannot pay.”</p>
-    <p>Anna wanted to argue, but she knew he would not change his mind. She shut the door and sat on the bed. Outside, the wind pushed snow against the glass.</p>
-    <p>She had no family in Bellford. Her mother had died when Anna was a girl, and her father had gone away years before. She had learned to sew and had lived by her own work ever since.</p>
-    <p>That evening, Anna packed her clothes and her needles into one bag. She wrapped her best dress in a scarf. She left her small cup on the table. It was too heavy to carry, and it belonged to no one she knew.</p>
-    <p>Before she went to sleep, she put another piece of wood into the stove. It gave little heat. Anna sat beside it and watched the red light grow dark.</p>
-    <p>In the morning, she would have no home and no job. Still, she told herself, “I can work. I must find a way.”</p>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 
-    <h2>1 A Room for the Night</h2>
+<header class="topbar">
+  <a href="../../index.html" class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M20 6v14h-4V6a2 2 0 0 1 4 0z" opacity=".55"/></svg>
+    </div>
+    <span class="brand-name">Lumen</span>
+  </a>
+  <nav class="nav-tabs">
+    <a href="../../index.html" class="nav-tab-btn">Library / Search</a>
+    <a href="../../discover.html" class="nav-tab-btn">Discover</a>
+  </nav>
+</header>
 
-    <p>The next morning, Anna left her room with one bag. Snow was falling again. She walked past the baker’s shop and down Mill Street. Poor families were staying inside their small homes. Many doors had old blankets over them to keep out the wind.</p>
-    <p>Anna’s shoes were thin, and the cold came through them. She asked at two shops if they needed a seamstress. One shop had no work. At the other, a woman said they already had too many workers.</p>
-    <p>By evening, Anna’s hands were stiff. She stood near a stone bridge and watched people hurry home. Their coats were thick, and their faces were red from the cold.</p>
-    <p>An older woman came along the street with a basket on her arm. She was wearing a wool hat and a long grey coat. When she saw Anna, she stopped.</p>
-    <p>“Are you all right, dear?” she asked.</p>
-    <p>Anna wanted to say yes, but her voice was tired. “I have nowhere to go tonight.”</p>
-    <p>The woman looked at Anna’s bag. “My name is Rose Bennett. I have a spare room. It is simple, but there is a bed and a stove. Come with me, and I will give you something warm to eat.”</p>
-    <p>Anna followed Mrs Bennett to a small house near the old church. The front room was warm, and a pot was heating on the stove. The furniture was old but clean. Mrs Bennett put a bowl of soup and a piece of bread on the table.</p>
-    <p>Anna sat down slowly. “Thank you, Mrs Bennett. I do not want to be a trouble.”</p>
-    <p>“A person is not trouble because she needs help,” Mrs Bennett said. “Eat while it is hot.”</p>
-    <p>The soup was made from potatoes and onions. Anna ate carefully, but she was very hungry. Mrs Bennett listened as Anna explained what had happened at the workshop.</p>
-    <p>“I am a seamstress,” Anna said. “I can mend clothes and make new ones. I will pay you when I find work.”</p>
-    <p>“You can help me with small jobs in the house,” Mrs Bennett replied. “But you do not need to pay me tonight.”</p>
-    <p>Anna looked down at her bowl. She was grateful, but she felt ashamed. She had always earned her own money. “I want to work,” she said.</p>
-    <p>“I believe you,” said Mrs Bennett. “Tomorrow we can ask around.”</p>
-    <p>Just then, someone knocked at the door. A young man came in, carrying a bundle of papers under his coat. He was about thirty, with brown hair and a friendly face.</p>
-    <p>“This is Thomas Reed,” Mrs Bennett said. “He works at the print shop.”</p>
-    <p>Thomas shook Anna’s hand. “I heard about Mr Dale’s workshop. My sister used to sew there.”</p>
-    <p>“I am sorry to hear that,” Anna said.</p>
-    <p>“Workers should be treated fairly,” Thomas replied. “When a business closes, people need more than a quick goodbye. I write notices for the workers’ group. We are asking the city for help.”</p>
-    <p>Anna listened. She had never joined a group or asked the city for anything. But Thomas spoke calmly, and he did not look down at her.</p>
-    <p>Before he left, he said, “I may hear of work for you. Some rich families need clothes repaired.”</p>
-    <p>For the first time that day, Anna felt a little hope. The wind still shook the windows, but she was warm, and she was not alone.</p>
+<main class="page-main">
 
-    <h2>2 News from the Big House</h2>
+  <a href="../../book.html?id=classic-17" class="back-link-btn" id="backBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    Back to Book Details
+  </a>
 
-    <p>Anna stayed with Mrs Bennett for several days. She swept the floor, carried water, and mended a tear in Mrs Bennett’s coat. The old woman gave her a small room at the back of the house. It had a narrow bed and a little window, but it was warm.</p>
-    <p>Anna still went out each morning to look for work. Thomas had told her about several shops, but none of them needed another seamstress. One shop owner said he might need help later. Anna thanked him and kept walking.</p>
-    <p>On the fourth morning, she went with Mrs Bennett to the market. The stalls were half empty. A few sellers had potatoes, carrots, and old apples. A boy in a thin cap was trying to sell matches.</p>
-    <p>“The winter is hard on everyone,” Mrs Bennett said. “But it is harder on those who have little.”</p>
-    <p>They crossed the market square. At the far end, a large black carriage was waiting beside a stone house. Two men carried boxes through the tall front door. Their coats were clean and warm. A servant stood near them, giving orders.</p>
-    <p>Anna looked at the house. It was much larger than any home she had ever entered. Its windows were bright, and smoke came from several chimneys.</p>
-    <p>“That is the Whitmore house,” Mrs Bennett said. “Mr and Mrs Whitmore have a great deal of money.”</p>
-    <p>“Do they need a seamstress?” Anna asked.</p>
-    <p>“I do not know,” said Mrs Bennett. “They have servants, and they give work to local people sometimes.”</p>
-    <p>Just then, a woman in a dark blue dress came out of the house. She was about Anna’s age and carried a small basket. She spoke to the servant, then turned and walked toward the market.</p>
-    <p>“That is Clara Whitmore,” Mrs Bennett said quietly. “She is their daughter.”</p>
-    <p>Clara saw the two women looking at her. She smiled and came over.</p>
-    <p>“Good morning, Mrs Bennett,” she said. “Is the cold making your walk difficult?”</p>
-    <p>“It is making every walk difficult,” Mrs Bennett answered. “This is Anna Miller. She is a skilled seamstress, but she has lost her job.”</p>
-    <p>Clara looked at Anna’s hands. “Can you sew fine cloth as well as ordinary cloth?”</p>
-    <p>“Yes,” Anna said. “I can mend dresses, shirts, and coats. I can also make small changes to a dress.”</p>
-    <p>“That may be useful,” Clara replied. “My mother has several dresses that need repair. I cannot promise anything, but I can ask her.”</p>
-    <p>Anna felt her cheeks grow warm. “Thank you, Miss Whitmore. I would be glad to do the work.”</p>
-    <p>Clara gave her a card with the house name on it. “Come tomorrow morning. Ask for Mrs Whitmore. Tell her I sent you.” Then she returned to the big house.</p>
-    <p>Anna held the card carefully. The paper was thick and smooth, unlike the thin paper she used at the workshop.</p>
-    <p>“You must be ready early,” Mrs Bennett said. “And wear your clean dress.”</p>
-    <p>That evening, Anna washed her best dress and placed it near the stove to dry. Thomas visited after work and heard the news.</p>
-    <p>“The Whitmores are rich,” he said. “Their house is warm, and they have plenty of food.”</p>
-    <p>“Perhaps they also have work,” Anna replied.</p>
-    <p>Thomas nodded. “You deserve fair pay for your skill. Remember that.”</p>
-    <p>Anna looked at the card on the table. Tomorrow she would walk through the big front door. She was still afraid of what might happen, but she had a reason to get up in the morning.</p>
+  <!-- HERO METADATA CARD (POPULATED DYNAMICALLY FROM JSON) -->
+  <article class="hero-meta-card glass" id="metaHeroCard">
+    <div class="hero-grid">
+      <div class="hero-cover" id="heroCoverContainer">
+        <!-- Render cover image or styled fallback -->
+      </div>
+      <div class="hero-info">
+        <h2 class="book-display-title" id="bookDisplayTitle">A Winter Without Hope</h2>
+        <p class="book-display-author" id="bookDisplayAuthor">—</p>
 
-    <h2>3 The Door of the Big House</h2>
+        <div class="hero-meta-chips" id="heroMetaChips">
+          <span class="meta-chip" id="chipLevel">Level —</span>
+          <span class="meta-chip" id="chipGenre">Genre —</span>
+          <span class="meta-chip" id="chipReadingTime">⏱ — min read</span>
+          <span class="meta-chip" id="chipDateAdded">📅 Added —</span>
+          <span class="meta-chip" id="chipVocab">📚 — vocab items</span>
+        </div>
 
-    <p>The next morning, Anna stood before the tall door of the Whitmore house. It was made of dark wood, and a brass lion watched over it. Snow covered the steps. Anna held her small bag close to her side.</p>
-    <p>A servant opened the door. Warm air came out, carrying the smell of bread and wood smoke.</p>
-    <p>“You are Anna,” he said. “Come in. Mr Whitmore is waiting.”</p>
-    <p>Anna followed him through a wide hall. There were lamps on the walls and a red rug on the floor. Her wet shoes left marks on it. She looked down, but the servant said nothing.</p>
-    <p>Mr Edward Whitmore was sitting in a room near the hall. He was a large man with a careful beard. His clothes were clean and fine. Mrs Eleanor Whitmore sat beside him, wearing a blue dress. She watched Anna with a small, cold smile.</p>
-    <p>“So this is the young woman from the workshop,” said Mr Whitmore. “You can sew well?”</p>
-    <p>“Yes, sir,” Anna answered. “I can repair coats and dresses.”</p>
-    <p>He gave her a torn sleeve. Anna looked at the cloth and found the weak place. She sewed it neatly, then handed it back.</p>
-    <p>Mr Whitmore studied the work. “Good. We need a careful worker. You will mend our clothes and help with other sewing.”</p>
-    <p>Mrs Whitmore raised her eyes. “You will also remember that this is a respectable house. You must not speak about our family outside these walls. And do not go to the poor streets in the evening.”</p>
-    <p>Anna felt her face grow warm. “I understand, madam.”</p>
-    <p>A young woman came into the room. She had brown hair and a gentle face. “I am Clara,” she said. “I am their daughter. You may work in the small room upstairs. There is a bed there too.”</p>
-    <p>Anna looked at her. A bed sounded like a great gift. “Thank you, miss.”</p>
-    <p>“Clara,” the young woman said. “Please call me Clara.”</p>
-    <p>A servant brought Anna a bowl of hot soup and a piece of bread. She ate slowly at first. Then the warmth reached her hands and face, and she finished every bite. The room was so warm that she had to take off her coat.</p>
-    <p>After lunch, Clara showed her the sewing room. It had a large window, a stove, and a table covered with cloth. A narrow bed stood behind a screen.</p>
-    <p>“You can sleep here,” Clara said. “It is not a fine room, but it is warm.”</p>
-    <p>“It is more than fine,” Anna replied. “Thank you.”</p>
-    <p>Clara helped her put her bag by the bed. Then she showed Anna where to find thread and needles. She spoke kindly, and Anna began to feel safe.</p>
-    <p>Before long, Mr Whitmore came to the door. He held two coats and a pile of shirts.</p>
-    <p>“These must be ready tomorrow,” he said. “The coats are for a business visit. You can finish them tonight.”</p>
-    <p>Anna looked at the pile. “I will try, sir.”</p>
-    <p>“Do not just try. Do the work. There will be no extra pay, but you have a room and food.” He placed the clothes on the table. “And if anything is wrong, you must take responsibility. I do not want my family hearing complaints.”</p>
-    <p>Anna wanted to ask what he meant, but Mr Whitmore had already left. Clara looked unhappy.</p>
-    <p>“You should start now,” she said quietly. “He expects things to be done quickly.”</p>
-    <p>Anna sat at the table. The warm room felt safe, but the pile of clothes seemed to grow before her. She picked up her needle and began to sew.</p>
+        <div>
+          <p style="font-size: .78rem; color: var(--text-tertiary); margin-bottom: 6px;">DIFFICULTY RATING</p>
+          <div class="vocab-meter" id="vocabMeter" aria-label="Difficulty Rating"></div>
+        </div>
 
-    <h2>4 Work Behind Warm Walls</h2>
+        <div class="hero-actions-row">
+          <a href="../../book.html?id=classic-17" class="btn-primary-lg" id="readInteractiveBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span>Interactive Reader</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
 
-    <p>Anna worked until the lamps were low. She repaired the coats and shirts, then checked each line of stitches. Her fingers hurt, but she did not stop. At last, she lay down on the narrow bed without taking off her dress.</p>
-    <p>The next morning, a bell woke her. A servant brought tea and bread. Anna ate quickly and returned to the sewing room.</p>
-    <p>The house was full of people, but most of them were busy. A maid carried heavy baskets up the stairs. A cook hurried between the kitchen and the dining room. An older servant was cleaning the hall rug.</p>
-    <p>“You are up early,” Clara said when she came in.</p>
-    <p>“There is a lot to do,” Anna replied.</p>
-    <p>Clara looked at the clothes. “You finished all of these?”</p>
-    <p>“Yes.”</p>
-    <p>“Then you worked all night.” Clara sat down beside her. “That is too much.”</p>
-    <p>Anna lowered her voice. “Mr Whitmore said the work must be ready.”</p>
-    <p>Clara did not answer. She picked up a shirt and saw a small mark near the collar.</p>
-    <p>“I can mend that,” Anna said at once.</p>
-    <p>“It is not your mistake,” Clara said. “The mark was here before.”</p>
-    <p>Just then, Mr Whitmore entered. He saw the shirt in Clara’s hand.</p>
-    <p>“What happened?” he asked.</p>
-    <p>Anna stood up. “The mark was already there, sir.”</p>
-    <p>Mr Whitmore looked at her. “Do not make excuses. You are responsible for the work you accept.”</p>
-    <p>Clara started to speak, but he raised one hand.</p>
-    <p>“You will repair it and finish the dresses today. There are more clothes coming this afternoon.”</p>
-    <p>When he left, Anna looked at Clara. “I will repair the shirt,” she said. “I do not want trouble.”</p>
-    <p>Clara’s face showed worry. “You should not have to say it was your fault.”</p>
-    <p>Anna kept sewing. “I need this room.”</p>
-    <p>At midday, she carried a basket of clothes to the laundry room. Two maids were working there. The windows were open, and the room was cold. One maid was rubbing a sheet in a tub. Her hands were red from the water.</p>
-    <p>“Do you work here every day?” Anna asked.</p>
-    <p>“Every day,” said the older maid. “We begin before the family wakes and stop when they go to bed.”</p>
-    <p>The younger maid gave a quick, tired smile. “But at least we have a place to sleep.”</p>
-    <p>Anna thought of her own warm room. She had food and a bed, yet she was already afraid of losing them. She carried the basket back upstairs.</p>
-    <p>Mrs Whitmore was waiting near the sewing room. Her eyes moved over Anna’s plain dress.</p>
-    <p>“I heard that you were asking the maids questions,” she said. “Do not fill their heads with talk. You are here to work.”</p>
-    <p>“I only asked if they worked every day,” Anna replied.</p>
-    <p>“That is not your concern. And do not visit the poor district. It will not help your place here. People speak carelessly there, and I will not have my name connected with them.”</p>
-    <p>Anna looked at the floor. “Yes, madam.”</p>
-    <p>Mrs Whitmore went away. Clara came to stand by Anna.</p>
-    <p>“Mother worries too much about what people say,” she whispered.</p>
-    <p>“Does she worry about the people who work here?” Anna asked.</p>
-    <p>Clara did not answer. Outside, snow moved across the glass. Anna returned to her sewing, but now she was thinking about the maids, the long hours, and Mr Whitmore’s words. The warm room still helped her. It no longer felt like a safe place without a price.</p>
+  <!-- METADATA SECTIONS (ABOUT, LEARNING, STATS) -->
+  <div class="sections-grid">
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        About This Book
+      </h3>
+      <p class="section-box-body" id="aboutTextDisplay">
+        Loading description…
+      </p>
 
-    <h2>5 Words on Paper</h2>
+      <h3 class="section-box-title" style="margin-top: 14px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        What You'll Learn
+      </h3>
+      <p class="section-box-body" id="learnTextDisplay">
+        Loading learning objectives…
+      </p>
+    </div>
 
-    <p>That afternoon, Anna finished the dresses and repaired the marked shirt. She was carrying a small box of thread downstairs when she saw a boy at the front door.</p>
-    <p>He was thin and wore a dark cap. Snow clung to his coat. He held a bundle of printed papers under one arm.</p>
-    <p>“I am looking for Anna,” he said to the servant.</p>
-    <p>Anna stopped on the stairs. She knew the voice.</p>
-    <p>“Thomas!” she called.</p>
-    <p>The boy looked up. His face brightened. “I wanted to see how you were doing.”</p>
-    <p>The servant opened the door only a little. “You cannot come in with those papers.”</p>
-    <p>“I will wait outside,” Thomas said.</p>
-    <p>Anna looked toward the hall. Mrs Whitmore was speaking to someone in the next room. Anna pulled on her coat and went to the door.</p>
-    <p>Thomas handed her one printed sheet. “We have been sharing these in the poor district,” he said. “They explain what workers can ask for: fair pay, safe rooms, and shorter days.”</p>
-    <p>Anna read the first lines. The words were simple, but she read them twice.</p>
-    <p>“Some people met last night,” Thomas continued. “They want workers to speak together, not alone. Mr Whitmore owns a lot of businesses, so his name is in the paper.”</p>
-    <p>Anna felt nervous. “You must be careful.”</p>
-    <p>“I am,” Thomas said. “And you should be careful too. Are they treating you well?”</p>
-    <p>Anna looked back at the warm hall. A servant was carrying another heavy basket. “They give me food and a place to sleep,” she said. “But there is more work every day. Mr Whitmore says I must take the blame when something is wrong.”</p>
-    <p>Thomas listened without speaking.</p>
-    <p>“Mrs Whitmore says I must not visit the poor district,” Anna went on. “She says I must not talk freely.”</p>
-    <p>“A room and a meal should not mean that you lose your voice,” Thomas said.</p>
-    <p>The servant moved closer. “You must leave now.”</p>
-    <p>Thomas nodded to Anna. “Keep the paper if you can. Read it when you have time.” Then he walked down the steps and disappeared into the snow.</p>
-    <p>Anna slipped the paper inside her coat. As she turned, Clara was standing behind her.</p>
-    <p>“Was that Thomas?” Clara asked.</p>
-    <p>Anna nodded. “He brought news for workers.”</p>
-    <p>“Mother will be angry if she sees that.” Clara glanced at the paper under Anna’s coat, but she did not ask to take it away. “You can read it in the sewing room. I will not tell her.”</p>
-    <p>Anna thanked her. Clara’s kindness was small, but it mattered.</p>
-    <p>That evening, Anna sat beside the stove. She opened the paper and read about workers who had asked for better pay. Some had lost their jobs. Others had found friends who helped them. The words made her afraid, but they also gave her a new thought: she was not alone.</p>
-    <p>A bell rang for the family’s dinner. Anna put the paper away and went to work on a new coat. Mr Whitmore had left it with a note: Finish tonight. No extra pay.</p>
-    <p>She picked up her needle. Her hands moved as before, but her mind had changed. The warm room and full bowl were important. So were fair work and honest words.</p>
-    <p>Outside, the winter wind shook the windows. Anna watched the snow for a moment, then looked again at Thomas’s paper. She did not know what she would do next. But she knew she could no longer believe that silence was the only way to stay safe.</p>
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Reading Stats
+      </h3>
+      <ul class="stat-list">
+        <li class="stat-item">
+          <span class="stat-label">CEFR Level</span>
+          <span class="stat-val" id="statLevel">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Author</span>
+          <span class="stat-val" id="statAuthor">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Genre</span>
+          <span class="stat-val" id="statGenre">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Estimated Time</span>
+          <span class="stat-val" id="statTime">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Word Count</span>
+          <span class="stat-val" id="statWordCount">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Vocabulary Items</span>
+          <span class="stat-val" id="statVocab">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Date Added</span>
+          <span class="stat-val" id="statDateAdded">—</span>
+        </li>
+      </ul>
+    </div>
+  </div>
 
-    <h2>6 The Dress with the Tear</h2>
+  <!-- STORY CONTENT (CONTAINING REQUIRED H1, H2, P ELEMENTS) -->
+  <article class="story-reader-card">
+    <div class="story-reader-container">
+        <h1 class="book-id-heading">classic-17</h1>
+        <h2 class="chapter-heading">0 The Last Day at the Workshop</h2>
 
-    <p>The next morning, Anna reached the Big House before the sun came up. Snow covered the street, and the wind pushed at her coat. Inside, the halls were warm, but the work did not feel warm at all. Mr Whitmore had given her a list of jobs, and there were more than she could finish before dinner.</p>
-    <p>“You will stay until everything is done,” he told her. “The house must be ready for the guests.”</p>
-    <p>Anna looked at the long list. “Yes, sir,” she said.</p>
-    <p>She carried coal, cleaned the front steps, and polished the silver bowls. She worked while the family ate breakfast and while the servants took their short rest. At noon, her hands were cold and sore, though the rooms were hot. Mrs Whitmore passed her in the hall.</p>
-    <p>“You are working too slowly,” she said. “Mr Whitmore expects better.”</p>
-    <p>Anna said nothing. She knew that if she lost this place, she might have nowhere warm to sleep.</p>
-    <p>After dinner, Mr Whitmore called her to his study. A beautiful blue dress lay across a chair. It was made of fine cloth, and small silver beads shone on the sleeves.</p>
-    <p>“This dress needs a little repair,” he said. “You will mend it tonight. Be very careful. It is worth a great deal.”</p>
-    <p>Anna saw a long tear near the left sleeve. The cloth around it was dirty, and a loose blue thread hung from one side.</p>
-    <p>“I will do my best, sir,” she said.</p>
-    <p>“You will do more than your best,” said Mr Whitmore. “If you damage it, I will take the cost from your wages. If the dress is spoiled, you may leave without pay.”</p>
-    <p>Anna felt her stomach tighten. “I understand, sir.”</p>
-    <p>She took the dress to the small workroom. The lamp gave little light. She touched the tear, then stopped. The edges were old and soft. Someone had tried to sew them before. This was not a new tear. Anna was sure of it.</p>
-    <p>Clara came into the room as Anna was looking at the sleeve. “Is the dress difficult?” she asked.</p>
-    <p>“It has a tear, Miss Clara.”</p>
-    <p>Clara bent close. Her face changed. “That was there before you took it.”</p>
-    <p>Anna looked up at her. “I think so too.”</p>
-    <p>Clara glanced towards the door. “Do not say that where Father can hear.”</p>
-    <p>“Why would he blame me for it?” Anna asked.</p>
-    <p>Clara did not answer at once. Then she said, “I heard him speaking to Mother this morning. He said he had a way to send you away without paying what he owes you.”</p>
-    <p>Anna’s needle rested in her hand. “You heard him say that?”</p>
-    <p>“Yes. I did not know what he meant until now.” Clara looked unhappy. “I am sorry.”</p>
-    <p>The door opened, and Clara stepped back. Mr Whitmore stood there.</p>
-    <p>“You are to finish before midnight,” he said. “And do not forget what I told you.”</p>
-    <p>He left without looking at the tear. Anna bent over the dress again. She wanted to believe that hard work would keep her safe, but the long hours and the threat in his voice had changed something. She was no longer only tired. She was afraid, and she was angry too.</p>
-    <p>Outside, snow fell over the city. In the warm house, Anna began to sew, watching every stitch and wondering how she could prove the truth.</p>
+        <p class="story-paragraph">The winter of 1898 was the coldest Anna Miller had ever known. Snow covered the roofs and the narrow streets of Bellford, a small city in northern Europe. The river was frozen near its banks. In the poor part of town, smoke rose from only a few chimneys.</p>
+        <p class="story-paragraph">Anna was twenty-four years old. She worked as a seamstress in a small workshop on Mill Street. Each day, she sat beside a window and sewed shirts and dresses. The window had a crack in it, so cold air came into the room. Anna kept her coat on while she worked.</p>
+        <p class="story-paragraph">The workshop belonged to Mr Dale. He was a thin man with a dark beard. He walked between the tables and watched the workers. That morning, he stopped beside Anna.</p>
+        <p class="story-paragraph">“The shop will close tonight,” he said. “I have no more orders.”</p>
+        <p class="story-paragraph">The women stopped sewing. Anna looked at the basket of clothes beside her. She had worked hard, but she did not have enough money saved.</p>
+        <p class="story-paragraph">“When will you open again?” she asked.</p>
+        <p class="story-paragraph">Mr Dale shook his head. “I do not know. I am sorry.”</p>
+        <p class="story-paragraph">Anna carried her sewing things home in a small cloth bag. Her room was above a baker’s shop, at the end of a poor street. It was one small room with a bed, a chair, and a little iron stove. The baker had no bread to give her. He had closed his shop early because there was no coal for the oven.</p>
+        <p class="story-paragraph">Anna looked into her coal bucket. It was empty. She had one small piece of bread and a little tea. She put a few coins on the table and counted them twice. They were not enough to pay the rent.</p>
+        <p class="story-paragraph">Her landlord, Mr Pike, came to her door that afternoon. He wore a warm brown coat and carried a walking stick.</p>
+        <p class="story-paragraph">“The rent is due tomorrow,” he said.</p>
+        <p class="story-paragraph">“I have lost my work,” Anna replied. “Could I pay you next week?”</p>
+        <p class="story-paragraph">Mr Pike looked at the cold room. “I need the money, Miss Miller. You must leave tomorrow if you cannot pay.”</p>
+        <p class="story-paragraph">Anna wanted to argue, but she knew he would not change his mind. She shut the door and sat on the bed. Outside, the wind pushed snow against the glass.</p>
+        <p class="story-paragraph">She had no family in Bellford. Her mother had died when Anna was a girl, and her father had gone away years before. She had learned to sew and had lived by her own work ever since.</p>
+        <p class="story-paragraph">That evening, Anna packed her clothes and her needles into one bag. She wrapped her best dress in a scarf. She left her small cup on the table. It was too heavy to carry, and it belonged to no one she knew.</p>
+        <p class="story-paragraph">Before she went to sleep, she put another piece of wood into the stove. It gave little heat. Anna sat beside it and watched the red light grow dark.</p>
+        <p class="story-paragraph">In the morning, she would have no home and no job. Still, she told herself, “I can work. I must find a way.”</p>
 
-    <h2>7 A Small Written Promise</h2>
+        <h2 class="chapter-heading">1 A Room for the Night</h2>
 
-    <p>Anna finished sewing the dress after midnight. She did not close the old tear. Instead, she fixed the loose cloth as well as she could, leaving the marks of the earlier repair easy to see. Then she folded the dress and placed it on the workroom table.</p>
-    <p>In the morning, Mr Whitmore came to inspect it. He turned the sleeve in his hands.</p>
-    <p>“This is poor work,” he said.</p>
-    <p>“The tear was there before I received the dress, sir,” Anna replied. “I have not made it worse.”</p>
-    <p>“Do not argue with me,” he said. “You will be paid when I choose to pay you.”</p>
-    <p>He walked away with the dress. Anna stood still for a moment. Then she went to the kitchen, where Mrs Bennett was cutting bread.</p>
-    <p>“Can you tell me what to do?” Anna asked quietly. “He says he may send me away without my wages.”</p>
-    <p>Mrs Bennett put down the knife. “I cannot make him pay,” she said. “I have no power over Mr Whitmore. But you can protect yourself as much as you can.”</p>
-    <p>“How?”</p>
-    <p>“Write down the days you worked and the hours you stayed. Keep any note or paper he gives you. Do not sign anything you cannot read.”</p>
-    <p>Anna nodded. Mrs Bennett gave her a small piece of paper and a pencil. “Use these. Hide them well.”</p>
-    <p>Later, Thomas met Anna near the side door. He was carrying a basket from the market. She told him about the dress and Mr Whitmore’s threat.</p>
-    <p>Thomas listened carefully. “Did you agree to work for a set time?” he asked.</p>
-    <p>“He said I would have work and a room. I was to receive wages each week.”</p>
-    <p>“Was it written down?”</p>
-    <p>Anna shook her head. “No. I could not read well when I came here.”</p>
-    <p>Thomas took a folded paper from his coat. “This is a simple work agreement from my last job. It says what work I did and how much I was to be paid.” He pointed to the lines. “These words say ‘wages each week.’ This line says how many days I worked.”</p>
-    <p>Anna studied the paper. She knew some letters, but the lines ran together when she was nervous.</p>
-    <p>“I can help you read it,” Thomas said. “But I cannot make Mr Whitmore follow it. Write down your own days and hours. If anyone saw you working, remember who they were.”</p>
-    <p>“Clara saw the tear,” Anna said.</p>
-    <p>“Then ask her to write down what she remembers, if she is willing.”</p>
-    <p>Anna looked at the paper. “I have no proper place to keep records.”</p>
-    <p>“A little paper can still help,” Thomas said. “And a witness can help too. Keep the proof safe. Do not give it to Mr Whitmore unless you have to.”</p>
-    <p>That evening, Anna wrote the date and her hours on Mrs Bennett’s paper. Her writing was slow, but she made each number clear. She added: The tear was old when I received the dress.</p>
-    <p>Then she heard steps in the hall. She hid the paper inside the lining of her coat. Mr Whitmore’s voice came through the door.</p>
-    <p>“Anna, come to the study,” he called.</p>
-    <p>She took a breath and went to meet him, carrying no paper in her hands.</p>
+        <p class="story-paragraph">The next morning, Anna left her room with one bag. Snow was falling again. She walked past the baker’s shop and down Mill Street. Poor families were staying inside their small homes. Many doors had old blankets over them to keep out the wind.</p>
+        <p class="story-paragraph">Anna’s shoes were thin, and the cold came through them. She asked at two shops if they needed a seamstress. One shop had no work. At the other, a woman said they already had too many workers.</p>
+        <p class="story-paragraph">By evening, Anna’s hands were stiff. She stood near a stone bridge and watched people hurry home. Their coats were thick, and their faces were red from the cold.</p>
+        <p class="story-paragraph">An older woman came along the street with a basket on her arm. She was wearing a wool hat and a long grey coat. When she saw Anna, she stopped.</p>
+        <p class="story-paragraph">“Are you all right, dear?” she asked.</p>
+        <p class="story-paragraph">Anna wanted to say yes, but her voice was tired. “I have nowhere to go tonight.”</p>
+        <p class="story-paragraph">The woman looked at Anna’s bag. “My name is Rose Bennett. I have a spare room. It is simple, but there is a bed and a stove. Come with me, and I will give you something warm to eat.”</p>
+        <p class="story-paragraph">Anna followed Mrs Bennett to a small house near the old church. The front room was warm, and a pot was heating on the stove. The furniture was old but clean. Mrs Bennett put a bowl of soup and a piece of bread on the table.</p>
+        <p class="story-paragraph">Anna sat down slowly. “Thank you, Mrs Bennett. I do not want to be a trouble.”</p>
+        <p class="story-paragraph">“A person is not trouble because she needs help,” Mrs Bennett said. “Eat while it is hot.”</p>
+        <p class="story-paragraph">The soup was made from potatoes and onions. Anna ate carefully, but she was very hungry. Mrs Bennett listened as Anna explained what had happened at the workshop.</p>
+        <p class="story-paragraph">“I am a seamstress,” Anna said. “I can mend clothes and make new ones. I will pay you when I find work.”</p>
+        <p class="story-paragraph">“You can help me with small jobs in the house,” Mrs Bennett replied. “But you do not need to pay me tonight.”</p>
+        <p class="story-paragraph">Anna looked down at her bowl. She was grateful, but she felt ashamed. She had always earned her own money. “I want to work,” she said.</p>
+        <p class="story-paragraph">“I believe you,” said Mrs Bennett. “Tomorrow we can ask around.”</p>
+        <p class="story-paragraph">Just then, someone knocked at the door. A young man came in, carrying a bundle of papers under his coat. He was about thirty, with brown hair and a friendly face.</p>
+        <p class="story-paragraph">“This is Thomas Reed,” Mrs Bennett said. “He works at the print shop.”</p>
+        <p class="story-paragraph">Thomas shook Anna’s hand. “I heard about Mr Dale’s workshop. My sister used to sew there.”</p>
+        <p class="story-paragraph">“I am sorry to hear that,” Anna said.</p>
+        <p class="story-paragraph">“Workers should be treated fairly,” Thomas replied. “When a business closes, people need more than a quick goodbye. I write notices for the workers’ group. We are asking the city for help.”</p>
+        <p class="story-paragraph">Anna listened. She had never joined a group or asked the city for anything. But Thomas spoke calmly, and he did not look down at her.</p>
+        <p class="story-paragraph">Before he left, he said, “I may hear of work for you. Some rich families need clothes repaired.”</p>
+        <p class="story-paragraph">For the first time that day, Anna felt a little hope. The wind still shook the windows, but she was warm, and she was not alone.</p>
 
-    <h2>8 The Choice at the Door</h2>
+        <h2 class="chapter-heading">2 News from the Big House</h2>
 
-    <p>Mr Whitmore was standing beside his desk. The blue dress lay in front of him.</p>
-    <p>“You have spoiled it,” he said. “You will leave this house tomorrow. I will not pay you for the last week.”</p>
-    <p>Anna kept her hands at her sides. “I did not tear the dress, sir. The tear was there when you gave it to me.”</p>
-    <p>“You have no proof.”</p>
-    <p>“I have written down my work and hours,” she said. “And Miss Clara saw the tear.”</p>
-    <p>Mr Whitmore’s face grew red. “You will not bring my daughter into this.”</p>
-    <p>Clara stood in the doorway. She had heard him. “I saw the tear before Anna began to sew,” she said. “You showed me the dress in the morning.”</p>
-    <p>Mr Whitmore looked at her. “Go to your room.”</p>
-    <p>Clara did not move, but she stopped speaking. Anna knew Clara was afraid of her father. She also knew the girl had told the truth.</p>
-    <p>Mrs Bennett came to the doorway with a small bundle. “Anna, you may sleep at my sister’s tonight,” she said. “It is not a warm house, and there is little space. But it is a roof.”</p>
-    <p>Anna thanked her. Then Mrs Bennett added, “You can stay here tonight too, if you agree to Mr Whitmore’s rules. But I cannot promise he will pay you, or treat you fairly.”</p>
-    <p>Anna looked towards the wide hall. A fire burned in the sitting room. Her room was warm. If she left, the snow and cold waited outside. Still, staying meant working under a man who could take her wages and blame her for another person’s mistake.</p>
-    <p>“I will go,” Anna said. Her voice shook, but she did not change her mind. “I cannot stay because I am afraid.”</p>
-    <p>Mrs Bennett nodded. “I understand. Take your coat, and keep your paper safe.”</p>
-    <p>Thomas was waiting near the side door. Anna showed him the small record she had hidden in her coat.</p>
-    <p>“You kept it,” he said. “That is good. Do not let anyone take it.”</p>
-    <p>“I still have no wages,” Anna said.</p>
-    <p>“No,” Thomas replied. “This paper may help you ask for them, but it cannot promise an answer. We will find someone who knows the rules.”</p>
-    <p>Anna looked back at the house. Clara was standing at an upstairs window. She raised one hand, and Anna raised hers in reply.</p>
-    <p>Then Anna and Thomas stepped into the street. Snow lay deep beside the road, and the evening wind moved between the buildings. Anna’s fingers hurt inside her thin gloves. She was leaving warmth for a hard night, but she was leaving with her own choice.</p>
-    <p>At the corner, Thomas saw a woman coming from the Big House. She was one of the servants, carrying a covered basket.</p>
-    <p>“Anna,” the woman called. She hurried towards them. “I heard what Mr Whitmore said. I was there when the dress came from the cupboard. The tear was already in the sleeve.”</p>
-    <p>Anna stopped. “Will you tell someone?”</p>
-    <p>The woman looked towards the house, then back at Anna. “I will. But you must come to me tomorrow. I have something else too.”</p>
-    <p>She gave Anna a folded note. The paper was still warm from her pocket.</p>
-    <p>Anna opened it beneath a street lamp. The first words were clear: I saw the tear before Anna received the dress.</p>
+        <p class="story-paragraph">Anna stayed with Mrs Bennett for several days. She swept the floor, carried water, and mended a tear in Mrs Bennett’s coat. The old woman gave her a small room at the back of the house. It had a narrow bed and a little window, but it was warm.</p>
+        <p class="story-paragraph">Anna still went out each morning to look for work. Thomas had told her about several shops, but none of them needed another seamstress. One shop owner said he might need help later. Anna thanked him and kept walking.</p>
+        <p class="story-paragraph">On the fourth morning, she went with Mrs Bennett to the market. The stalls were half empty. A few sellers had potatoes, carrots, and old apples. A boy in a thin cap was trying to sell matches.</p>
+        <p class="story-paragraph">“The winter is hard on everyone,” Mrs Bennett said. “But it is harder on those who have little.”</p>
+        <p class="story-paragraph">They crossed the market square. At the far end, a large black carriage was waiting beside a stone house. Two men carried boxes through the tall front door. Their coats were clean and warm. A servant stood near them, giving orders.</p>
+        <p class="story-paragraph">Anna looked at the house. It was much larger than any home she had ever entered. Its windows were bright, and smoke came from several chimneys.</p>
+        <p class="story-paragraph">“That is the Whitmore house,” Mrs Bennett said. “Mr and Mrs Whitmore have a great deal of money.”</p>
+        <p class="story-paragraph">“Do they need a seamstress?” Anna asked.</p>
+        <p class="story-paragraph">“I do not know,” said Mrs Bennett. “They have servants, and they give work to local people sometimes.”</p>
+        <p class="story-paragraph">Just then, a woman in a dark blue dress came out of the house. She was about Anna’s age and carried a small basket. She spoke to the servant, then turned and walked toward the market.</p>
+        <p class="story-paragraph">“That is Clara Whitmore,” Mrs Bennett said quietly. “She is their daughter.”</p>
+        <p class="story-paragraph">Clara saw the two women looking at her. She smiled and came over.</p>
+        <p class="story-paragraph">“Good morning, Mrs Bennett,” she said. “Is the cold making your walk difficult?”</p>
+        <p class="story-paragraph">“It is making every walk difficult,” Mrs Bennett answered. “This is Anna Miller. She is a skilled seamstress, but she has lost her job.”</p>
+        <p class="story-paragraph">Clara looked at Anna’s hands. “Can you sew fine cloth as well as ordinary cloth?”</p>
+        <p class="story-paragraph">“Yes,” Anna said. “I can mend dresses, shirts, and coats. I can also make small changes to a dress.”</p>
+        <p class="story-paragraph">“That may be useful,” Clara replied. “My mother has several dresses that need repair. I cannot promise anything, but I can ask her.”</p>
+        <p class="story-paragraph">Anna felt her cheeks grow warm. “Thank you, Miss Whitmore. I would be glad to do the work.”</p>
+        <p class="story-paragraph">Clara gave her a card with the house name on it. “Come tomorrow morning. Ask for Mrs Whitmore. Tell her I sent you.” Then she returned to the big house.</p>
+        <p class="story-paragraph">Anna held the card carefully. The paper was thick and smooth, unlike the thin paper she used at the workshop.</p>
+        <p class="story-paragraph">“You must be ready early,” Mrs Bennett said. “And wear your clean dress.”</p>
+        <p class="story-paragraph">That evening, Anna washed her best dress and placed it near the stove to dry. Thomas visited after work and heard the news.</p>
+        <p class="story-paragraph">“The Whitmores are rich,” he said. “Their house is warm, and they have plenty of food.”</p>
+        <p class="story-paragraph">“Perhaps they also have work,” Anna replied.</p>
+        <p class="story-paragraph">Thomas nodded. “You deserve fair pay for your skill. Remember that.”</p>
+        <p class="story-paragraph">Anna looked at the card on the table. Tomorrow she would walk through the big front door. She was still afraid of what might happen, but she had a reason to get up in the morning.</p>
 
-    <h2>9 Clara Finds Her Voice</h2>
+        <h2 class="chapter-heading">3 The Door of the Big House</h2>
 
-    <p>The next morning, Clara stood by the tall window of the Whitmores’ house. Outside, snow covered the street. A thin line of smoke rose from the poor houses across the square. In this house, a fire burned in every room.</p>
-    <p>Clara held a folded note in her hand. She had written it the night before, but she had not yet decided what to do with it. It said that she had seen the dress before Anna touched it. The tear was already there.</p>
-    <p>Her mother came into the room. “You have not sent that note, I hope,” Mrs Whitmore said.</p>
-    <p>“I have not sent it,” Clara replied. “But I must tell the truth.”</p>
-    <p>Mrs Whitmore looked toward the door. “Your father is angry. Do not make things worse for the family.”</p>
-    <p>“Anna may lose her good name and her pay,” said Clara. “That is worse for her.”</p>
-    <p>Her mother sat down. “You are young. You do not understand how people will speak about us.”</p>
-    <p>Clara looked at the warm fire. She thought of Anna’s cold hands and quiet face. “I understand that people should not blame someone for a thing she did not do.”</p>
-    <p>Mrs Whitmore did not answer. She picked up a book and opened it, but she did not read.</p>
-    <p>That afternoon, Clara went to the back room where Anna had been working. Mr Whitmore was there, speaking to the housekeeper. He stopped when he saw his daughter.</p>
-    <p>“You should be upstairs,” he said.</p>
-    <p>“Father, I need to speak with you.”</p>
-    <p>“Not now.”</p>
-    <p>“It is about the dress.” Clara’s voice shook, but she stayed where she was. “I saw the tear before Anna began to sew. I should have said so earlier.”</p>
-    <p>Mr Whitmore’s face became hard. “You are certain?”</p>
-    <p>“Yes. I saw it when the dress came from the cupboard. I thought someone else would notice.”</p>
-    <p>“Then you should have told me at once,” he said.</p>
-    <p>“I know. I am sorry. But I will not say Anna did it.”</p>
-    <p>He told her to go to her room. Clara went, but she did not change her mind. She put on her coat and slipped out by the side door.</p>
-    <p>Clara found Mrs Bennett and Thomas near the small shop at the end of the street. Anna was with them. She looked tired, but she stood straight.</p>
-    <p>“I have something to say,” Clara told her. “I saw the tear before you worked on the dress. I will tell my father and anyone else who asks.”</p>
-    <p>Anna’s eyes widened. “Thank you, Clara.”</p>
-    <p>“I should have spoken sooner,” Clara said. “I was afraid of making my family look bad.”</p>
-    <p>Mrs Bennett nodded. “It takes courage to speak when silence is easier.”</p>
-    <p>Thomas held a small notebook. He had written down the days Anna worked and the money Mr Whitmore still owed her. Anna had checked the list carefully.</p>
-    <p>“We can go together tomorrow,” he said. “No shouting. We will show him the facts.”</p>
-    <p>Anna looked at each of them. “I want my pay, and I want people to know I did not damage that dress.”</p>
-    <p>“That is fair,” said Mrs Bennett. “We will stand beside you.”</p>
-    <p>As they walked home, Clara stayed with them instead of returning at once to the big house. The cold air hurt her face, but she felt lighter. She had not solved the trouble yet. Still, she had stopped hiding the truth.</p>
+        <p class="story-paragraph">The next morning, Anna stood before the tall door of the Whitmore house. It was made of dark wood, and a brass lion watched over it. Snow covered the steps. Anna held her small bag close to her side.</p>
+        <p class="story-paragraph">A servant opened the door. Warm air came out, carrying the smell of bread and wood smoke.</p>
+        <p class="story-paragraph">“You are Anna,” he said. “Come in. Mr Whitmore is waiting.”</p>
+        <p class="story-paragraph">Anna followed him through a wide hall. There were lamps on the walls and a red rug on the floor. Her wet shoes left marks on it. She looked down, but the servant said nothing.</p>
+        <p class="story-paragraph">Mr Edward Whitmore was sitting in a room near the hall. He was a large man with a careful beard. His clothes were clean and fine. Mrs Eleanor Whitmore sat beside him, wearing a blue dress. She watched Anna with a small, cold smile.</p>
+        <p class="story-paragraph">“So this is the young woman from the workshop,” said Mr Whitmore. “You can sew well?”</p>
+        <p class="story-paragraph">“Yes, sir,” Anna answered. “I can repair coats and dresses.”</p>
+        <p class="story-paragraph">He gave her a torn sleeve. Anna looked at the cloth and found the weak place. She sewed it neatly, then handed it back.</p>
+        <p class="story-paragraph">Mr Whitmore studied the work. “Good. We need a careful worker. You will mend our clothes and help with other sewing.”</p>
+        <p class="story-paragraph">Mrs Whitmore raised her eyes. “You will also remember that this is a respectable house. You must not speak about our family outside these walls. And do not go to the poor streets in the evening.”</p>
+        <p class="story-paragraph">Anna felt her face grow warm. “I understand, madam.”</p>
+        <p class="story-paragraph">A young woman came into the room. She had brown hair and a gentle face. “I am Clara,” she said. “I am their daughter. You may work in the small room upstairs. There is a bed there too.”</p>
+        <p class="story-paragraph">Anna looked at her. A bed sounded like a great gift. “Thank you, miss.”</p>
+        <p class="story-paragraph">“Clara,” the young woman said. “Please call me Clara.”</p>
+        <p class="story-paragraph">A servant brought Anna a bowl of hot soup and a piece of bread. She ate slowly at first. Then the warmth reached her hands and face, and she finished every bite. The room was so warm that she had to take off her coat.</p>
+        <p class="story-paragraph">After lunch, Clara showed her the sewing room. It had a large window, a stove, and a table covered with cloth. A narrow bed stood behind a screen.</p>
+        <p class="story-paragraph">“You can sleep here,” Clara said. “It is not a fine room, but it is warm.”</p>
+        <p class="story-paragraph">“It is more than fine,” Anna replied. “Thank you.”</p>
+        <p class="story-paragraph">Clara helped her put her bag by the bed. Then she showed Anna where to find thread and needles. She spoke kindly, and Anna began to feel safe.</p>
+        <p class="story-paragraph">Before long, Mr Whitmore came to the door. He held two coats and a pile of shirts.</p>
+        <p class="story-paragraph">“These must be ready tomorrow,” he said. “The coats are for a business visit. You can finish them tonight.”</p>
+        <p class="story-paragraph">Anna looked at the pile. “I will try, sir.”</p>
+        <p class="story-paragraph">“Do not just try. Do the work. There will be no extra pay, but you have a room and food.” He placed the clothes on the table. “And if anything is wrong, you must take responsibility. I do not want my family hearing complaints.”</p>
+        <p class="story-paragraph">Anna wanted to ask what he meant, but Mr Whitmore had already left. Clara looked unhappy.</p>
+        <p class="story-paragraph">“You should start now,” she said quietly. “He expects things to be done quickly.”</p>
+        <p class="story-paragraph">Anna sat at the table. The warm room felt safe, but the pile of clothes seemed to grow before her. She picked up her needle and began to sew.</p>
 
-    <h2>10 The Truth in the Front Room</h2>
+        <h2 class="chapter-heading">4 Work Behind Warm Walls</h2>
 
-    <p>The following morning, Anna, Mrs Bennett and Thomas went to the Whitmore house. Clara met them at the front door. She led them to the front room, where Mr Whitmore was reading a letter.</p>
-    <p>“You have brought a group to speak to me?” he asked.</p>
-    <p>“We have come to discuss Anna’s pay and the dress,” said Mrs Bennett. Her voice was calm. “We would like you to listen.”</p>
-    <p>Mr Whitmore looked at Anna. “You have already caused enough trouble.”</p>
-    <p>“I want to settle this fairly,” Anna said. “I have done my work. I have not been paid for all of it, and I did not tear the dress.”</p>
-    <p>Thomas opened his notebook. “These are the days Anna worked. Here are the dates and the hours she stayed late.”</p>
-    <p>Mr Whitmore took the notebook and read the list. His mouth tightened. “I do not agree with every hour.”</p>
-    <p>“You can check the house records,” said Thomas. “The work was written down there too.”</p>
-    <p>Clara stepped forward. “I saw the tear before Anna began. I am sure of it.”</p>
-    <p>Mr Whitmore turned to his daughter. “You understand what this means for your family?”</p>
-    <p>“I do,” Clara replied. “It does not change what I saw.”</p>
-    <p>For a moment, no one spoke. A fire crackled in the grate. Outside, a cart rolled slowly through the snow.</p>
-    <p>Mrs Bennett placed a folded paper on the table. “I have written the facts as we know them. If we cannot agree, I will take this to the local paper. They can ask the other workers about their unpaid money too.”</p>
-    <p>Mr Whitmore looked at the paper, then at the people in the room. “You would put my name in the paper?”</p>
-    <p>“We would tell the truth,” Mrs Bennett said. “It may harm your good name. It is still your choice to pay what is owed.”</p>
-    <p>Mr Whitmore walked to the window. The other workers’ houses stood on the far side of the square. Their roofs were low and their windows small. He said nothing for a long time.</p>
-    <p>Then he turned back. “I will pay Anna for the hours on this list. I will also check the accounts for the other workers.”</p>
-    <p>Anna did not smile. “I want the money I earned. I also want you to say that I did not damage the dress.”</p>
-    <p>Mr Whitmore’s face remained stiff. “The tear was there before you worked on it,” he said. “I accept that you did not cause it.”</p>
-    <p>He did not say he was sorry. But he sent a servant to bring the account book and asked Thomas to check the dates.</p>
-    <p>They spent the next hour checking names and sums. Mr Whitmore questioned some of the hours, but he paid Anna the full amount on Thomas’s list. He agreed to pay the other workers after checking their records.</p>
-    <p>“I will not have the paper printing stories about this house,” he said as he counted out the money.</p>
-    <p>“Then deal honestly with the people who work for you,” Mrs Bennett replied.</p>
-    <p>Anna put the coins in her purse. She had waited a long time for them, but she did not feel that she had won everything. Mr Whitmore had paid because the truth could reach the paper, not because he had become kind.</p>
-    <p>At the door, Clara walked beside Anna. “I wish I had spoken sooner.”</p>
-    <p>“You spoke when it mattered,” Anna said. “Next time, do not wait so long.”</p>
-    <p>Clara gave a small, sad smile. She looked toward the warm rooms behind her, then followed Anna out into the cold street.</p>
-    <p>For the first time, the big house seemed less important than the people standing outside it.</p>
+        <p class="story-paragraph">Anna worked until the lamps were low. She repaired the coats and shirts, then checked each line of stitches. Her fingers hurt, but she did not stop. At last, she lay down on the narrow bed without taking off her dress.</p>
+        <p class="story-paragraph">The next morning, a bell woke her. A servant brought tea and bread. Anna ate quickly and returned to the sewing room.</p>
+        <p class="story-paragraph">The house was full of people, but most of them were busy. A maid carried heavy baskets up the stairs. A cook hurried between the kitchen and the dining room. An older servant was cleaning the hall rug.</p>
+        <p class="story-paragraph">“You are up early,” Clara said when she came in.</p>
+        <p class="story-paragraph">“There is a lot to do,” Anna replied.</p>
+        <p class="story-paragraph">Clara looked at the clothes. “You finished all of these?”</p>
+        <p class="story-paragraph">“Yes.”</p>
+        <p class="story-paragraph">“Then you worked all night.” Clara sat down beside her. “That is too much.”</p>
+        <p class="story-paragraph">Anna lowered her voice. “Mr Whitmore said the work must be ready.”</p>
+        <p class="story-paragraph">Clara did not answer. She picked up a shirt and saw a small mark near the collar.</p>
+        <p class="story-paragraph">“I can mend that,” Anna said at once.</p>
+        <p class="story-paragraph">“It is not your mistake,” Clara said. “The mark was here before.”</p>
+        <p class="story-paragraph">Just then, Mr Whitmore entered. He saw the shirt in Clara’s hand.</p>
+        <p class="story-paragraph">“What happened?” he asked.</p>
+        <p class="story-paragraph">Anna stood up. “The mark was already there, sir.”</p>
+        <p class="story-paragraph">Mr Whitmore looked at her. “Do not make excuses. You are responsible for the work you accept.”</p>
+        <p class="story-paragraph">Clara started to speak, but he raised one hand.</p>
+        <p class="story-paragraph">“You will repair it and finish the dresses today. There are more clothes coming this afternoon.”</p>
+        <p class="story-paragraph">When he left, Anna looked at Clara. “I will repair the shirt,” she said. “I do not want trouble.”</p>
+        <p class="story-paragraph">Clara’s face showed worry. “You should not have to say it was your fault.”</p>
+        <p class="story-paragraph">Anna kept sewing. “I need this room.”</p>
+        <p class="story-paragraph">At midday, she carried a basket of clothes to the laundry room. Two maids were working there. The windows were open, and the room was cold. One maid was rubbing a sheet in a tub. Her hands were red from the water.</p>
+        <p class="story-paragraph">“Do you work here every day?” Anna asked.</p>
+        <p class="story-paragraph">“Every day,” said the older maid. “We begin before the family wakes and stop when they go to bed.”</p>
+        <p class="story-paragraph">The younger maid gave a quick, tired smile. “But at least we have a place to sleep.”</p>
+        <p class="story-paragraph">Anna thought of her own warm room. She had food and a bed, yet she was already afraid of losing them. She carried the basket back upstairs.</p>
+        <p class="story-paragraph">Mrs Whitmore was waiting near the sewing room. Her eyes moved over Anna’s plain dress.</p>
+        <p class="story-paragraph">“I heard that you were asking the maids questions,” she said. “Do not fill their heads with talk. You are here to work.”</p>
+        <p class="story-paragraph">“I only asked if they worked every day,” Anna replied.</p>
+        <p class="story-paragraph">“That is not your concern. And do not visit the poor district. It will not help your place here. People speak carelessly there, and I will not have my name connected with them.”</p>
+        <p class="story-paragraph">Anna looked at the floor. “Yes, madam.”</p>
+        <p class="story-paragraph">Mrs Whitmore went away. Clara came to stand by Anna.</p>
+        <p class="story-paragraph">“Mother worries too much about what people say,” she whispered.</p>
+        <p class="story-paragraph">“Does she worry about the people who work here?” Anna asked.</p>
+        <p class="story-paragraph">Clara did not answer. Outside, snow moved across the glass. Anna returned to her sewing, but now she was thinking about the maids, the long hours, and Mr Whitmore’s words. The warm room still helped her. It no longer felt like a safe place without a price.</p>
 
-    <h2>11 A Window Facing Spring</h2>
+        <h2 class="chapter-heading">5 Words on Paper</h2>
 
-    <p>Anna did not return to work at the Whitmore house. She had her money, and she wanted to choose her own work. Mrs Bennett offered her half of a room above the little shop where she lived.</p>
-    <p>“It is not large,” Mrs Bennett said. “But the window is good, and there is room for a table and two chairs.”</p>
-    <p>“I can pay you a fair share of the rent,” Anna replied.</p>
-    <p>“That is what I want,” said Mrs Bennett. “We will make fair rules for both of us.”</p>
-    <p>They cleaned the room together. Mrs Bennett moved a shelf, and Anna carried up a sewing table. Thomas brought a small lamp from his room. The boards were old, and the window let in a little cold air, but the room was bright in the daytime.</p>
-    <p>Anna bought thread and needles with some of her pay. She kept the rest for food and rent. She wrote a list of prices for mending coats, making simple dresses and sewing buttons.</p>
-    <p>“No secret hours,” she told Mrs Bennett. “And no work without an agreed price.”</p>
-    <p>Mrs Bennett smiled. “Those are good rules.”</p>
-    <p>Thomas helped Anna make a notice. He printed the words clearly on a sheet of paper: ANNA’S SEWING SERVICE. FAIR PRICES. CAREFUL WORK. ASK INSIDE.</p>
-    <p>He carried copies to the baker, the grocer and the station wall. Some people stopped to read them. One woman came that afternoon with a coat that needed a new sleeve.</p>
-    <p>Anna looked at the coat and named a price. The woman agreed. Anna wrote the price and the day of collection in her notebook.</p>
-    <p>“You make it very clear,” the woman said.</p>
-    <p>“It is better for both of us,” Anna replied.</p>
-    <p>Work came slowly. Some days Anna had only a small repair. Other days she worked until the lamp was needed. Mrs Bennett also sewed beside her, and they shared the room without rushing one another.</p>
-    <p>Clara visited one cold evening. She brought a plain brown dress that needed a small repair. She paid the price Anna had written on the notice.</p>
-    <p>“My father says the workers’ money will be paid,” Clara said. “He is not happy about it.”</p>
-    <p>“He does not have to be happy,” Anna replied. “He has to be fair.”</p>
-    <p>Clara looked around the room. “I used to think a fine house made a family good.”</p>
-    <p>“A house is only a house,” said Mrs Bennett. “People show what they are by what they do.”</p>
-    <p>Clara nodded. She no longer spoke about Anna as if Anna’s life were far away from her own.</p>
-    <p>Weeks passed. The snow grew thin along the roads. Water ran beside the stones, and the days lasted a little longer. Winter was not gone, but it was beginning to soften.</p>
-    <p>Anna worked at the table near the window. A child brought a torn mitten. An old man asked her to mend his warm coat. She gave each person the same clear price and did each job with care.</p>
-    <p>Thomas came by with fresh notices. “People are asking for you now,” he said.</p>
-    <p>“Then I must keep doing good work,” Anna replied.</p>
-    <p>Outside, the sky was pale blue. A soft light reached through the window and fell across Anna’s hands. She stopped sewing for a moment and looked at it.</p>
-    <p>She remembered the dark weeks when she had no room of her own and no sure way to earn money. Life was still hard. The room was small, and the money did not come easily. But now she had work she could accept or refuse, and people who stood beside her.</p>
-    <p>Mrs Bennett set a pot of tea on the table. Clara was visiting, and Thomas sat near the door, warming his hands.</p>
-    <p>“The light looks different today,” Clara said.</p>
-    <p>Anna looked toward the street, where the first drops of snow were falling from a roof. “It is the same winter sun,” she said. “But spring is coming.”</p>
-    <p>She returned to her sewing. The new light stayed on the cloth, warm and clear. Kindness had helped her, but it had not asked her to be silent or obedient. Anna could speak, choose her work and stand with her head held high.</p>
+        <p class="story-paragraph">That afternoon, Anna finished the dresses and repaired the marked shirt. She was carrying a small box of thread downstairs when she saw a boy at the front door.</p>
+        <p class="story-paragraph">He was thin and wore a dark cap. Snow clung to his coat. He held a bundle of printed papers under one arm.</p>
+        <p class="story-paragraph">“I am looking for Anna,” he said to the servant.</p>
+        <p class="story-paragraph">Anna stopped on the stairs. She knew the voice.</p>
+        <p class="story-paragraph">“Thomas!” she called.</p>
+        <p class="story-paragraph">The boy looked up. His face brightened. “I wanted to see how you were doing.”</p>
+        <p class="story-paragraph">The servant opened the door only a little. “You cannot come in with those papers.”</p>
+        <p class="story-paragraph">“I will wait outside,” Thomas said.</p>
+        <p class="story-paragraph">Anna looked toward the hall. Mrs Whitmore was speaking to someone in the next room. Anna pulled on her coat and went to the door.</p>
+        <p class="story-paragraph">Thomas handed her one printed sheet. “We have been sharing these in the poor district,” he said. “They explain what workers can ask for: fair pay, safe rooms, and shorter days.”</p>
+        <p class="story-paragraph">Anna read the first lines. The words were simple, but she read them twice.</p>
+        <p class="story-paragraph">“Some people met last night,” Thomas continued. “They want workers to speak together, not alone. Mr Whitmore owns a lot of businesses, so his name is in the paper.”</p>
+        <p class="story-paragraph">Anna felt nervous. “You must be careful.”</p>
+        <p class="story-paragraph">“I am,” Thomas said. “And you should be careful too. Are they treating you well?”</p>
+        <p class="story-paragraph">Anna looked back at the warm hall. A servant was carrying another heavy basket. “They give me food and a place to sleep,” she said. “But there is more work every day. Mr Whitmore says I must take the blame when something is wrong.”</p>
+        <p class="story-paragraph">Thomas listened without speaking.</p>
+        <p class="story-paragraph">“Mrs Whitmore says I must not visit the poor district,” Anna went on. “She says I must not talk freely.”</p>
+        <p class="story-paragraph">“A room and a meal should not mean that you lose your voice,” Thomas said.</p>
+        <p class="story-paragraph">The servant moved closer. “You must leave now.”</p>
+        <p class="story-paragraph">Thomas nodded to Anna. “Keep the paper if you can. Read it when you have time.” Then he walked down the steps and disappeared into the snow.</p>
+        <p class="story-paragraph">Anna slipped the paper inside her coat. As she turned, Clara was standing behind her.</p>
+        <p class="story-paragraph">“Was that Thomas?” Clara asked.</p>
+        <p class="story-paragraph">Anna nodded. “He brought news for workers.”</p>
+        <p class="story-paragraph">“Mother will be angry if she sees that.” Clara glanced at the paper under Anna’s coat, but she did not ask to take it away. “You can read it in the sewing room. I will not tell her.”</p>
+        <p class="story-paragraph">Anna thanked her. Clara’s kindness was small, but it mattered.</p>
+        <p class="story-paragraph">That evening, Anna sat beside the stove. She opened the paper and read about workers who had asked for better pay. Some had lost their jobs. Others had found friends who helped them. The words made her afraid, but they also gave her a new thought: she was not alone.</p>
+        <p class="story-paragraph">A bell rang for the family’s dinner. Anna put the paper away and went to work on a new coat. Mr Whitmore had left it with a note: Finish tonight. No extra pay.</p>
+        <p class="story-paragraph">She picked up her needle. Her hands moved as before, but her mind had changed. The warm room and full bowl were important. So were fair work and honest words.</p>
+        <p class="story-paragraph">Outside, the winter wind shook the windows. Anna watched the snow for a moment, then looked again at Thomas’s paper. She did not know what she would do next. But she knew she could no longer believe that silence was the only way to stay safe.</p>
+
+        <h2 class="chapter-heading">6 The Dress with the Tear</h2>
+
+        <p class="story-paragraph">The next morning, Anna reached the Big House before the sun came up. Snow covered the street, and the wind pushed at her coat. Inside, the halls were warm, but the work did not feel warm at all. Mr Whitmore had given her a list of jobs, and there were more than she could finish before dinner.</p>
+        <p class="story-paragraph">“You will stay until everything is done,” he told her. “The house must be ready for the guests.”</p>
+        <p class="story-paragraph">Anna looked at the long list. “Yes, sir,” she said.</p>
+        <p class="story-paragraph">She carried coal, cleaned the front steps, and polished the silver bowls. She worked while the family ate breakfast and while the servants took their short rest. At noon, her hands were cold and sore, though the rooms were hot. Mrs Whitmore passed her in the hall.</p>
+        <p class="story-paragraph">“You are working too slowly,” she said. “Mr Whitmore expects better.”</p>
+        <p class="story-paragraph">Anna said nothing. She knew that if she lost this place, she might have nowhere warm to sleep.</p>
+        <p class="story-paragraph">After dinner, Mr Whitmore called her to his study. A beautiful blue dress lay across a chair. It was made of fine cloth, and small silver beads shone on the sleeves.</p>
+        <p class="story-paragraph">“This dress needs a little repair,” he said. “You will mend it tonight. Be very careful. It is worth a great deal.”</p>
+        <p class="story-paragraph">Anna saw a long tear near the left sleeve. The cloth around it was dirty, and a loose blue thread hung from one side.</p>
+        <p class="story-paragraph">“I will do my best, sir,” she said.</p>
+        <p class="story-paragraph">“You will do more than your best,” said Mr Whitmore. “If you damage it, I will take the cost from your wages. If the dress is spoiled, you may leave without pay.”</p>
+        <p class="story-paragraph">Anna felt her stomach tighten. “I understand, sir.”</p>
+        <p class="story-paragraph">She took the dress to the small workroom. The lamp gave little light. She touched the tear, then stopped. The edges were old and soft. Someone had tried to sew them before. This was not a new tear. Anna was sure of it.</p>
+        <p class="story-paragraph">Clara came into the room as Anna was looking at the sleeve. “Is the dress difficult?” she asked.</p>
+        <p class="story-paragraph">“It has a tear, Miss Clara.”</p>
+        <p class="story-paragraph">Clara bent close. Her face changed. “That was there before you took it.”</p>
+        <p class="story-paragraph">Anna looked up at her. “I think so too.”</p>
+        <p class="story-paragraph">Clara glanced towards the door. “Do not say that where Father can hear.”</p>
+        <p class="story-paragraph">“Why would he blame me for it?” Anna asked.</p>
+        <p class="story-paragraph">Clara did not answer at once. Then she said, “I heard him speaking to Mother this morning. He said he had a way to send you away without paying what he owes you.”</p>
+        <p class="story-paragraph">Anna’s needle rested in her hand. “You heard him say that?”</p>
+        <p class="story-paragraph">“Yes. I did not know what he meant until now.” Clara looked unhappy. “I am sorry.”</p>
+        <p class="story-paragraph">The door opened, and Clara stepped back. Mr Whitmore stood there.</p>
+        <p class="story-paragraph">“You are to finish before midnight,” he said. “And do not forget what I told you.”</p>
+        <p class="story-paragraph">He left without looking at the tear. Anna bent over the dress again. She wanted to believe that hard work would keep her safe, but the long hours and the threat in his voice had changed something. She was no longer only tired. She was afraid, and she was angry too.</p>
+        <p class="story-paragraph">Outside, snow fell over the city. In the warm house, Anna began to sew, watching every stitch and wondering how she could prove the truth.</p>
+
+        <h2 class="chapter-heading">7 A Small Written Promise</h2>
+
+        <p class="story-paragraph">Anna finished sewing the dress after midnight. She did not close the old tear. Instead, she fixed the loose cloth as well as she could, leaving the marks of the earlier repair easy to see. Then she folded the dress and placed it on the workroom table.</p>
+        <p class="story-paragraph">In the morning, Mr Whitmore came to inspect it. He turned the sleeve in his hands.</p>
+        <p class="story-paragraph">“This is poor work,” he said.</p>
+        <p class="story-paragraph">“The tear was there before I received the dress, sir,” Anna replied. “I have not made it worse.”</p>
+        <p class="story-paragraph">“Do not argue with me,” he said. “You will be paid when I choose to pay you.”</p>
+        <p class="story-paragraph">He walked away with the dress. Anna stood still for a moment. Then she went to the kitchen, where Mrs Bennett was cutting bread.</p>
+        <p class="story-paragraph">“Can you tell me what to do?” Anna asked quietly. “He says he may send me away without my wages.”</p>
+        <p class="story-paragraph">Mrs Bennett put down the knife. “I cannot make him pay,” she said. “I have no power over Mr Whitmore. But you can protect yourself as much as you can.”</p>
+        <p class="story-paragraph">“How?”</p>
+        <p class="story-paragraph">“Write down the days you worked and the hours you stayed. Keep any note or paper he gives you. Do not sign anything you cannot read.”</p>
+        <p class="story-paragraph">Anna nodded. Mrs Bennett gave her a small piece of paper and a pencil. “Use these. Hide them well.”</p>
+        <p class="story-paragraph">Later, Thomas met Anna near the side door. He was carrying a basket from the market. She told him about the dress and Mr Whitmore’s threat.</p>
+        <p class="story-paragraph">Thomas listened carefully. “Did you agree to work for a set time?” he asked.</p>
+        <p class="story-paragraph">“He said I would have work and a room. I was to receive wages each week.”</p>
+        <p class="story-paragraph">“Was it written down?”</p>
+        <p class="story-paragraph">Anna shook her head. “No. I could not read well when I came here.”</p>
+        <p class="story-paragraph">Thomas took a folded paper from his coat. “This is a simple work agreement from my last job. It says what work I did and how much I was to be paid.” He pointed to the lines. “These words say ‘wages each week.’ This line says how many days I worked.”</p>
+        <p class="story-paragraph">Anna studied the paper. She knew some letters, but the lines ran together when she was nervous.</p>
+        <p class="story-paragraph">“I can help you read it,” Thomas said. “But I cannot make Mr Whitmore follow it. Write down your own days and hours. If anyone saw you working, remember who they were.”</p>
+        <p class="story-paragraph">“Clara saw the tear,” Anna said.</p>
+        <p class="story-paragraph">“Then ask her to write down what she remembers, if she is willing.”</p>
+        <p class="story-paragraph">Anna looked at the paper. “I have no proper place to keep records.”</p>
+        <p class="story-paragraph">“A little paper can still help,” Thomas said. “And a witness can help too. Keep the proof safe. Do not give it to Mr Whitmore unless you have to.”</p>
+        <p class="story-paragraph">That evening, Anna wrote the date and her hours on Mrs Bennett’s paper. Her writing was slow, but she made each number clear. She added: The tear was old when I received the dress.</p>
+        <p class="story-paragraph">Then she heard steps in the hall. She hid the paper inside the lining of her coat. Mr Whitmore’s voice came through the door.</p>
+        <p class="story-paragraph">“Anna, come to the study,” he called.</p>
+        <p class="story-paragraph">She took a breath and went to meet him, carrying no paper in her hands.</p>
+
+        <h2 class="chapter-heading">8 The Choice at the Door</h2>
+
+        <p class="story-paragraph">Mr Whitmore was standing beside his desk. The blue dress lay in front of him.</p>
+        <p class="story-paragraph">“You have spoiled it,” he said. “You will leave this house tomorrow. I will not pay you for the last week.”</p>
+        <p class="story-paragraph">Anna kept her hands at her sides. “I did not tear the dress, sir. The tear was there when you gave it to me.”</p>
+        <p class="story-paragraph">“You have no proof.”</p>
+        <p class="story-paragraph">“I have written down my work and hours,” she said. “And Miss Clara saw the tear.”</p>
+        <p class="story-paragraph">Mr Whitmore’s face grew red. “You will not bring my daughter into this.”</p>
+        <p class="story-paragraph">Clara stood in the doorway. She had heard him. “I saw the tear before Anna began to sew,” she said. “You showed me the dress in the morning.”</p>
+        <p class="story-paragraph">Mr Whitmore looked at her. “Go to your room.”</p>
+        <p class="story-paragraph">Clara did not move, but she stopped speaking. Anna knew Clara was afraid of her father. She also knew the girl had told the truth.</p>
+        <p class="story-paragraph">Mrs Bennett came to the doorway with a small bundle. “Anna, you may sleep at my sister’s tonight,” she said. “It is not a warm house, and there is little space. But it is a roof.”</p>
+        <p class="story-paragraph">Anna thanked her. Then Mrs Bennett added, “You can stay here tonight too, if you agree to Mr Whitmore’s rules. But I cannot promise he will pay you, or treat you fairly.”</p>
+        <p class="story-paragraph">Anna looked towards the wide hall. A fire burned in the sitting room. Her room was warm. If she left, the snow and cold waited outside. Still, staying meant working under a man who could take her wages and blame her for another person’s mistake.</p>
+        <p class="story-paragraph">“I will go,” Anna said. Her voice shook, but she did not change her mind. “I cannot stay because I am afraid.”</p>
+        <p class="story-paragraph">Mrs Bennett nodded. “I understand. Take your coat, and keep your paper safe.”</p>
+        <p class="story-paragraph">Thomas was waiting near the side door. Anna showed him the small record she had hidden in her coat.</p>
+        <p class="story-paragraph">“You kept it,” he said. “That is good. Do not let anyone take it.”</p>
+        <p class="story-paragraph">“I still have no wages,” Anna said.</p>
+        <p class="story-paragraph">“No,” Thomas replied. “This paper may help you ask for them, but it cannot promise an answer. We will find someone who knows the rules.”</p>
+        <p class="story-paragraph">Anna looked back at the house. Clara was standing at an upstairs window. She raised one hand, and Anna raised hers in reply.</p>
+        <p class="story-paragraph">Then Anna and Thomas stepped into the street. Snow lay deep beside the road, and the evening wind moved between the buildings. Anna’s fingers hurt inside her thin gloves. She was leaving warmth for a hard night, but she was leaving with her own choice.</p>
+        <p class="story-paragraph">At the corner, Thomas saw a woman coming from the Big House. She was one of the servants, carrying a covered basket.</p>
+        <p class="story-paragraph">“Anna,” the woman called. She hurried towards them. “I heard what Mr Whitmore said. I was there when the dress came from the cupboard. The tear was already in the sleeve.”</p>
+        <p class="story-paragraph">Anna stopped. “Will you tell someone?”</p>
+        <p class="story-paragraph">The woman looked towards the house, then back at Anna. “I will. But you must come to me tomorrow. I have something else too.”</p>
+        <p class="story-paragraph">She gave Anna a folded note. The paper was still warm from her pocket.</p>
+        <p class="story-paragraph">Anna opened it beneath a street lamp. The first words were clear: I saw the tear before Anna received the dress.</p>
+
+        <h2 class="chapter-heading">9 Clara Finds Her Voice</h2>
+
+        <p class="story-paragraph">The next morning, Clara stood by the tall window of the Whitmores’ house. Outside, snow covered the street. A thin line of smoke rose from the poor houses across the square. In this house, a fire burned in every room.</p>
+        <p class="story-paragraph">Clara held a folded note in her hand. She had written it the night before, but she had not yet decided what to do with it. It said that she had seen the dress before Anna touched it. The tear was already there.</p>
+        <p class="story-paragraph">Her mother came into the room. “You have not sent that note, I hope,” Mrs Whitmore said.</p>
+        <p class="story-paragraph">“I have not sent it,” Clara replied. “But I must tell the truth.”</p>
+        <p class="story-paragraph">Mrs Whitmore looked toward the door. “Your father is angry. Do not make things worse for the family.”</p>
+        <p class="story-paragraph">“Anna may lose her good name and her pay,” said Clara. “That is worse for her.”</p>
+        <p class="story-paragraph">Her mother sat down. “You are young. You do not understand how people will speak about us.”</p>
+        <p class="story-paragraph">Clara looked at the warm fire. She thought of Anna’s cold hands and quiet face. “I understand that people should not blame someone for a thing she did not do.”</p>
+        <p class="story-paragraph">Mrs Whitmore did not answer. She picked up a book and opened it, but she did not read.</p>
+        <p class="story-paragraph">That afternoon, Clara went to the back room where Anna had been working. Mr Whitmore was there, speaking to the housekeeper. He stopped when he saw his daughter.</p>
+        <p class="story-paragraph">“You should be upstairs,” he said.</p>
+        <p class="story-paragraph">“Father, I need to speak with you.”</p>
+        <p class="story-paragraph">“Not now.”</p>
+        <p class="story-paragraph">“It is about the dress.” Clara’s voice shook, but she stayed where she was. “I saw the tear before Anna began to sew. I should have said so earlier.”</p>
+        <p class="story-paragraph">Mr Whitmore’s face became hard. “You are certain?”</p>
+        <p class="story-paragraph">“Yes. I saw it when the dress came from the cupboard. I thought someone else would notice.”</p>
+        <p class="story-paragraph">“Then you should have told me at once,” he said.</p>
+        <p class="story-paragraph">“I know. I am sorry. But I will not say Anna did it.”</p>
+        <p class="story-paragraph">He told her to go to her room. Clara went, but she did not change her mind. She put on her coat and slipped out by the side door.</p>
+        <p class="story-paragraph">Clara found Mrs Bennett and Thomas near the small shop at the end of the street. Anna was with them. She looked tired, but she stood straight.</p>
+        <p class="story-paragraph">“I have something to say,” Clara told her. “I saw the tear before you worked on the dress. I will tell my father and anyone else who asks.”</p>
+        <p class="story-paragraph">Anna’s eyes widened. “Thank you, Clara.”</p>
+        <p class="story-paragraph">“I should have spoken sooner,” Clara said. “I was afraid of making my family look bad.”</p>
+        <p class="story-paragraph">Mrs Bennett nodded. “It takes courage to speak when silence is easier.”</p>
+        <p class="story-paragraph">Thomas held a small notebook. He had written down the days Anna worked and the money Mr Whitmore still owed her. Anna had checked the list carefully.</p>
+        <p class="story-paragraph">“We can go together tomorrow,” he said. “No shouting. We will show him the facts.”</p>
+        <p class="story-paragraph">Anna looked at each of them. “I want my pay, and I want people to know I did not damage that dress.”</p>
+        <p class="story-paragraph">“That is fair,” said Mrs Bennett. “We will stand beside you.”</p>
+        <p class="story-paragraph">As they walked home, Clara stayed with them instead of returning at once to the big house. The cold air hurt her face, but she felt lighter. She had not solved the trouble yet. Still, she had stopped hiding the truth.</p>
+
+        <h2 class="chapter-heading">10 The Truth in the Front Room</h2>
+
+        <p class="story-paragraph">The following morning, Anna, Mrs Bennett and Thomas went to the Whitmore house. Clara met them at the front door. She led them to the front room, where Mr Whitmore was reading a letter.</p>
+        <p class="story-paragraph">“You have brought a group to speak to me?” he asked.</p>
+        <p class="story-paragraph">“We have come to discuss Anna’s pay and the dress,” said Mrs Bennett. Her voice was calm. “We would like you to listen.”</p>
+        <p class="story-paragraph">Mr Whitmore looked at Anna. “You have already caused enough trouble.”</p>
+        <p class="story-paragraph">“I want to settle this fairly,” Anna said. “I have done my work. I have not been paid for all of it, and I did not tear the dress.”</p>
+        <p class="story-paragraph">Thomas opened his notebook. “These are the days Anna worked. Here are the dates and the hours she stayed late.”</p>
+        <p class="story-paragraph">Mr Whitmore took the notebook and read the list. His mouth tightened. “I do not agree with every hour.”</p>
+        <p class="story-paragraph">“You can check the house records,” said Thomas. “The work was written down there too.”</p>
+        <p class="story-paragraph">Clara stepped forward. “I saw the tear before Anna began. I am sure of it.”</p>
+        <p class="story-paragraph">Mr Whitmore turned to his daughter. “You understand what this means for your family?”</p>
+        <p class="story-paragraph">“I do,” Clara replied. “It does not change what I saw.”</p>
+        <p class="story-paragraph">For a moment, no one spoke. A fire crackled in the grate. Outside, a cart rolled slowly through the snow.</p>
+        <p class="story-paragraph">Mrs Bennett placed a folded paper on the table. “I have written the facts as we know them. If we cannot agree, I will take this to the local paper. They can ask the other workers about their unpaid money too.”</p>
+        <p class="story-paragraph">Mr Whitmore looked at the paper, then at the people in the room. “You would put my name in the paper?”</p>
+        <p class="story-paragraph">“We would tell the truth,” Mrs Bennett said. “It may harm your good name. It is still your choice to pay what is owed.”</p>
+        <p class="story-paragraph">Mr Whitmore walked to the window. The other workers’ houses stood on the far side of the square. Their roofs were low and their windows small. He said nothing for a long time.</p>
+        <p class="story-paragraph">Then he turned back. “I will pay Anna for the hours on this list. I will also check the accounts for the other workers.”</p>
+        <p class="story-paragraph">Anna did not smile. “I want the money I earned. I also want you to say that I did not damage the dress.”</p>
+        <p class="story-paragraph">Mr Whitmore’s face remained stiff. “The tear was there before you worked on it,” he said. “I accept that you did not cause it.”</p>
+        <p class="story-paragraph">He did not say he was sorry. But he sent a servant to bring the account book and asked Thomas to check the dates.</p>
+        <p class="story-paragraph">They spent the next hour checking names and sums. Mr Whitmore questioned some of the hours, but he paid Anna the full amount on Thomas’s list. He agreed to pay the other workers after checking their records.</p>
+        <p class="story-paragraph">“I will not have the paper printing stories about this house,” he said as he counted out the money.</p>
+        <p class="story-paragraph">“Then deal honestly with the people who work for you,” Mrs Bennett replied.</p>
+        <p class="story-paragraph">Anna put the coins in her purse. She had waited a long time for them, but she did not feel that she had won everything. Mr Whitmore had paid because the truth could reach the paper, not because he had become kind.</p>
+        <p class="story-paragraph">At the door, Clara walked beside Anna. “I wish I had spoken sooner.”</p>
+        <p class="story-paragraph">“You spoke when it mattered,” Anna said. “Next time, do not wait so long.”</p>
+        <p class="story-paragraph">Clara gave a small, sad smile. She looked toward the warm rooms behind her, then followed Anna out into the cold street.</p>
+        <p class="story-paragraph">For the first time, the big house seemed less important than the people standing outside it.</p>
+
+        <h2 class="chapter-heading">11 A Window Facing Spring</h2>
+
+        <p class="story-paragraph">Anna did not return to work at the Whitmore house. She had her money, and she wanted to choose her own work. Mrs Bennett offered her half of a room above the little shop where she lived.</p>
+        <p class="story-paragraph">“It is not large,” Mrs Bennett said. “But the window is good, and there is room for a table and two chairs.”</p>
+        <p class="story-paragraph">“I can pay you a fair share of the rent,” Anna replied.</p>
+        <p class="story-paragraph">“That is what I want,” said Mrs Bennett. “We will make fair rules for both of us.”</p>
+        <p class="story-paragraph">They cleaned the room together. Mrs Bennett moved a shelf, and Anna carried up a sewing table. Thomas brought a small lamp from his room. The boards were old, and the window let in a little cold air, but the room was bright in the daytime.</p>
+        <p class="story-paragraph">Anna bought thread and needles with some of her pay. She kept the rest for food and rent. She wrote a list of prices for mending coats, making simple dresses and sewing buttons.</p>
+        <p class="story-paragraph">“No secret hours,” she told Mrs Bennett. “And no work without an agreed price.”</p>
+        <p class="story-paragraph">Mrs Bennett smiled. “Those are good rules.”</p>
+        <p class="story-paragraph">Thomas helped Anna make a notice. He printed the words clearly on a sheet of paper: ANNA’S SEWING SERVICE. FAIR PRICES. CAREFUL WORK. ASK INSIDE.</p>
+        <p class="story-paragraph">He carried copies to the baker, the grocer and the station wall. Some people stopped to read them. One woman came that afternoon with a coat that needed a new sleeve.</p>
+        <p class="story-paragraph">Anna looked at the coat and named a price. The woman agreed. Anna wrote the price and the day of collection in her notebook.</p>
+        <p class="story-paragraph">“You make it very clear,” the woman said.</p>
+        <p class="story-paragraph">“It is better for both of us,” Anna replied.</p>
+        <p class="story-paragraph">Work came slowly. Some days Anna had only a small repair. Other days she worked until the lamp was needed. Mrs Bennett also sewed beside her, and they shared the room without rushing one another.</p>
+        <p class="story-paragraph">Clara visited one cold evening. She brought a plain brown dress that needed a small repair. She paid the price Anna had written on the notice.</p>
+        <p class="story-paragraph">“My father says the workers’ money will be paid,” Clara said. “He is not happy about it.”</p>
+        <p class="story-paragraph">“He does not have to be happy,” Anna replied. “He has to be fair.”</p>
+        <p class="story-paragraph">Clara looked around the room. “I used to think a fine house made a family good.”</p>
+        <p class="story-paragraph">“A house is only a house,” said Mrs Bennett. “People show what they are by what they do.”</p>
+        <p class="story-paragraph">Clara nodded. She no longer spoke about Anna as if Anna’s life were far away from her own.</p>
+        <p class="story-paragraph">Weeks passed. The snow grew thin along the roads. Water ran beside the stones, and the days lasted a little longer. Winter was not gone, but it was beginning to soften.</p>
+        <p class="story-paragraph">Anna worked at the table near the window. A child brought a torn mitten. An old man asked her to mend his warm coat. She gave each person the same clear price and did each job with care.</p>
+        <p class="story-paragraph">Thomas came by with fresh notices. “People are asking for you now,” he said.</p>
+        <p class="story-paragraph">“Then I must keep doing good work,” Anna replied.</p>
+        <p class="story-paragraph">Outside, the sky was pale blue. A soft light reached through the window and fell across Anna’s hands. She stopped sewing for a moment and looked at it.</p>
+        <p class="story-paragraph">She remembered the dark weeks when she had no room of her own and no sure way to earn money. Life was still hard. The room was small, and the money did not come easily. But now she had work she could accept or refuse, and people who stood beside her.</p>
+        <p class="story-paragraph">Mrs Bennett set a pot of tea on the table. Clara was visiting, and Thomas sat near the door, warming his hands.</p>
+        <p class="story-paragraph">“The light looks different today,” Clara said.</p>
+        <p class="story-paragraph">Anna looked toward the street, where the first drops of snow were falling from a roof. “It is the same winter sun,” she said. “But spring is coming.”</p>
+        <p class="story-paragraph">She returned to her sewing. The new light stayed on the cloth, warm and clear. Kindness had helped her, but it had not asked her to be silent or obedient. Anna could speak, choose her work and stand with her head held high.</p>
+    </div>
+  </article>
+
+</main>
+
+<script>
+// Dynamic Metadata Loader
+(async function initMetadata() {
+  const jsonUrl = '../content/classic-17-a2.json';
+  let data = null;
+
+  try {
+    const res = await fetch(jsonUrl);
+    if (res.ok) {
+      data = await res.json();
+    }
+  } catch (err) {
+    console.warn('Could not fetch external JSON, using embedded fallback:', err);
+  }
+
+  // Fallback initial data in case fetch is blocked by file:// protocol
+  if (!data) {
+    data = {"id":"classic-17","title":"A Winter Without Hope","author":"T. R. Davis","level":"A2","genre":"classic","minutes":35,"vocab":5,"dateAdded":"2026-10-24","coverImage":"books/covers/classic-17.png","description":"","whatYouWillLearn":""};
+  }
+
+  const genreLabels = {
+    scifi: 'Sci-Fi & Future Worlds',
+    business: 'Business & Growth',
+    classic: 'Classic Literature',
+    daily: 'Daily Conversations',
+    healthy: 'Health & Wellness'
+  };
+
+  const level = (data.level || 'B1').toUpperCase();
+  const genreFormatted = genreLabels[data.genre] || (data.genre ? String(data.genre).toUpperCase() : 'General');
+  const author = data.author || 'Unknown Author';
+  const minutes = data.minutes ? data.minutes + ' min' : '5 min';
+  const vocabCount = typeof data.vocab === 'number' ? data.vocab : (Array.isArray(data.vocab) ? data.vocab.length : 0);
+
+  // Format date
+  let formattedDate = 'Recently';
+  if (data.dateAdded) {
+    try {
+      const d = new Date(data.dateAdded);
+      if (!isNaN(d.getTime())) {
+        formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    } catch (_) {}
+  }
+
+  // Calculate word count from document paragraphs
+  const paragraphs = document.querySelectorAll('p.story-paragraph');
+  let totalWords = 0;
+  paragraphs.forEach(p => {
+    const text = p.textContent.trim();
+    if (text) totalWords += text.split(/\s+/).length;
+  });
+
+  // Populate hero card
+  const titleEl = document.getElementById('bookDisplayTitle');
+  if (titleEl && data.title) titleEl.textContent = data.title;
+
+  const authorEl = document.getElementById('bookDisplayAuthor');
+  if (authorEl) authorEl.textContent = 'by ' + author;
+
+  const chipLevel = document.getElementById('chipLevel');
+  if (chipLevel) {
+    chipLevel.innerHTML = '<span class="level-dot"></span> Level ' + level;
+    chipLevel.style.color = 'var(--lvl-' + level + ')';
+    chipLevel.style.borderColor = 'var(--lvl-' + level + ')';
+  }
+
+  const chipGenre = document.getElementById('chipGenre');
+  if (chipGenre) chipGenre.textContent = genreFormatted;
+
+  const chipTime = document.getElementById('chipReadingTime');
+  if (chipTime) chipTime.textContent = '⏱ ' + minutes + ' read';
+
+  const chipDate = document.getElementById('chipDateAdded');
+  if (chipDate) chipDate.textContent = '📅 Added ' + formattedDate;
+
+  const chipVocab = document.getElementById('chipVocab');
+  if (chipVocab) chipVocab.textContent = '📚 ' + vocabCount + ' vocab items';
+
+  // Difficulty meter (1 to 6)
+  const LEVEL_SEGMENTS = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
+  const meterSegments = LEVEL_SEGMENTS[level] || 3;
+  const meterEl = document.getElementById('vocabMeter');
+  if (meterEl) {
+    let segHtml = '';
+    for (let i = 0; i < 6; i++) {
+      segHtml += '<i class="' + (i < meterSegments ? 'on' : '') + '"></i>';
+    }
+    meterEl.innerHTML = segHtml;
+  }
+
+  // Cover
+  const coverContainer = document.getElementById('heroCoverContainer');
+  if (coverContainer) {
+    if (data.coverImage) {
+      coverContainer.innerHTML = '<img src="../../' + data.coverImage.replace(/^\/?/, '') + '" alt="' + (data.title || '') + '" onerror="this.style.display=\'none\'">';
+    } else {
+      coverContainer.innerHTML = '<div class="hero-cover-fallback"><div class="hero-cover-title">' + (data.title || '') + '</div><div class="hero-cover-author">' + author + '</div></div>';
+    }
+  }
+
+  // Descriptions
+  const aboutText = data.description || 'Explore "' + (data.title || '') + '", an engaging ' + genreFormatted.toLowerCase() + ' story specifically leveled at the CEFR ' + level + ' proficiency tier.';
+  const learnText = data.whatYouWillLearn || 'Master ' + level + '-level grammar structures and vocabulary in authentic context. Designed for English learners wanting to improve vocabulary retention and fluency.';
+
+  const aboutEl = document.getElementById('aboutTextDisplay');
+  if (aboutEl) aboutEl.textContent = aboutText;
+
+  const learnEl = document.getElementById('learnTextDisplay');
+  if (learnEl) learnEl.textContent = learnText;
+
+  // Stats list
+  const statLevel = document.getElementById('statLevel');
+  if (statLevel) {
+    statLevel.textContent = 'CEFR ' + level;
+    statLevel.style.color = 'var(--lvl-' + level + ')';
+  }
+
+  const statAuthor = document.getElementById('statAuthor');
+  if (statAuthor) statAuthor.textContent = author;
+
+  const statGenre = document.getElementById('statGenre');
+  if (statGenre) statGenre.textContent = genreFormatted;
+
+  const statTime = document.getElementById('statTime');
+  if (statTime) statTime.textContent = minutes;
+
+  const statWordCount = document.getElementById('statWordCount');
+  if (statWordCount) statWordCount.textContent = totalWords.toLocaleString() + ' words';
+
+  const statVocab = document.getElementById('statVocab');
+  if (statVocab) statVocab.textContent = vocabCount.toLocaleString() + ' words';
+
+  const statDate = document.getElementById('statDateAdded');
+  if (statDate) statDate.textContent = formattedDate;
+})();
+</script>
 </body>
 </html>
