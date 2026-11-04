@@ -781,7 +781,6 @@
     *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
   }
 </style>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7203744964486071" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -891,12 +890,12 @@
   </div>
 
   <!-- READER AD SLOT -->
-  <!-- TODO: vytvoriť nový ad unit v AdSense dashboarde pre reader a vložiť jeho skutočné slot ID sem -->
+  <!-- Dedicated reader ad unit separate from book detail page. Replace REPLACE_WITH_NEW_READER_SLOT_ID with real slot ID created in AdSense -->
   <div class="ad-container ad-container--reader">
     <ins class="adsbygoogle"
          style="display:block"
          data-ad-client="ca-pub-7203744964486071"
-             data-ad-slot="2463032215"
+         data-ad-slot="REPLACE_WITH_NEW_READER_SLOT_ID"
          data-ad-format="auto"
          data-full-width-responsive="true"></ins>
   </div>
@@ -982,20 +981,6 @@ function refreshAllBookDisplays() {
   renderDiscoverPage();
 }
 
-function createAdSlotEl() {
-  const container = document.createElement('div');
-  container.className = 'ad-container';
-  container.innerHTML = `
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-7203744964486071"
-             data-ad-slot="2463032215"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-  `;
-  return container;
-}
-
 function renderDiscoverPage() {
   const sorted = getSortedBooks(BOOKS);
 
@@ -1051,15 +1036,6 @@ function renderDiscoverPage() {
     section.appendChild(head);
     section.appendChild(track);
     genreRowsContainer.appendChild(section);
-
-    // Insert an ad slot between genre sections (after 2nd genre section)
-    if (idx === 1) {
-      const adEl = createAdSlotEl();
-      genreRowsContainer.appendChild(adEl);
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) { /* ignore */ }
-    }
   });
 
   // 3. Render Browse by English Level rows
@@ -1103,15 +1079,6 @@ function renderDiscoverPage() {
     section.appendChild(head);
     section.appendChild(track);
     levelRowsContainer.appendChild(section);
-
-    // Insert an ad slot between level sections (after 3rd level section)
-    if (idx === 2) {
-      const adEl = createAdSlotEl();
-      levelRowsContainer.appendChild(adEl);
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) { /* ignore */ }
-    }
   });
 }
 
