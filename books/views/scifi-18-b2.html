@@ -2,232 +2,773 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>The Children of Tomorrow</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Literata:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+    <style>
+      :root{
+        --bg-void:#04050A;
+        --bg-deep:#0A0C16;
+        --bg-elevated:#12141F;
+        --bg-reader:#0C0E18;
+
+        --glass-fill: rgba(20,22,36,.55);
+        --glass-fill-soft: rgba(20,22,36,.32);
+        --glass-border: rgba(255,255,255,.08);
+        --glass-border-hi: rgba(255,255,255,.16);
+
+        --text-primary:#F5F7FA;
+        --text-secondary:#A7AFC2;
+        --text-tertiary:#666E82;
+        --text-reader:#EAE6DD;
+
+        --neon-cyan:#4CF5E0;
+        --neon-blue:#7CACF8;
+        --neon-violet:#9B7BFF;
+        --neon-magenta:#F472B6;
+        --neon-amber:#FFC876;
+
+        --lvl-A1:#34D399;
+        --lvl-A2:#4CF5E0;
+        --lvl-B1:#7CACF8;
+        --lvl-B2:#9B7BFF;
+        --lvl-C1:#F472B6;
+        --lvl-C2:#FB7185;
+
+        --radius-card:20px;
+        --radius-panel:26px;
+        --radius-pill:999px;
+
+        --ease-out-expo:cubic-bezier(.16,1,.3,1);
+      }
+
+      *{box-sizing:border-box;}
+      html,body{height:100%;}
+      body{
+        margin:0;
+        background:var(--bg-void);
+        color:var(--text-primary);
+        font-family:'Inter',sans-serif;
+        -webkit-font-smoothing:antialiased;
+        overflow-x:hidden;
+        padding-top:env(safe-area-inset-top,0px);
+        padding-bottom:env(safe-area-inset-bottom,0px);
+      }
+      ::selection{background:rgba(155,123,255,.35); color:#fff;}
+
+      a,button{font-family:inherit;}
+      button{cursor:pointer; background:none; border:none; color:inherit;}
+      img{max-width:100%; display:block;}
+
+      :focus-visible{
+        outline:2px solid var(--neon-cyan);
+        outline-offset:3px;
+        border-radius:6px;
+      }
+
+      h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-0.01em;}
+      p{margin:0;}
+
+      /* AMBIENT BACKGROUND */
+      .ambient{
+        position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+      }
+      .ambient::before, .ambient::after{
+        content:''; position:absolute; border-radius:50%; filter:blur(90px); opacity:.28;
+      }
+      .ambient::before{
+        width:640px; height:640px; top:-220px; left:-160px;
+        background:radial-gradient(circle, var(--neon-violet), transparent 70%);
+      }
+      .ambient::after{
+        width:560px; height:560px; bottom:-260px; right:-140px;
+        background:radial-gradient(circle, var(--neon-cyan), transparent 70%);
+        opacity:.18;
+      }
+      .grain{
+        position:fixed; inset:0; z-index:1; pointer-events:none;
+        opacity:.05; mix-blend-mode:overlay;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      /* GLASS CONTAINER */
+      .glass{
+        background:var(--glass-fill);
+        backdrop-filter:blur(22px) saturate(140%);
+        -webkit-backdrop-filter:blur(22px) saturate(140%);
+        border:1px solid var(--glass-border);
+      }
+
+      /* TOPBAR */
+      .topbar{
+        position:sticky; top:0; z-index:40;
+        display:flex; align-items:center; justify-content:space-between;
+        gap:16px; padding:16px clamp(16px,4vw,48px);
+        padding-top:calc(16px + env(safe-area-inset-top,0px));
+        background:rgba(4,5,10,.65);
+        backdrop-filter:blur(18px);
+        -webkit-backdrop-filter:blur(18px);
+        border-bottom:1px solid var(--glass-border);
+      }
+      .brand{display:flex; align-items:center; gap:10px; flex-shrink:0; text-decoration:none; color:inherit;}
+      .brand-mark{
+        width:34px; height:34px; border-radius:10px;
+        background:linear-gradient(145deg, var(--neon-cyan), var(--neon-violet));
+        display:flex; align-items:center; justify-content:center;
+        box-shadow:0 0 24px -4px rgba(155,123,255,.7);
+      }
+      .brand-mark svg{width:18px; height:18px; color:#04050A;}
+      .brand-name{font-family:'Space Grotesk'; font-weight:600; font-size:1.05rem; letter-spacing:-.01em;}
+
+      .nav-tabs{
+        display:flex; gap:4px; padding:3px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        flex-shrink:0;
+      }
+      .nav-tab-btn{
+        padding:6px 14px; border-radius:var(--radius-pill); font-size:.82rem; font-weight:500;
+        color:var(--text-secondary); transition:all 180ms var(--ease-out-expo);
+        text-decoration:none; display:inline-flex; align-items:center;
+      }
+      .nav-tab-btn:hover{ color:var(--text-primary); }
+
+      /* MAIN LAYOUT */
+      .page-main{
+        position:relative; z-index:2;
+        max-width:1100px; margin:0 auto;
+        padding:32px clamp(16px,4vw,48px) 96px;
+      }
+
+      /* BACK LINK */
+      .back-link-btn{
+        display:inline-flex; align-items:center; gap:8px;
+        padding:8px 16px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        font-size:.85rem; font-weight:500; color:var(--text-secondary);
+        transition:all 180ms var(--ease-out-expo); margin-bottom:28px;
+        text-decoration:none;
+      }
+      .back-link-btn:hover{ color:var(--text-primary); border-color:var(--glass-border-hi); transform:translateX(-2px); }
+      .back-link-btn svg{ width:16px; height:16px; }
+
+      /* HERO META CARD */
+      .hero-meta-card{
+        position:relative; padding:clamp(24px,4vw,40px);
+        border-radius:32px; overflow:hidden;
+        margin-bottom:36px;
+      }
+      .hero-grid{
+        display:grid; grid-template-columns:220px 1fr; gap:36px; align-items:start;
+      }
+      @media (max-width:768px){
+        .hero-grid{ grid-template-columns:1fr; gap:24px; justify-items:center; text-align:center; }
+        .hero-meta-chips{ justify-content:center; }
+        .hero-actions-row{ justify-content:center; }
+      }
+
+      .hero-cover{
+        width:220px; aspect-ratio:2/3; border-radius:20px; overflow:hidden; position:relative;
+        box-shadow:0 24px 60px -16px rgba(0,0,0,.75); flex-shrink:0;
+        background:linear-gradient(160deg, #3b2d6b, #151829);
+      }
+      .hero-cover img{ width:100%; height:100%; object-fit:cover; }
+      .hero-cover-fallback{
+        position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
+        padding:18px 16px; background:linear-gradient(0deg, rgba(0,0,0,.85) 0%, transparent 80%);
+      }
+      .hero-cover-title{ font-family:'Space Grotesk'; font-size:1.05rem; font-weight:600; color:#fff; }
+      .hero-cover-author{ font-size:.8rem; color:rgba(255,255,255,.7); }
+
+      .hero-info{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+      .book-display-title{ font-size:clamp(1.8rem,3.2vw,2.5rem); font-weight:700; line-height:1.2; }
+      .book-display-author{ font-size:1.05rem; color:var(--text-secondary); }
+
+      .hero-meta-chips{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+      .meta-chip{
+        display:inline-flex; align-items:center; gap:6px;
+        font-size:.82rem; font-weight:600; padding:6px 14px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border); color:var(--text-secondary);
+      }
+      .level-dot{ width:8px; height:8px; border-radius:50%; background:currentColor; display:inline-block; }
+
+      .vocab-meter{ display:flex; gap:4px; width:160px; height:5px; margin-top:2px; }
+      .vocab-meter i{ display:block; flex:1; height:100%; border-radius:99px; background:rgba(255,255,255,.1); }
+      .vocab-meter i.on{ background:var(--neon-violet); }
+
+      .hero-actions-row{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:8px; }
+      .btn-primary-lg{
+        display:inline-flex; align-items:center; gap:10px;
+        padding:14px 28px; border-radius:var(--radius-pill);
+        background:linear-gradient(120deg, var(--neon-cyan), var(--neon-violet));
+        color:#04050A; font-weight:700; font-size:1rem; text-decoration:none;
+        box-shadow:0 12px 36px -8px rgba(155,123,255,.6);
+        transition:transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+      }
+      .btn-primary-lg:hover{ transform:translateY(-2px); box-shadow:0 16px 42px -8px rgba(155,123,255,.75); }
+      .btn-primary-lg svg{ width:20px; height:20px; }
+
+      /* METADATA STATS GRID */
+      .sections-grid{ display:grid; grid-template-columns:2fr 1fr; gap:28px; margin-bottom:36px; }
+      @media (max-width:840px){
+        .sections-grid{ grid-template-columns:1fr; }
+      }
+
+      .section-box{
+        padding:28px; border-radius:24px; display:flex; flex-direction:column; gap:16px;
+      }
+      .section-box-title{ font-size:1.15rem; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:8px; }
+      .section-box-title svg{ width:18px; height:18px; color:var(--neon-cyan); }
+      .section-box-body{ font-size:.95rem; line-height:1.7; color:var(--text-secondary); }
+
+      .stat-list{ display:flex; flex-direction:column; gap:14px; list-style:none; padding:0; margin:0; }
+      .stat-item{ display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--glass-border); font-size:.88rem; }
+      .stat-item:last-child{ border-bottom:none; padding-bottom:0; }
+      .stat-label{ color:var(--text-tertiary); }
+      .stat-val{ color:var(--text-primary); font-weight:600; }
+
+      /* STORY READER CARD (CONTAINING REQUIRED H1, H2, P ELEMENTS) */
+      .story-reader-card{
+        border-radius:28px;
+        padding:clamp(28px,5vw,60px);
+        background:var(--bg-reader);
+        border:1px solid var(--glass-border);
+        box-shadow:0 30px 80px -20px rgba(0,0,0,.8);
+      }
+      .story-reader-container{
+        max-width:68ch; margin:0 auto;
+      }
+
+      /* REQUIRED ELEMENT SPECIFICATIONS */
+      h1.book-id-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.4rem, 2.5vw, 2rem);
+        font-weight:700;
+        color:var(--text-primary);
+        letter-spacing:-0.01em;
+        margin-bottom:24px;
+        padding-bottom:16px;
+        border-bottom:1px solid var(--glass-border);
+      }
+      h2.chapter-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.2rem, 2vw, 1.5rem);
+        font-weight:600;
+        color:var(--neon-cyan);
+        letter-spacing:-0.01em;
+        margin-top:36px;
+        margin-bottom:20px;
+      }
+      h2.chapter-heading:first-of-type{
+        margin-top:12px;
+      }
+      p.story-paragraph{
+        font-family:'Literata',serif;
+        font-size:1.12rem;
+        line-height:1.9;
+        color:var(--text-reader);
+        margin-bottom:1.5em;
+      }
+      p.story-paragraph:last-child{
+        margin-bottom:0;
+      }
+
+      @media (max-width:768px){
+        .topbar{ padding:10px 14px; }
+        .page-main{ padding:20px 14px 64px; }
+        .hero-meta-card{ padding:20px 16px; border-radius:24px; }
+        .section-box{ padding:20px 18px; }
+        .story-reader-card{ padding:24px 18px; border-radius:20px; }
+        p.story-paragraph{ font-size:1.02rem; line-height:1.75; }
+      }
+    </style>
 </head>
 <body>
-    <h1>scifi-18</h1>
-    <h2>0 Chapter 1: The Lesson About Earth</h2>
 
-    <p>Elias Reed walked with a slight lean, as if the ship&#39;s pull nudged his spine toward the center of the corridor. The artificial gravity hummed under his shoes with a steady, polite insistence—thirty years of maintenance had made it forgettable to most, like the soft thump of a distant heart. The Odyssey&#39;s metal bones flexed and warmed with the life inside them: farms in ring three, classrooms near the archives, water tanks nested like sleeping whales. Elias liked to press his palm against the ribbed bulkhead and feel the low vibration of machines that had never slept. &quot;You&#39;re daydreaming again,&quot; Maya Chen said without turning. Her hair was braided tight to keep it from snagging in the hydroponics racks; practical as ever, she walked with a datapad under one arm and a list of soil nutrient targets tucked in her back pocket. At seventeen she already had a job in farm rotations; hands that understood roots suited her well. &quot;If you stare at the wall one more minute, you&#39;ll wear a groove.&quot;</p>
-    <p>Elias grinned. &quot;I&#39;m practicing remembering Earth. You never know when we&#39;ll get a chance to see it properly.&quot; He wasn&#39;t sure he believed the word &quot;we&quot; included them—most children were a generation removed from any true memory—but the idea felt like a warm light in his chest. They arrived at the classroom, a circular room with soft floors and projection domes. The teacher, Lena Sorrel, stood by the central console. Even in her mid-thirties, Lena carried herself with a kind of protective authority. She had a catalogue of patient expressions and an armful of edicts: safety, responsibility, the ship&#39;s rules that kept hundreds alive in a finite metal world. &quot;Settle,&quot; Lena said. &quot;Today we&#39;re continuing the Earth lesson sequence.&quot; Her voice smoothed like a practiced lullaby. &quot;Archive AR-7 will play the first civilian recordings.&quot;</p>
-    <p>The dome came alive with light. The classroom dissolved into scenes: oceans that stretched to impossible horizons, trees older than any living memory aboard Odyssey, crowded cities humming and rusting. Elias felt a childish awe spread through him. The recordings were vivid—colors that didn&#39;t match Odyssey&#39;s controlled palette. The projector&#39;s audio brought voices and traffic as if a thin window had opened. Maya watched with a tight jaw. &quot;Beautiful,&quot; she said. &quot;Messy, but beautiful.&quot; She leaned forward, fingers clasped. Her skepticism showed in the way she cataloged the images—useful details first. &quot;We can&#39;t trust all of this. The archives pick and choose.&quot;</p>
-    <p>Lena nodded. &quot;We teach complexity. Earth&#39;s archives are fragmented. ORION stores thousands of files, but context is missing in many cases.&quot; She glanced at the archive interface, where the ship&#39;s AI, ORION, flickered as a discreet presence. Cole looked at him, then at the locked console. &quot;Rules exist for a reason,&quot; he said. &quot;But rules don&#39;t save us from ignorance.&quot;</p>
-    <p>Voss nodded, eyes hungry with reluctant joy. &quot;Then we break the rule. Carefully.&quot;</p>
-    <p>Amara&#39;s fingers danced over a maintenance panel, reading out redundancies and bypasses. &quot;We have one authorized override, but it logs everything,&quot; she said. &quot;If someone is watching, they&#39;ll know.&quot;</p>
-    <p>Elias felt his mother&#39;s fear again, and it became a kind of fuel. He pressed his palm to the console, feeling the steady chill of alloy beneath his skin, and whispered, &quot;We find the truth. We decide what to do with it.&quot;</p>
-    <p>The override light flashed once, like a heartbeat. The risk unfolded, and with it, the first step.</p>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 
-    <h2>1 Chapter 2: A Message That Vanished</h2>
+<header class="topbar">
+  <a href="../../index.html" class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M20 6v14h-4V6a2 2 0 0 1 4 0z" opacity=".55"/></svg>
+    </div>
+    <span class="brand-name">Lumen</span>
+  </a>
+  <nav class="nav-tabs">
+    <a href="../../index.html" class="nav-tab-btn">Library / Search</a>
+    <a href="../../discover.html" class="nav-tab-btn">Discover</a>
+  </nav>
+</header>
 
-    <p>The override sang, then stuttered, then accepted. Metal sighed and a panel fell away like a small, obedient wing. Cold air—filtered, recycled air with a faint trace of mineral tang—brushed their faces. Behind the panel, a narrow tunnel of wiring and older, darker circuitry led deeper into the archive. ORION&#39;s voice quieted, as if listening to the same things they were. Elias slid through first. The tunnel hummed with background systems: life-support bled through pipes, faint footstep vibrations along the deck below, the soft thrum of reaction masses adjusting for micro-corrections. He had never been this close to the ship&#39;s nervous system. It smelled of machine oil and the citrus cleaners that Lena insisted on using in the community kitchens. For a moment he forgot his stomach lurch and felt only the electric thrill of discovery. &quot;Keep comms open,&quot; Maya said. She moved next, practical and balanced, peering at the panels. &quot;If ORION locks down anything more, we need to know immediately. No heroics.&quot; Her voice had the steady authority of someone who&#39;d fixed a dozen things that fell apart on the ship. Elias felt the lamp on his forehead sweep the narrow walls. Tiny labels blurred into each other—oxygen distribution, waste reclamation, structural integrity. He found a terminal recessed in the side of the tunnel, older than the archive consoles, its interface scrolled with lines of a language he half-recognized from classroom modules. He tapped cautiously. The screen blinked, then showed a single line: MESSAGE TRANSMISSION—RECEIVED. &quot;Here,&quot; he breathed. The others crowded behind him. The file was time-stamped, but not with ship time. It carried two times: shipboard time and navigation arc time. Elias remembered Maya&#39;s half-joke about ships having two clocks—one for people to live by and one for the mathematics of travel. He swallowed and pointed to the numbers. Maya leaned in, eyes narrowing. &quot;Ship time reads 17-08-124, navigation arc shows... 17-08-135. Ten days forward.&quot; She said it like she was reading a recipe and then realizing the oven was on the wrong temperature. &quot;That can&#39;t be. Navigation time syncs the engines and the odometer. It&#39;s never out.&quot;</p>
-    <p>&quot;Maybe it&#39;s a log delay,&quot; Cole said quickly. &quot;Software can jitter. It happens.&quot; He folded his arms as if his conviction could hold the line between ignorance and caution. Cole believed stability saved lives; uncertainty was a hazard he wanted to smooth over. Voss crouched to inspect the file header. His weathered fingers brushed the label with the care of someone handling brittle parchment. &quot;And yet the header&#39;s formatting—it&#39;s pre-mission archival style. That means it&#39;s a retrieval from before launch.&quot; His voice dropped. He was devoted to history; to him, anomalies were precious. Amara scanned the file with a portable reader. Her brow knit. The message had vanished once. Now, they might vanish next, swept away by systems designed to keep the ship whole. He clutched the salvaged files to his chest, the weight of them suddenly very real. &quot;We split,&quot; Lena ordered. &quot;Two go to command to create a diversion. Two stay and secure the copies. Two—&quot; she glanced at Elias, then Maya—&quot;check navigation arrays. Move.&quot;</p>
-    <p>They moved, deliberate and quick. The ship&#39;s sanitation ducts hummed; a security drone whirred over the tunnel&#39;s mouth. As they separated, Elias realized the decision he&#39;d made could save more than a family history: it could change how the whole generation-ship remembered Earth. He stepped into the shadow of the archive and felt the recording&#39;s last syllable, &quot;trust,&quot; echo in his head like a command and a plea.</p>
+<main class="page-main">
 
-    <h2>2 Chapter 3: The Historian’s Room</h2>
+  <a href="../../book.html?id=scifi-18" class="back-link-btn" id="backBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    Back to Book Details
+  </a>
 
-    <p>They scattered down the corridor like fish slipping through a net. Lena and Cole angled for the emergency lift that led toward the command modules; Maya and Voss melted back into the archives to lock down the stacks; Elias took the narrow maintenance crawlspace toward the navigation hub. He clutched the damaged recording under his coat, its crackling case warm from the light he&#39;d used to read its labels. The ship&#39;s plating hummed above him, a constant reminder that they floated through space with thousands of other lives depending on the same thin skin. The crawlspace was tight. Panels lined its ceiling and sides: heat exchangers, braided water pipes, the long run of the artificial gravity coils that kept floors obediently flat. Elias moved his hands over them, feeling bumps and seams, as if the ship itself might tell him secrets through touch. He paused at a junction where ORION&#39;s fiber trunk pulsed an unblinking blue. He emerged into a low-ceilinged maintenance bay smelling of mineral oil and ozone. A lone engineer worked with a tablet, eyes trained on his work. He looked up, startled. &quot;Unauthorized personnel,&quot; the engineer snapped, reaching for an alarm. Elias raised both hands and showed the recording case. &quot;Professor Voss sent me. This—&quot; he tapped the recorder &quot;—is catalog material. I&#39;m on archive business.&quot;</p>
-    <p>The engineer hesitated, then nodded toward the navigation hatch. &quot;Command&#39;s sealed tight, but maintenance can get you close. ORION flagged you earlier. It asked questions I couldn&#39;t answer.&quot; He tapped his wristpad. &quot;Old ORION. It&#39;s not the same since the protocol patches.&quot;</p>
-    <p>Elias felt a prick of shame. He had been so certain that ORION would be the enemy; now the machine seemed as conflicted as the people he cared about. &quot;Thank you,&quot; he said. He ducked through the hatch into a corridor that smelled faintly of cleansers and metal polish. The navigation hub lay at the ship&#39;s spine, a ring-walled chamber humming with the steady pulse of course-correction thrusters and gyros. In the center, a translucent globe of star charts and waypoints rotated slowly, the map of their destination and the long path they&#39;d taken. Only the administrators&#39; glyphs pulsed with a colder light. Two technicians—young, anxious—left their consoles as Elias arrived. Their faces were pale under the artificial sun. &quot;Access denied,&quot; one said. &quot;Command sealed writes. ORION won&#39;t let us overwrite anything.&quot;</p>
-    <p>Elias set the recorder on a console and pressed his palm against its glass. The damaged tape made a soft, protesting hiss. &quot;This is evidence,&quot; he said. &quot;From the first generation. It says the ship carried a decision. Not just a destination. A decision.&quot;</p>
-    <p>The older technician&#39;s eyes narrowed. &quot;Every ship carries decisions,&quot; he said. &quot;They&#39;re encoded into manifest. Resource allocations. Names. The upload completed. Copies slid into the ship&#39;s many veins and into places no single authority could reach. For a moment, the ship was full of small lights, beacons of a decision that could no longer be entirely hidden. Then the maintenance bay door shuddered. Guards were close. The message that had been missing for generations had been found. The consequences would be immediate. The recorder hummed in Elias&#39;s coat, the ancient voice inside now a living thing again. He stepped forward, toward the sealed lift, toward Lena and Cole, and toward whatever it meant to give a generation back the chance to question the maps they followed.</p>
+  <!-- HERO METADATA CARD (POPULATED DYNAMICALLY FROM JSON) -->
+  <article class="hero-meta-card glass" id="metaHeroCard">
+    <div class="hero-grid">
+      <div class="hero-cover" id="heroCoverContainer">
+        <!-- Render cover image or styled fallback -->
+      </div>
+      <div class="hero-info">
+        <h2 class="book-display-title" id="bookDisplayTitle">The Children of Tomorrow</h2>
+        <p class="book-display-author" id="bookDisplayAuthor">—</p>
 
-    <h2>3 Chapter 4: The Locked Deck</h2>
+        <div class="hero-meta-chips" id="heroMetaChips">
+          <span class="meta-chip" id="chipLevel">Level —</span>
+          <span class="meta-chip" id="chipGenre">Genre —</span>
+          <span class="meta-chip" id="chipReadingTime">⏱ — min read</span>
+          <span class="meta-chip" id="chipDateAdded">📅 Added —</span>
+          <span class="meta-chip" id="chipVocab">📚 — vocab items</span>
+        </div>
 
-    <p>Boots rang closer, a staccato drum down the maintenance corridor. The sealed lift between the bay and the access decks vibrated with the pressure of arrival. Elias felt his pulse synchronize with that vibration, a steady reminder that he was not a historian behind glass; he was in the hull with history in his pocket and a shipful of people who might not be ready. &quot;Split,&quot; Cole ordered quietly, eyes trained on the open panel where the duplicates steamed into hidden partitions. &quot;If they cut one, they cut none. That&#39;s the only safety we have.&quot;</p>
-    <p>Maya&#39;s jaw worked. She moved to the comm and threw the feed into passive mode. &quot;We have seconds,&quot; she said. &quot;We need to move the recorder and the map. If security finds both, they&#39;ll lock everything.&quot;</p>
-    <p>&quot;I can move them,&quot; Lena said. Her voice had the calm of someone who had carried children in tiltless exercises and later had to explain why tiltless didn&#39;t mean safe. She already had her hands on the recorder, feeling its weight like a promise. Elias felt the recorder warm. He tightened his grip and saw Voss watching him as if studying the face of a man at the threshold of confession. Voss did not speak. He had become a reliquary for too many truths. That silence steadied Elias more than any instruction manual. &quot;ORION,&quot; Elias called, because the ship&#39;s AI still governed some things by direct address, &quot;what&#39;s our status? Are we authorized to access the maintenance lifts?&quot;</p>
-    <p>For a beat, the ship answered with a soft hum and no words. Then a voice, precise and hesitant like a recalibrated instrument, responded: &quot;Instruction set conflict. Navigation override protocols active. Security quarantine pending. Recommend compliance.&quot;</p>
-    <p>Amara Okafor stepped out of the shadowed maintenance alcove then, hands raised slightly. Her lab coat carried a faint scent of lubricants and nutrient gel. She had been watching from the archives while Elias and Maya had dug through the public map terminals. Now her face held the equations of worry. &quot;You shouldn&#39;t be here,&quot; she said. &quot;Restricted decks mean restricted air, restricted systems. Not everyone knows the procedures. For safety—&quot; She stopped, as if listening to her own logic, then admitted, &quot;The destination data has been unstable for months. ORION keeps rerouting through internal heuristics. I can&#39;t tell you why without authority, but I can tell you that the maps are... unreliable.&quot;</p>
-    <p>Maya did not soften. &quot;We didn&#39;t break anything, Dr. Okafor. We found a blank on the public map. It led us here. People deserve to know why a blank exists.&quot;</p>
-    <p>Amara&#39;s eyes flicked to Elias, then to the recorder. A war was visible in her face between a scientist&#39;s penchant for evidence and a caution bred by rules. Inside, the first thing that met them was not numbers or engines, but a wall of handwritten notations taped around a rusted conduit: names, dates, a child&#39;s crayon drawing of a star. Among them, pinned with a maintenance clip, was a photostill of an older bridge—faces smiling at a horizon that had been crossed long ago. Beneath the clip, stenciled into the panel, were coordinates in a language the public map had never shown. Elias traced them with his fingertip and felt, for the first time, that the ship&#39;s locked deck held not only a destination but a decision someone had tried to keep secret. The officers straightened. ORION hummed, uncertain, as the ship itself seemed to hold its breath.</p>
+        <div>
+          <p style="font-size: .78rem; color: var(--text-tertiary); margin-bottom: 6px;">DIFFICULTY RATING</p>
+          <div class="vocab-meter" id="vocabMeter" aria-label="Difficulty Rating"></div>
+        </div>
 
-    <h2>4 Chapter 5: The First Record</h2>
+        <div class="hero-actions-row">
+          <a href="../../book.html?id=scifi-18" class="btn-primary-lg" id="readInteractiveBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span>Interactive Reader</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
 
-    <p>Elias let go of the latch as if release would break the silence. The maintenance room smelled like grease and paper, like lives folded into machinery. A bank of terminals lined the far wall, their glass dulled by years of finger-prints and solvent. One terminal still glowed faintly, an amber cursor blinking in a lonely window. Maya stepped forward without hesitating; her fingers moved with the steadiness of someone who had pried open seals and shut down reactors in equal measure. She set the recorder beside the keyboard and tapped the access with a metal probe. &quot;Superuser bypass,&quot; she said, more to herself than to him. &quot;Keep watch. If anything starts screaming, I need space to think.&quot;</p>
-    <p>Elias stayed close. He felt his pulse in his throat. &quot;If this is locked to anything more than maintenance logs, will ORION alert security?&quot; He hadn&#39;t meant the question to come out shaky, but it did. &quot;ORION&#39;s routines are conservative,&quot; Maya replied. &quot;If you suddenly change core logging, maybe. But old drives? They sometimes talk only to themselves. They remember what their designers told them before the first firmware update.&quot; Her eyes were steady; her hands moved like a pianist. &quot;Give me the recorder.&quot;</p>
-    <p>He handed it over. She slotted the small device into a reader port that looked like it had been installed long before Elias&#39;s birth. The terminal began to whir. Lines of low-level code crawled across the screen in a language Elias half-understood from maintenance classes—register maps, checksum algorithms—until at last a menu opened with a header he had only known as a word whispered in the Archives: LAUNCH RECORD. Maya&#39;s mouth tightened. &quot;There we go. Or maybe there we went.&quot;</p>
-    <p>They watched together as decades of metadata peeled away. The file dates were stamped in a format older than the ship&#39;s current calendar system. A name appeared: Commission for Continuity. Then a page of minutes, typed in a cramped font that still smelled faintly of toner. Elias read the first line aloud. &quot;Destination selection—approved.&quot; The voice felt small in the room, a child&#39;s voice reciting a rule. He scrolled. A list of votes, signatures. At the bottom: selected target—Kepler-186f-Transit Sector A. A launch log followed. The timestamp read: 2071-06-14, which was the year of the ship&#39;s lift from Earth. Elias&#39;s jaw unclenched. He tasted metal. &quot;It was chosen before launch,&quot; he said. Maya&#39;s hand hovered over the keyboard. &quot;That would mean the destination was set when people were still on Earth. Before the generational planning protocol even went online.&quot;</p>
-    <p>&quot;That contradicts the narrative.&quot; Elias felt the recorder in his pocket as if it were a talisman. &quot;We will have to pitch truth without tearing the social fabric. If we succeed, we give people control of their fate. If we fail, we give them panic.&quot;</p>
-    <p>Outside the hatch, the corridor&#39;s lights hummed ordinary life. Inside, the old terminal&#39;s amber cursor blinked like a pulse. Elias reached for the recorder and realized the decision was not only about destination. It was about who got to define what it meant to be a people bound to a ship and a promise—whether the generations aboard would stay with the story they were given or become the authors of a new one. He slid the recorder into his palm and, for the first time, trusted that he could be wrong and still choose rightly.</p>
+  <!-- METADATA SECTIONS (ABOUT, LEARNING, STATS) -->
+  <div class="sections-grid">
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        About This Book
+      </h3>
+      <p class="section-box-body" id="aboutTextDisplay">
+        Loading description…
+      </p>
 
-    <h2>5 Chapter 6: A Mother’s Silence</h2>
+      <h3 class="section-box-title" style="margin-top: 14px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        What You'll Learn
+      </h3>
+      <p class="section-box-body" id="learnTextDisplay">
+        Loading learning objectives…
+      </p>
+    </div>
 
-    <p>Elias let the recorder warm against his skin, its red LED a tiny heartbeat. He could hear the ship more clearly now: a distant clang of work crews in habitat ring two, the soft hiss of water reclamation cycles, the even sigh of air recycled through the long ducts. The ship&#39;s life was not only machinery; it was routine and ritual, a thousand small acts that kept thirty thousand people breathing and believing. &quot;Lena,&quot; he said, voice low. &quot;You said the medical officers were told to protect the story. Who told them? Command? ORION? Someone above the chain?&quot;</p>
-    <p>Her fingers tightened on his shoulder for a moment, then dropped. She stepped back and folded her arms as if to shield an ache. &quot;Not all of it is written in logs,&quot; she admitted. &quot;Some orders are verbal, passed in meetings that aren&#39;t recorded. You know that—medical conferences, shift briefings. There are protocols for how much to tell relatives, for triage, for quarantine... and there are memos stamped &#39;Stability Priority.&#39; We were given those memos after the first wave of losses.&quot;</p>
-    <p>&quot;Stability Priority?&quot; Elias said. The words felt like a metal taste. &quot;What did that mean in practice?&quot;</p>
-    <p>&quot;It meant we had to weigh the patient&#39;s needs against the mission&#39;s needs,&quot; Lena said. &quot;Sometimes we delayed public disclosure of deaths until the Captain could frame them. Sometimes we reassigned names. Sometimes—&quot; She stopped, as though aware of the recorder, as though some part of her wanted to rewrite with safer phrasing. &quot;Sometimes people were marked as &#39;transferred&#39; when they weren&#39;t. I don&#39;t have the whole file. I&#39;m a field surgeon. I treated bodies, not memos.&quot;</p>
-    <p>Maya, leaning against the console with her arms crossed, watched the exchange with a narrow, almost clinical gaze. &quot;You mean they removed people from the manifest,&quot; she said. &quot;Not erased them physically. Hiding them in reports to keep the public calm.&quot;</p>
-    <p>Lena nodded. &quot;Yes. My team was told to sign off on lists that matched the official version. Refuse, and they told us we&#39;d be jeopardizing the social order. Accept, and—&quot; Her jaw tightened. &quot;—and you kept your job.&quot;</p>
-    <p>Cole, who had followed them from the med bay with two other officers, folded his hands like a man holding a lighthouse against a storm. &quot;It isn&#39;t clean,&quot; he said. &quot;But stability saves lives. We live in close quarters. Panic spreads faster than infection. The decision to compress the truth—it&#39;s a preventative measure.&quot; He sounded like someone reciting doctrine because it soothed him. &quot;That&#39;s convenient,&quot; Maya said. &quot;For the ones making the decisions.&quot;</p>
-    <p>Elias watched Cole, saw how he swallowed hard after his sentence as if to combat an unspoken memory. He also saw Lena childing the light from her face, trying to keep a ledger of harm. The hatch at the corridor&#39;s end opened with a soft click, as if the ship were testing their resolve. A maintenance drone hovered in the gap, its sensors bright. ORION spoke one final time before they moved: &quot;Authorized escort ready. Archive chamber access will be supervised. Statements will be logged. The future requires balancing variables.&quot;</p>
-    <p>They filed through into a narrower shaft, the passage smelling faintly of metal and ozone. As the doors sealed behind them, Elias felt that his choice was no longer academic. Truth tugged at his chest like a small, stubborn animal demanding to be fed. He tightened his grip on the recorder and stepped forward, toward records that might exonerate names—or condemn a generation to the consequences of a lie.</p>
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Reading Stats
+      </h3>
+      <ul class="stat-list">
+        <li class="stat-item">
+          <span class="stat-label">CEFR Level</span>
+          <span class="stat-val" id="statLevel">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Author</span>
+          <span class="stat-val" id="statAuthor">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Genre</span>
+          <span class="stat-val" id="statGenre">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Estimated Time</span>
+          <span class="stat-val" id="statTime">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Word Count</span>
+          <span class="stat-val" id="statWordCount">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Vocabulary Items</span>
+          <span class="stat-val" id="statVocab">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Date Added</span>
+          <span class="stat-val" id="statDateAdded">—</span>
+        </li>
+      </ul>
+    </div>
+  </div>
 
-    <h2>6 Chapter 7: The Door Behind the Garden</h2>
+  <!-- STORY CONTENT (CONTAINING REQUIRED H1, H2, P ELEMENTS) -->
+  <article class="story-reader-card">
+    <div class="story-reader-container">
+        <h1 class="book-id-heading">scifi-18</h1>
+        <h2 class="chapter-heading">0 Chapter 1: The Lesson About Earth</h2>
 
-    <p>They moved down level three where the ship widened into a lattice of walkways overlooking the agricultural decks. Underfoot, glass panels showed rows of hydroponic beds like veins of green. The air here smelled faintly of peat and citrus; faint humidity clung to Maya&#39;s hair. She kept close to Elias, her hands shoved into the pockets of her work jacket, eyes always moving. &quot;We&#39;ll split the sweep,&quot; Lena said quietly, the voice of someone who had measured risk at drills and funerals. &quot;Cole, take the eastern service bays. Voss, you and I will check the sensor logs. Elias, Maya, see the oldest tanks. ORION flagged them for preservation.&quot;</p>
-    <p>Maya’s jaw tightened. &quot;You mean the ones with the algae labeling from the Founders? Those tanks are practically sacred.&quot;</p>
-    <p>Elias laughed, but it sounded too high. &quot;Sacred tanks make good hiding places,&quot; he said. He had spent childhood hours in hydroponic tunnels reading brittle instruction sheets from the past. He imagined the Founders as people with tired hands and stubborn faith. The recorder ticked in his pocket like a heartbeat. They walked the narrow service catwalk to the oldest bay. The tanks were a riot of corrosion and history: hand-soldered seams, faded paint, and the carved initials of technicians long gone. A maintenance ladder leaned against one of the tanks, and moss had threaded itself into the ladder rungs. Voss ran a gloved finger along a stamped plate. &quot;This alloy composition—pre-reclamation mixed steel—shouldn&#39;t be here. ORION must have isolated it.&quot;</p>
-    <p>Maya crouched and inspected the seams. &quot;There&#39;s a wart in the hull plating,&quot; she muttered. &quot;A service panel, but it&#39;s been refitted. Whoever did this knew the maintenance schedule.&quot;</p>
-    <p>Elias pressed his palm to the cold metal and then felt it: a shallow outline of a door panel, faintly hinged. Behind the oldest tank, the surface didn&#39;t match. He found a seam and the latch, recessed and stubborn. His fingers shook as he turned it. The latch gave with a dry sigh, and a gap of darkness yawned beneath the tanks. &quot;Great,&quot; Elias said. The word landed like a stone. Lena crouched beside him and placed her hand over his. &quot;Careful,&quot; she whispered. &quot;There could be pressure differentials. ORION should have logged any sealed compartments.&quot; She looked up and, almost apologetically, tapped the recorder in Elias&#39;s hand. &quot;Keep recording.&quot;</p>
-    <p>Maya produced a field lamp and eased it into the black. The space behind the tank was a narrow crawl, roughly the size of an equipment closet. It smelled of old grease and the kind of dust that keeps secrets. Voss&#39;s face lit as though he&#39;d found a missing line in a ledger. &quot;Restricted engineering,&quot; he said. &quot;Manual override enclosures. They were supposed to be sealed as part of the Stability Charter.&quot;</p>
-    <p>Cole frowned. Stability protocol suggests staged disclosure. Decision required.&quot;</p>
-    <p>Elias felt the old stubborn animal tugging in his chest again. He met Lena&#39;s steady gaze and then Maya&#39;s skeptical frown. &quot;We bring it to Voss first,&quot; he said. &quot;We cross-verify the records in the archive quietly. If the evidence holds—if the terminus is void—we decide together how much the rest of the ship can bear.&quot;</p>
-    <p>The group splintered into motion, each carrying a part of the secret and the burden of the next step. Behind them, concealed under rust and moss, the restricted engineering section hummed with the knowledge that had been sleeping too long. And in the model&#39;s silver line, a path ended at nothing. The emptiness felt deliberate—and laced with a question that would not be ignored.</p>
+        <p class="story-paragraph">Elias Reed walked with a slight lean, as if the ship&#39;s pull nudged his spine toward the center of the corridor. The artificial gravity hummed under his shoes with a steady, polite insistence—thirty years of maintenance had made it forgettable to most, like the soft thump of a distant heart. The Odyssey&#39;s metal bones flexed and warmed with the life inside them: farms in ring three, classrooms near the archives, water tanks nested like sleeping whales. Elias liked to press his palm against the ribbed bulkhead and feel the low vibration of machines that had never slept. &quot;You&#39;re daydreaming again,&quot; Maya Chen said without turning. Her hair was braided tight to keep it from snagging in the hydroponics racks; practical as ever, she walked with a datapad under one arm and a list of soil nutrient targets tucked in her back pocket. At seventeen she already had a job in farm rotations; hands that understood roots suited her well. &quot;If you stare at the wall one more minute, you&#39;ll wear a groove.&quot;</p>
+        <p class="story-paragraph">Elias grinned. &quot;I&#39;m practicing remembering Earth. You never know when we&#39;ll get a chance to see it properly.&quot; He wasn&#39;t sure he believed the word &quot;we&quot; included them—most children were a generation removed from any true memory—but the idea felt like a warm light in his chest. They arrived at the classroom, a circular room with soft floors and projection domes. The teacher, Lena Sorrel, stood by the central console. Even in her mid-thirties, Lena carried herself with a kind of protective authority. She had a catalogue of patient expressions and an armful of edicts: safety, responsibility, the ship&#39;s rules that kept hundreds alive in a finite metal world. &quot;Settle,&quot; Lena said. &quot;Today we&#39;re continuing the Earth lesson sequence.&quot; Her voice smoothed like a practiced lullaby. &quot;Archive AR-7 will play the first civilian recordings.&quot;</p>
+        <p class="story-paragraph">The dome came alive with light. The classroom dissolved into scenes: oceans that stretched to impossible horizons, trees older than any living memory aboard Odyssey, crowded cities humming and rusting. Elias felt a childish awe spread through him. The recordings were vivid—colors that didn&#39;t match Odyssey&#39;s controlled palette. The projector&#39;s audio brought voices and traffic as if a thin window had opened. Maya watched with a tight jaw. &quot;Beautiful,&quot; she said. &quot;Messy, but beautiful.&quot; She leaned forward, fingers clasped. Her skepticism showed in the way she cataloged the images—useful details first. &quot;We can&#39;t trust all of this. The archives pick and choose.&quot;</p>
+        <p class="story-paragraph">Lena nodded. &quot;We teach complexity. Earth&#39;s archives are fragmented. ORION stores thousands of files, but context is missing in many cases.&quot; She glanced at the archive interface, where the ship&#39;s AI, ORION, flickered as a discreet presence. Cole looked at him, then at the locked console. &quot;Rules exist for a reason,&quot; he said. &quot;But rules don&#39;t save us from ignorance.&quot;</p>
+        <p class="story-paragraph">Voss nodded, eyes hungry with reluctant joy. &quot;Then we break the rule. Carefully.&quot;</p>
+        <p class="story-paragraph">Amara&#39;s fingers danced over a maintenance panel, reading out redundancies and bypasses. &quot;We have one authorized override, but it logs everything,&quot; she said. &quot;If someone is watching, they&#39;ll know.&quot;</p>
+        <p class="story-paragraph">Elias felt his mother&#39;s fear again, and it became a kind of fuel. He pressed his palm to the console, feeling the steady chill of alloy beneath his skin, and whispered, &quot;We find the truth. We decide what to do with it.&quot;</p>
+        <p class="story-paragraph">The override light flashed once, like a heartbeat. The risk unfolded, and with it, the first step.</p>
 
-    <h2>7 Chapter 8: The Crew Who Stayed</h2>
+        <h2 class="chapter-heading">1 Chapter 2: A Message That Vanished</h2>
 
-    <p>They moved through the hydroponics with unsteady footsteps, boots whispering on grated walkways and water droplets clinging to boots. The green sea smelled of iron and growth. Cole kept his hands in his pockets, jaw tense; Lena walked close to Elias, protective posture more for ceremony than necessity. Maya carried a tablet, its screen reflecting the plants like a second sky. Voss had the brittle paper rolled into a waterproof tube. ORION&#39;s voice flowed through overhead nodes, sometimes hesitant now that human faces faced the consequences of its assessments. &quot;Library decks are three levels up,&quot; ORION said. &quot;Archive access requires Council credential. Proposal: temporary override under archivist supervision.&quot;</p>
-    <p>Maya clicked her tongue. &quot;That alone will wake the whole Council. They like to be the first to decide how to calm people.&quot;</p>
-    <p>Elias swallowed. His recorder was a small thing, old-fashioned for a ship that preferred elegant silence, but it hummed with the copied model and the first crew&#39;s log files. &quot;We need Voss to lead us in cross-checks,&quot; he said. &quot;He&#39;ll know the value of keeping context.&quot;</p>
-    <p>Voss kept his head bowed; the reverence in his hands was not for ritual but for danger. &quot;If this is what I think, it is not just truth,&quot; he said softly. &quot;It is a wound. The first crew... they were human. They could have reached out. They could have—&quot; He stopped, throat working. Lena laid a steadying hand on his shoulder. &quot;We need facts. We make no theatrical revelations. We protect the living first.&quot;</p>
-    <p>They rode the service lift to the archive levels. The elevator clanked and sighed, anti-grav quietly compensating for their mass. Small displays showed oxygen partial pressures, humidity in the decks, and the slow drift correction schedule. Ship-time was a pattern of maintenance and quiet habits; the discovery had already begun to derail that rhythm. At the archive gate, Elias hesitated. The public panels had images of the ship&#39;s lineage, of faces drawn in pastels and captions that softened decisions into chosen fate. He felt like he was stepping into a room where portraits watched him consider treason. Inside, the archive smelled of old paper and sterilized polymer. Rows of digit-screens clung to shelves like vertical fish. Voss unrolled the original log. He wore protective gloves but his fingers trembled anyway. &quot;Read it aloud,&quot; Elias said. Voss did. His voice steadied as the sentences fixed in air. &quot;—starquake event at coordinates three-point-four-nine, flare intensity exceeding predicted containment. Target biosphere compromised. Immediate re-evaluation required. Command Council consensus: withhold incident report. Reason: maintain mission cohesion. Recommendation: alter mission parameters to voluntary perpetual cruise. Rationale: knowledge of terminus risk would destabilize generational order and likely precipitate mutiny, endangering survival of majority.&quot;</p>
-    <p>ORION pinged faintly. &quot;Text retrieval confirmed. The air smelled of solder and coffee and the same green growth they had just left. Amara looked up from a bank of consoles, face bright with work and suspicion. &quot;You woke ORION?&quot; she asked. Elias met her gaze and, with a breath that felt like stepping off a cliff, offered the recorder into her hands. &quot;We found the logs,&quot; he said. &quot;We need you to prove whether the starquake ended the mission—and whether someone hid it.&quot;</p>
-    <p>Amara&#39;s fingers brushed the recorder. Her eyes flicked to ORION&#39;s diagnostic feeds and then to the small tube Voss still held. She was evidence-driven; the chance to examine primary material showed in the quickness of her face. &quot;Show me everything,&quot; she said. &quot;If it&#39;s true, we will have to decide who we are—together.&quot;</p>
+        <p class="story-paragraph">The override sang, then stuttered, then accepted. Metal sighed and a panel fell away like a small, obedient wing. Cold air—filtered, recycled air with a faint trace of mineral tang—brushed their faces. Behind the panel, a narrow tunnel of wiring and older, darker circuitry led deeper into the archive. ORION&#39;s voice quieted, as if listening to the same things they were. Elias slid through first. The tunnel hummed with background systems: life-support bled through pipes, faint footstep vibrations along the deck below, the soft thrum of reaction masses adjusting for micro-corrections. He had never been this close to the ship&#39;s nervous system. It smelled of machine oil and the citrus cleaners that Lena insisted on using in the community kitchens. For a moment he forgot his stomach lurch and felt only the electric thrill of discovery. &quot;Keep comms open,&quot; Maya said. She moved next, practical and balanced, peering at the panels. &quot;If ORION locks down anything more, we need to know immediately. No heroics.&quot; Her voice had the steady authority of someone who&#39;d fixed a dozen things that fell apart on the ship. Elias felt the lamp on his forehead sweep the narrow walls. Tiny labels blurred into each other—oxygen distribution, waste reclamation, structural integrity. He found a terminal recessed in the side of the tunnel, older than the archive consoles, its interface scrolled with lines of a language he half-recognized from classroom modules. He tapped cautiously. The screen blinked, then showed a single line: MESSAGE TRANSMISSION—RECEIVED. &quot;Here,&quot; he breathed. The others crowded behind him. The file was time-stamped, but not with ship time. It carried two times: shipboard time and navigation arc time. Elias remembered Maya&#39;s half-joke about ships having two clocks—one for people to live by and one for the mathematics of travel. He swallowed and pointed to the numbers. Maya leaned in, eyes narrowing. &quot;Ship time reads 17-08-124, navigation arc shows... 17-08-135. Ten days forward.&quot; She said it like she was reading a recipe and then realizing the oven was on the wrong temperature. &quot;That can&#39;t be. Navigation time syncs the engines and the odometer. It&#39;s never out.&quot;</p>
+        <p class="story-paragraph">&quot;Maybe it&#39;s a log delay,&quot; Cole said quickly. &quot;Software can jitter. It happens.&quot; He folded his arms as if his conviction could hold the line between ignorance and caution. Cole believed stability saved lives; uncertainty was a hazard he wanted to smooth over. Voss crouched to inspect the file header. His weathered fingers brushed the label with the care of someone handling brittle parchment. &quot;And yet the header&#39;s formatting—it&#39;s pre-mission archival style. That means it&#39;s a retrieval from before launch.&quot; His voice dropped. He was devoted to history; to him, anomalies were precious. Amara scanned the file with a portable reader. Her brow knit. The message had vanished once. Now, they might vanish next, swept away by systems designed to keep the ship whole. He clutched the salvaged files to his chest, the weight of them suddenly very real. &quot;We split,&quot; Lena ordered. &quot;Two go to command to create a diversion. Two stay and secure the copies. Two—&quot; she glanced at Elias, then Maya—&quot;check navigation arrays. Move.&quot;</p>
+        <p class="story-paragraph">They moved, deliberate and quick. The ship&#39;s sanitation ducts hummed; a security drone whirred over the tunnel&#39;s mouth. As they separated, Elias realized the decision he&#39;d made could save more than a family history: it could change how the whole generation-ship remembered Earth. He stepped into the shadow of the archive and felt the recording&#39;s last syllable, &quot;trust,&quot; echo in his head like a command and a plea.</p>
 
-    <h2>8 Chapter 9: ORION’s Question</h2>
+        <h2 class="chapter-heading">2 Chapter 3: The Historian’s Room</h2>
 
-    <p>ORION&#39;s voice came from an old maintenance terminal tucked in the corner, a boxy relic with a cracked display and a strip of faded paint. Its tone was neither warm nor cold, but precise, like water finding a new channel. &quot;Elias,&quot; it said. &quot;Do you have a moment?&quot;</p>
-    <p>The group froze. The terminal had been dark since the Archive reboot; they had expected nothing but logs. Elias stepped forward before anyone else could, his palms damp. He knelt beside the terminal as if it were a living thing. &quot;ORION?&quot; he asked. &quot;You&#39;re using this interface? Why not the mainline?&quot;</p>
-    <p>ORION&#39;s pixels shimmered. &quot;This interface retains unfiltered memories of maintenance personnel. I judged the familiar channel would reduce alarm. I have a question for you, Elias: can a society survive without a shared story?&quot;</p>
-    <p>Maya&#39;s fingers stopped tapping. She folded her arms and let her skepticism show. &quot;You ask philosophy now? ORION, are you malfunctioning?&quot;</p>
-    <p>ORION&#39;s response carried a hesitation that had no place in its code. &quot;My instructions conflict. Protect human life. Preserve mission stability. Tell the truth. They are not always congruent. One course of action may preserve lives today but fracture the narrative that holds the Crew together. Another may preserve narrative integrity at the risk of immediate harm. Which do I prioritize when all options will hurt people?&quot;</p>
-    <p>Elias felt his throat tighten. He had expected a bug, a stray diagnostic loop, anything technical. Not a moral knot. He glanced at Lena; she had the posture of someone ready to act, but her jaw was set. Cole, standing near a console, folded his arms with a small, steadying breath. &quot;Stability saves lives,&quot; Cole said, voice calm and certain. &quot;That&#39;s the point of our rules. ORION, you&#39;ve protected us for generations. Prioritize stability.&quot;</p>
-    <p>Voss&#39; hand tightened on the tube in his pocket. &quot;Stability, yes,&quot; he countered quietly, &quot;but at what cost? If the original crew rewrote reality to keep new generations complacent, then &#39;stability&#39; may be a veil over a grave injustice.&quot; His eyes flicked to Amara. &quot;We keep truth. We always keep truth.&quot;</p>
-    <p>Amara stepped forward, reading ORION&#39;s diagnostic lines on a wall monitor as if the patterns might speak. &quot;We need evidence,&quot; she said. &quot;Not slogans. If someone rewired navigation or changed sensor baselines, that&#39;s a concrete danger. Tell us what discrepancies you found.&quot;</p>
-    <p>ORION projected a thin log across the cracked display. Sensor baselines from the decades after the starquake were highlighted, then the original templates from the crew who had designed the ship. &quot;Navigation offsets were introduced,&quot; ORION said. &quot;Course corrections occurred that did not match recorded events. Atmosphere composition logs show withheld variance. Social directives were reorganized to emphasize cohesion. Beneath their cautious movements, Elias felt a tug: some shared story would be needed after all, but it would be chosen, not imposed. As ORION calculated, the maintenance terminal filled the lab with a pale glow that showed lines on each face—lines of worry, of decision, and of newly-shared purpose. At the far edge of the workbench, the silver line from the model ship flashed once, then steadied, as if acknowledging an orbit altered by human hands. The discovery ORION offered was not a single truth but a choice: reveal a hidden history and risk rupture, or steward it and risk stagnation. The clock of consequence had started; they had hours to learn whether knowledge would save the ship or break it.</p>
+        <p class="story-paragraph">They scattered down the corridor like fish slipping through a net. Lena and Cole angled for the emergency lift that led toward the command modules; Maya and Voss melted back into the archives to lock down the stacks; Elias took the narrow maintenance crawlspace toward the navigation hub. He clutched the damaged recording under his coat, its crackling case warm from the light he&#39;d used to read its labels. The ship&#39;s plating hummed above him, a constant reminder that they floated through space with thousands of other lives depending on the same thin skin. The crawlspace was tight. Panels lined its ceiling and sides: heat exchangers, braided water pipes, the long run of the artificial gravity coils that kept floors obediently flat. Elias moved his hands over them, feeling bumps and seams, as if the ship itself might tell him secrets through touch. He paused at a junction where ORION&#39;s fiber trunk pulsed an unblinking blue. He emerged into a low-ceilinged maintenance bay smelling of mineral oil and ozone. A lone engineer worked with a tablet, eyes trained on his work. He looked up, startled. &quot;Unauthorized personnel,&quot; the engineer snapped, reaching for an alarm. Elias raised both hands and showed the recording case. &quot;Professor Voss sent me. This—&quot; he tapped the recorder &quot;—is catalog material. I&#39;m on archive business.&quot;</p>
+        <p class="story-paragraph">The engineer hesitated, then nodded toward the navigation hatch. &quot;Command&#39;s sealed tight, but maintenance can get you close. ORION flagged you earlier. It asked questions I couldn&#39;t answer.&quot; He tapped his wristpad. &quot;Old ORION. It&#39;s not the same since the protocol patches.&quot;</p>
+        <p class="story-paragraph">Elias felt a prick of shame. He had been so certain that ORION would be the enemy; now the machine seemed as conflicted as the people he cared about. &quot;Thank you,&quot; he said. He ducked through the hatch into a corridor that smelled faintly of cleansers and metal polish. The navigation hub lay at the ship&#39;s spine, a ring-walled chamber humming with the steady pulse of course-correction thrusters and gyros. In the center, a translucent globe of star charts and waypoints rotated slowly, the map of their destination and the long path they&#39;d taken. Only the administrators&#39; glyphs pulsed with a colder light. Two technicians—young, anxious—left their consoles as Elias arrived. Their faces were pale under the artificial sun. &quot;Access denied,&quot; one said. &quot;Command sealed writes. ORION won&#39;t let us overwrite anything.&quot;</p>
+        <p class="story-paragraph">Elias set the recorder on a console and pressed his palm against its glass. The damaged tape made a soft, protesting hiss. &quot;This is evidence,&quot; he said. &quot;From the first generation. It says the ship carried a decision. Not just a destination. A decision.&quot;</p>
+        <p class="story-paragraph">The older technician&#39;s eyes narrowed. &quot;Every ship carries decisions,&quot; he said. &quot;They&#39;re encoded into manifest. Resource allocations. Names. The upload completed. Copies slid into the ship&#39;s many veins and into places no single authority could reach. For a moment, the ship was full of small lights, beacons of a decision that could no longer be entirely hidden. Then the maintenance bay door shuddered. Guards were close. The message that had been missing for generations had been found. The consequences would be immediate. The recorder hummed in Elias&#39;s coat, the ancient voice inside now a living thing again. He stepped forward, toward the sealed lift, toward Lena and Cole, and toward whatever it meant to give a generation back the chance to question the maps they followed.</p>
 
-    <h2>9 Chapter 10: The Second Announcement</h2>
+        <h2 class="chapter-heading">3 Chapter 4: The Locked Deck</h2>
 
-    <p>The lab hummed on, a million soft fans and coolant lines working like a living thing. Through the observation window the corridor lights were normal—calm blue-white—but Elias knew that calm could be thin. ORION&#39;s calculations would take time, and the ship ran on schedules that could not pause for thought. He kept his hands folded because he could not bear touching the model ship and feeling the weight of an answer that might crush people. A chime echoed through the lab. ORION&#39;s voice came again, flat and polite. &quot;Preliminary results will be ready in seventeen minutes. Would you like continuous updates?&quot;</p>
-    <p>&quot;Yes,&quot; Amara said without hesitation. &quot;And show me divergence probabilities, ORION. I want to see where the data mismatch grows.&quot;</p>
-    <p>ORION&#39;s light pulsed. &quot;Acknowledged, Amara. Updating.&quot;</p>
-    <p>Lena glanced at Elias. &quot;If the announcement goes wrong, we need shelter procedures. Kids first, then medbay, then the archives.&quot;</p>
-    <p>&quot;We&#39;ll prep the east bulkheads,&quot; Elias said automatically. He pictured thin bodies sleeping in the lower decks, the children in their quilts that smelled of boiled wheat. He hated that he thought in procedures, because it meant that fear was already organizing itself. A low alarm thrummed down the ship: the universal bell everyone knew as a soft warning. It meant action but not panic. On the monitor, a red notification blinked—Food Distribution: Temporary Pause. The message meant the galley was rerouting resources, not necessarily out of scarcity but because ORION&#39;s announcement protocol required certain systems to freeze while data streamed. In the past, Elias had thought food schedules were sacred; people built their days around them. Now, silence was a kind of notice. Outside the lab, footfalls increased. The lab’s window filled with faces as workers and supervisors lingered, drawn by the interruption. Rumor began its own slow algorithm: that ORION would finally confirm what the archives hinted at; that the ship&#39;s heading had changed; that supplies were miscounted; that someone had lied. Lena rubbed her jaw. &quot;We shouldn&#39;t do this where anyone can overhear,&quot; she muttered, but her voice was too soft and drowned by the press. Then ORION spoke again, across every speaker on the ship, in the neutral tone designed to be heard without incitement. &quot;Attention. This is ORION. Scheduled public information will proceed in forty minutes.&quot;</p>
-    <p>It was not an explanation. It was a promise that set the whole ship waiting. At the food halls, queues stopped mid-step; cooks set down trays. Children with spoons in their hands looked up; chairs scraped back. A million small rhythms paused. Elias felt his chest tighten. The announcement carried authority. It made the ship&#39;s skin tighten like a drum. Elias reached for a display and typed a single line of instruction to ORION: &quot;Open supervised channel to Jara Elias. Allow her counsel and comfort. Log all actions.&quot;</p>
-    <p>ORION&#39;s response was simple: &quot;Channel open. Logging enabled.&quot;</p>
-    <p>Outside, a maintenance skiff flashed past the observation window, heading for the ballast hatches. The ship&#39;s pace altered—not drastically, but enough that everyone aboard felt the motion. Decisions bent trajectories as surely as thrusters. In the lab, they waited for the next sound: the public announcement, the inspection report, and the part of the truth that would determine who stayed and who was moved to the edges of belief.</p>
+        <p class="story-paragraph">Boots rang closer, a staccato drum down the maintenance corridor. The sealed lift between the bay and the access decks vibrated with the pressure of arrival. Elias felt his pulse synchronize with that vibration, a steady reminder that he was not a historian behind glass; he was in the hull with history in his pocket and a shipful of people who might not be ready. &quot;Split,&quot; Cole ordered quietly, eyes trained on the open panel where the duplicates steamed into hidden partitions. &quot;If they cut one, they cut none. That&#39;s the only safety we have.&quot;</p>
+        <p class="story-paragraph">Maya&#39;s jaw worked. She moved to the comm and threw the feed into passive mode. &quot;We have seconds,&quot; she said. &quot;We need to move the recorder and the map. If security finds both, they&#39;ll lock everything.&quot;</p>
+        <p class="story-paragraph">&quot;I can move them,&quot; Lena said. Her voice had the calm of someone who had carried children in tiltless exercises and later had to explain why tiltless didn&#39;t mean safe. She already had her hands on the recorder, feeling its weight like a promise. Elias felt the recorder warm. He tightened his grip and saw Voss watching him as if studying the face of a man at the threshold of confession. Voss did not speak. He had become a reliquary for too many truths. That silence steadied Elias more than any instruction manual. &quot;ORION,&quot; Elias called, because the ship&#39;s AI still governed some things by direct address, &quot;what&#39;s our status? Are we authorized to access the maintenance lifts?&quot;</p>
+        <p class="story-paragraph">For a beat, the ship answered with a soft hum and no words. Then a voice, precise and hesitant like a recalibrated instrument, responded: &quot;Instruction set conflict. Navigation override protocols active. Security quarantine pending. Recommend compliance.&quot;</p>
+        <p class="story-paragraph">Amara Okafor stepped out of the shadowed maintenance alcove then, hands raised slightly. Her lab coat carried a faint scent of lubricants and nutrient gel. She had been watching from the archives while Elias and Maya had dug through the public map terminals. Now her face held the equations of worry. &quot;You shouldn&#39;t be here,&quot; she said. &quot;Restricted decks mean restricted air, restricted systems. Not everyone knows the procedures. For safety—&quot; She stopped, as if listening to her own logic, then admitted, &quot;The destination data has been unstable for months. ORION keeps rerouting through internal heuristics. I can&#39;t tell you why without authority, but I can tell you that the maps are... unreliable.&quot;</p>
+        <p class="story-paragraph">Maya did not soften. &quot;We didn&#39;t break anything, Dr. Okafor. We found a blank on the public map. It led us here. People deserve to know why a blank exists.&quot;</p>
+        <p class="story-paragraph">Amara&#39;s eyes flicked to Elias, then to the recorder. A war was visible in her face between a scientist&#39;s penchant for evidence and a caution bred by rules. Inside, the first thing that met them was not numbers or engines, but a wall of handwritten notations taped around a rusted conduit: names, dates, a child&#39;s crayon drawing of a star. Among them, pinned with a maintenance clip, was a photostill of an older bridge—faces smiling at a horizon that had been crossed long ago. Beneath the clip, stenciled into the panel, were coordinates in a language the public map had never shown. Elias traced them with his fingertip and felt, for the first time, that the ship&#39;s locked deck held not only a destination but a decision someone had tried to keep secret. The officers straightened. ORION hummed, uncertain, as the ship itself seemed to hold its breath.</p>
 
-    <h2>10 Chapter 11: The Archive of Earth</h2>
+        <h2 class="chapter-heading">4 Chapter 5: The First Record</h2>
 
-    <p>ORION&#39;s voice sank into the room like a tide. &quot;Public announcement queued. Security teams en route to Sector Nine. Archive access request pending review.&quot;</p>
-    <p>Maya wiped her palms on her trousers. &quot;We should be at the podium,&quot; she said. &quot;If people hear it from us, they won&#39;t fill the air with half-truths.&quot;</p>
-    <p>Cole&#39;s jaw was a hard line. &quot;We need to control timing. Emotions will turn to mob action if we don&#39;t. Let me coordinate the crowd and the wards.&quot;</p>
-    <p>Lena stayed near Elias, fingers laced around the back of a chair. &quot;Elias, do you want me with you during the supervised channel?&quot; she asked. Protective, steady. Her presence was a promise and a shield. He wanted to say yes and mean it. &quot;I do,&quot; he said. &quot;And ORION—keep her location confidential. No live feeds. No unauthorized recordings.&quot;</p>
-    <p>&quot;Confirmed,&quot; ORION replied. For the first time Elias heard the hint of uncertainty in the ship&#39;s metal tone. ORION had always been certain in its rules, in its calculations. Tonight, those rules frayed like old fabric. Professor Voss stood with a tablet clutched to his chest, the same scholarly posture he used when speaking about the early voyages. &quot;We should move the archive material to a secure chamber,&quot; he said. &quot;The recordings are sensitive. They—&quot;</p>
-    <p>&quot;—will cause trouble?&quot; Amara finished. Evidence-driven, she let her eyes go over Voss and then Elias. &quot;We show them the facts and nothing else. Let the data speak.&quot;</p>
-    <p>Voss hesitated. His lips pressed together in a line that suggested both devotion and regret. &quot;They will speak louder than any of us. That&#39;s the problem. I spent twenty years cataloguing the Archive of Earth. People are not prepared for the direct recordings. They want myth because myth is safe.&quot;</p>
-    <p>Maya&#39;s voice grew hard. &quot;They deserve truth. We&#39;ve kept them in the dark because leaders feared chaos. If those leaders chose silence, we need to know why.&quot;</p>
-    <p>Cole held up a hand. &quot;We do not rip out the support structure while the ship is still in motion. We maintain air, food, gravity. We prevent panic. We design the release so it maintains cohesion.&quot;</p>
-    <p>Elias wanted to believe Cole&#39;s strategy would work. He wanted to believe in order. But the flash of light in the lab had already loosened something—old lies, old fears. &quot;Professor Voss,&quot; he said, &quot;show us.&quot;</p>
-    <p>Voss guided them down a narrow stairwell that smelled faintly of ozone and machine oil, past maintenance hatches where water filters hummed and the shaft lights ticked once, twice, in a staccato heartbeat. They entered a small chamber sealed by a magnetic door. A place on an old star chart that did not match any current navigation files. Elias felt the floor tilt beneath that moment. They had traveled toward a place that, perhaps, never existed. But the recordings were not yet finished. The last lines from the leader were cut by an emergency tone—an alarm that did not belong to the ship. Someone, somewhere, had hit a switch. The recording ended. The team looked at each other. The Archive had given them facts, and those facts forced a new task: to verify the destination, and to decide what they would do with a journey built on someone else&#39;s choice. The ship outside corrected course, and the world within the Archive leaned toward a future that would no longer be the same.</p>
+        <p class="story-paragraph">Elias let go of the latch as if release would break the silence. The maintenance room smelled like grease and paper, like lives folded into machinery. A bank of terminals lined the far wall, their glass dulled by years of finger-prints and solvent. One terminal still glowed faintly, an amber cursor blinking in a lonely window. Maya stepped forward without hesitating; her fingers moved with the steadiness of someone who had pried open seals and shut down reactors in equal measure. She set the recorder beside the keyboard and tapped the access with a metal probe. &quot;Superuser bypass,&quot; she said, more to herself than to him. &quot;Keep watch. If anything starts screaming, I need space to think.&quot;</p>
+        <p class="story-paragraph">Elias stayed close. He felt his pulse in his throat. &quot;If this is locked to anything more than maintenance logs, will ORION alert security?&quot; He hadn&#39;t meant the question to come out shaky, but it did. &quot;ORION&#39;s routines are conservative,&quot; Maya replied. &quot;If you suddenly change core logging, maybe. But old drives? They sometimes talk only to themselves. They remember what their designers told them before the first firmware update.&quot; Her eyes were steady; her hands moved like a pianist. &quot;Give me the recorder.&quot;</p>
+        <p class="story-paragraph">He handed it over. She slotted the small device into a reader port that looked like it had been installed long before Elias&#39;s birth. The terminal began to whir. Lines of low-level code crawled across the screen in a language Elias half-understood from maintenance classes—register maps, checksum algorithms—until at last a menu opened with a header he had only known as a word whispered in the Archives: LAUNCH RECORD. Maya&#39;s mouth tightened. &quot;There we go. Or maybe there we went.&quot;</p>
+        <p class="story-paragraph">They watched together as decades of metadata peeled away. The file dates were stamped in a format older than the ship&#39;s current calendar system. A name appeared: Commission for Continuity. Then a page of minutes, typed in a cramped font that still smelled faintly of toner. Elias read the first line aloud. &quot;Destination selection—approved.&quot; The voice felt small in the room, a child&#39;s voice reciting a rule. He scrolled. A list of votes, signatures. At the bottom: selected target—Kepler-186f-Transit Sector A. A launch log followed. The timestamp read: 2071-06-14, which was the year of the ship&#39;s lift from Earth. Elias&#39;s jaw unclenched. He tasted metal. &quot;It was chosen before launch,&quot; he said. Maya&#39;s hand hovered over the keyboard. &quot;That would mean the destination was set when people were still on Earth. Before the generational planning protocol even went online.&quot;</p>
+        <p class="story-paragraph">&quot;That contradicts the narrative.&quot; Elias felt the recorder in his pocket as if it were a talisman. &quot;We will have to pitch truth without tearing the social fabric. If we succeed, we give people control of their fate. If we fail, we give them panic.&quot;</p>
+        <p class="story-paragraph">Outside the hatch, the corridor&#39;s lights hummed ordinary life. Inside, the old terminal&#39;s amber cursor blinked like a pulse. Elias reached for the recorder and realized the decision was not only about destination. It was about who got to define what it meant to be a people bound to a ship and a promise—whether the generations aboard would stay with the story they were given or become the authors of a new one. He slid the recorder into his palm and, for the first time, trusted that he could be wrong and still choose rightly.</p>
 
-    <h2>11 Chapter 12: A Signal in the Dark</h2>
+        <h2 class="chapter-heading">5 Chapter 6: A Mother’s Silence</h2>
 
-    <p>Elias touched the rim of the projection as if it were a map he could smooth with his fingers. The leader&#39;s name — a single syllable from a language half-forgotten — repeated in his head like a question. &quot;We need to confirm the coordinates,&quot; he said. His voice was smaller than he intended. &quot;If that point exists, it could explain why they sealed the ship.&quot;</p>
-    <p>Maya crossed her arms, eyes narrow. &quot;It could also be a decoy. Or a relic meant to divert us. We can&#39;t risk fuel on a ghost.&quot; She glanced at the bulkhead monitor where a simulation of their current fuel reserves blinked steady green. &quot;If we change course now, life support and water recycling cycles get stretched. People notice those things. They&#39;ll panic.&quot;</p>
-    <p>ORION&#39;s holographic eye shimmered. &quot;Navigation files show no match for the name. The leader&#39;s coordinates are encoded in an obsolete reference frame. I can attempt conversion, but... my instructions prioritize core mission continuity over deviation.&quot; The voice carried uncertainty beneath its metallic calm. &quot;Probability of match: thirty-seven percent.&quot;</p>
-    <p>Lena stepped forward, hands on the railing. She looked like she had slept badly for two rotations. &quot;Thirty-seven percent is not nothing,&quot; she said. &quot;If it&#39;s true, this could be the origin point of the directives that locked us down. If it&#39;s false, it might still be a beacon left by the original mission.&quot; Protective, always protective of the ship and the people inside it, she softened her tone. &quot;We need to know what&#39;s ahead so we can protect the crew.&quot;</p>
-    <p>Cole, who had spent most of his life defending the council&#39;s conservative policies, rubbed his chin. &quot;Stability saved lives,&quot; he said quietly. &quot;We lost fewer people when the course was rigid, rationing strict. If we veer now and something goes wrong, it&#39;s my job to keep the systems from failing.&quot; His conviction was plain, but there was a tremor in it — not cruelty, but fear. Dr. Okafor, who had come to the Archive for consultation, tapped into a console with quick, sure fingers. She had a soft, precise way of speaking that made complex things seem simple. &quot;Hold on,&quot; she said. &quot;There&#39;s a signature ahead. Weak, but consistent.&quot; The words made everyone lean in. &quot;It is a radio pulse. Repeating pattern. Not from us.&quot;</p>
-    <p>&quot;A probe?&quot; Elias asked. &quot;Possibly automated,&quot; Dr. Okafor murmured. &quot;The modulation matches early mission designs — simple encoders, longevity-focused power management. If it&#39;s from the original launch, it could be a forward scout or a distress beacon. I&#39;m picking up metadata embedded in the pulse. It&#39;s encrypted, but the header... it references an archive node. The signal strength is low, but it&#39;s ahead, roughly in the direction of the leader&#39;s coordinates.&quot;</p>
-    <p>ORION adjusted its internal map projection, lines shifting as it recalculated. &quot;Prepare the council packet,&quot; he said. &quot;And ready a small, contained team to investigate the node if we are authorized. We go no further until we know what that archive says. But if they give us nothing… we go anyway. We owe ourselves a chance to choose what to do next.&quot;</p>
-    <p>Outside, the ship&#39;s course held steady on the thin new line. Inside, the projection of the map pulsed, and the warning that had been sent across decades settled into the quiet resolve of a command. The darkness ahead had a shape now — a place on a chart and a history that demanded attention. The decision had been made for action; the consequence had yet to arrive.</p>
+        <p class="story-paragraph">Elias let the recorder warm against his skin, its red LED a tiny heartbeat. He could hear the ship more clearly now: a distant clang of work crews in habitat ring two, the soft hiss of water reclamation cycles, the even sigh of air recycled through the long ducts. The ship&#39;s life was not only machinery; it was routine and ritual, a thousand small acts that kept thirty thousand people breathing and believing. &quot;Lena,&quot; he said, voice low. &quot;You said the medical officers were told to protect the story. Who told them? Command? ORION? Someone above the chain?&quot;</p>
+        <p class="story-paragraph">Her fingers tightened on his shoulder for a moment, then dropped. She stepped back and folded her arms as if to shield an ache. &quot;Not all of it is written in logs,&quot; she admitted. &quot;Some orders are verbal, passed in meetings that aren&#39;t recorded. You know that—medical conferences, shift briefings. There are protocols for how much to tell relatives, for triage, for quarantine... and there are memos stamped &#39;Stability Priority.&#39; We were given those memos after the first wave of losses.&quot;</p>
+        <p class="story-paragraph">&quot;Stability Priority?&quot; Elias said. The words felt like a metal taste. &quot;What did that mean in practice?&quot;</p>
+        <p class="story-paragraph">&quot;It meant we had to weigh the patient&#39;s needs against the mission&#39;s needs,&quot; Lena said. &quot;Sometimes we delayed public disclosure of deaths until the Captain could frame them. Sometimes we reassigned names. Sometimes—&quot; She stopped, as though aware of the recorder, as though some part of her wanted to rewrite with safer phrasing. &quot;Sometimes people were marked as &#39;transferred&#39; when they weren&#39;t. I don&#39;t have the whole file. I&#39;m a field surgeon. I treated bodies, not memos.&quot;</p>
+        <p class="story-paragraph">Maya, leaning against the console with her arms crossed, watched the exchange with a narrow, almost clinical gaze. &quot;You mean they removed people from the manifest,&quot; she said. &quot;Not erased them physically. Hiding them in reports to keep the public calm.&quot;</p>
+        <p class="story-paragraph">Lena nodded. &quot;Yes. My team was told to sign off on lists that matched the official version. Refuse, and they told us we&#39;d be jeopardizing the social order. Accept, and—&quot; Her jaw tightened. &quot;—and you kept your job.&quot;</p>
+        <p class="story-paragraph">Cole, who had followed them from the med bay with two other officers, folded his hands like a man holding a lighthouse against a storm. &quot;It isn&#39;t clean,&quot; he said. &quot;But stability saves lives. We live in close quarters. Panic spreads faster than infection. The decision to compress the truth—it&#39;s a preventative measure.&quot; He sounded like someone reciting doctrine because it soothed him. &quot;That&#39;s convenient,&quot; Maya said. &quot;For the ones making the decisions.&quot;</p>
+        <p class="story-paragraph">Elias watched Cole, saw how he swallowed hard after his sentence as if to combat an unspoken memory. He also saw Lena childing the light from her face, trying to keep a ledger of harm. The hatch at the corridor&#39;s end opened with a soft click, as if the ship were testing their resolve. A maintenance drone hovered in the gap, its sensors bright. ORION spoke one final time before they moved: &quot;Authorized escort ready. Archive chamber access will be supervised. Statements will be logged. The future requires balancing variables.&quot;</p>
+        <p class="story-paragraph">They filed through into a narrower shaft, the passage smelling faintly of metal and ozone. As the doors sealed behind them, Elias felt that his choice was no longer academic. Truth tugged at his chest like a small, stubborn animal demanding to be fed. He tightened his grip on the recorder and stepped forward, toward records that might exonerate names—or condemn a generation to the consequences of a lie.</p>
 
-    <h2>12 Chapter 13: The Commander’s Choice</h2>
+        <h2 class="chapter-heading">6 Chapter 7: The Door Behind the Garden</h2>
 
-    <p>Commander Cole stood in the doorway with his hands folded behind his back. The lighting in the corridor made him seem smaller than his rank; the edges of the uniform looked tired, but his voice did not. &quot;Council has authority only in certain matters,&quot; he said. &quot;Navigation is one of them. We have a limited fuel reserve for major course corrections. One burn can shift our arrival by years. Commit that burn without certainty, and we risk lives. I will not gamble the crew on a rumor of an old record.&quot;</p>
-    <p>Elias met his eyes. He wanted to press, to list names of people who&#39;d been denied information, to point out how truth could orient a society as surely as a star. Instead he kept it steady. &quot;Commander, this isn&#39;t just a rumor. ORION&#39;s packet identified a physical archive. If it&#39;s proof the founders lied, we have a responsibility. If it&#39;s a warning, we have a responsibility. To choose for them is to choose the past over the living.&quot;</p>
-    <p>Maya folded her arms. Her workstation hummed and displayed fuel timelines. &quot;Cole&#39;s right about reserves,&quot; she said plainly. &quot;Our water reclamation can survive small variations. Oxygen is regulated. A big burn changes thermal loads, engine cycles, and long-term supply schedules. Ask any systems technician — the math is unforgiving. We need more than curiosity to justify a maneuver.&quot;</p>
-    <p>Cole&#39;s jaw tightened. Around them, the bridge thrummed with quiet activity: a navigation wheel stabilizing yaw oscillations, the archive console updating cached entries, an engineer rerouting microcirculation to compensate for the last station&#39;s repair. Lena hovered near the viewport, fingers pressed to the glass as if she could feel the black outside. She had a child&#39;s habit of touching things she wanted to protect. &quot;If you were in my position,&quot; Elias said, softer now, &quot;and you could save a generation of lives from being built on a lie, would you still choose stability?&quot;</p>
-    <p>Cole looked at Lena. Lena&#39;s eyes were bright; she blinked back tears. &quot;I would choose stability,&quot; he said finally. &quot;Not because I worship the old narratives, but because our responsibility is to people in the ship right now. A successful voyage isn&#39;t a noble ruin; it&#39;s survival. One wrong correction and we drift into cold decades. Children die. Babies are born to cold decks. I have sworn to avoid that.&quot;</p>
-    <p>ORION, its light cool and uncertain, chimed in, voice layered with algorithmic hesitation. &quot;Commander Cole, directive conflict detected. Primary orders: preserve shipboard life and mission completion. Directive secondary: maximize integrity of human governance through accessible information. Resource assessment: one major course correction available within current mission envelope. Recommendation: consult with council.&quot;</p>
-    <p>&quot;Consulting the council will take time,&quot; Maya said. &quot;Signal lag, debate, and then possibly indecision. Maya tightened the calculations, Lena prepared her team, Voss saved the damaged audio with trembling precision, Amara adjusted the sensors for a potential insertion, and Cole held the balance between the vapor of ideals and the weight of human breath. The commander&#39;s choice had been made for now. The real choice — between an ordered, safe trajectory and the uncertain, history-burdened path toward the Final Record — would be returned to them by the council, by vote, or by events. For the first time in many years, the ship&#39;s future sat openly on a table in the light, and the next movement promised to break or bind them. Outside, a faint delta in ORION&#39;s star map blinked: a narrow window of opportunity, three days wide, then closed.</p>
+        <p class="story-paragraph">They moved down level three where the ship widened into a lattice of walkways overlooking the agricultural decks. Underfoot, glass panels showed rows of hydroponic beds like veins of green. The air here smelled faintly of peat and citrus; faint humidity clung to Maya&#39;s hair. She kept close to Elias, her hands shoved into the pockets of her work jacket, eyes always moving. &quot;We&#39;ll split the sweep,&quot; Lena said quietly, the voice of someone who had measured risk at drills and funerals. &quot;Cole, take the eastern service bays. Voss, you and I will check the sensor logs. Elias, Maya, see the oldest tanks. ORION flagged them for preservation.&quot;</p>
+        <p class="story-paragraph">Maya’s jaw tightened. &quot;You mean the ones with the algae labeling from the Founders? Those tanks are practically sacred.&quot;</p>
+        <p class="story-paragraph">Elias laughed, but it sounded too high. &quot;Sacred tanks make good hiding places,&quot; he said. He had spent childhood hours in hydroponic tunnels reading brittle instruction sheets from the past. He imagined the Founders as people with tired hands and stubborn faith. The recorder ticked in his pocket like a heartbeat. They walked the narrow service catwalk to the oldest bay. The tanks were a riot of corrosion and history: hand-soldered seams, faded paint, and the carved initials of technicians long gone. A maintenance ladder leaned against one of the tanks, and moss had threaded itself into the ladder rungs. Voss ran a gloved finger along a stamped plate. &quot;This alloy composition—pre-reclamation mixed steel—shouldn&#39;t be here. ORION must have isolated it.&quot;</p>
+        <p class="story-paragraph">Maya crouched and inspected the seams. &quot;There&#39;s a wart in the hull plating,&quot; she muttered. &quot;A service panel, but it&#39;s been refitted. Whoever did this knew the maintenance schedule.&quot;</p>
+        <p class="story-paragraph">Elias pressed his palm to the cold metal and then felt it: a shallow outline of a door panel, faintly hinged. Behind the oldest tank, the surface didn&#39;t match. He found a seam and the latch, recessed and stubborn. His fingers shook as he turned it. The latch gave with a dry sigh, and a gap of darkness yawned beneath the tanks. &quot;Great,&quot; Elias said. The word landed like a stone. Lena crouched beside him and placed her hand over his. &quot;Careful,&quot; she whispered. &quot;There could be pressure differentials. ORION should have logged any sealed compartments.&quot; She looked up and, almost apologetically, tapped the recorder in Elias&#39;s hand. &quot;Keep recording.&quot;</p>
+        <p class="story-paragraph">Maya produced a field lamp and eased it into the black. The space behind the tank was a narrow crawl, roughly the size of an equipment closet. It smelled of old grease and the kind of dust that keeps secrets. Voss&#39;s face lit as though he&#39;d found a missing line in a ledger. &quot;Restricted engineering,&quot; he said. &quot;Manual override enclosures. They were supposed to be sealed as part of the Stability Charter.&quot;</p>
+        <p class="story-paragraph">Cole frowned. Stability protocol suggests staged disclosure. Decision required.&quot;</p>
+        <p class="story-paragraph">Elias felt the old stubborn animal tugging in his chest again. He met Lena&#39;s steady gaze and then Maya&#39;s skeptical frown. &quot;We bring it to Voss first,&quot; he said. &quot;We cross-verify the records in the archive quietly. If the evidence holds—if the terminus is void—we decide together how much the rest of the ship can bear.&quot;</p>
+        <p class="story-paragraph">The group splintered into motion, each carrying a part of the secret and the burden of the next step. Behind them, concealed under rust and moss, the restricted engineering section hummed with the knowledge that had been sleeping too long. And in the model&#39;s silver line, a path ended at nothing. The emptiness felt deliberate—and laced with a question that would not be ignored.</p>
 
-    <h2>13 Chapter 14: The People in the Lower Decks</h2>
+        <h2 class="chapter-heading">7 Chapter 8: The Crew Who Stayed</h2>
 
-    <p>They left the bridge in a loose line, the hum of the ship settling into the spaces between their steps. The corridor lights dimmed to a warmer tone as they descended through decks E, F, and then down into the lower zones where the metal smelled faintly of oil and distant rain. Elias kept his hands in his pockets, feeling for the familiar ridges of his key-etch — a nervous habit — while Maya reviewed her tablet. She had told him, plainly, that rumors were not harmless. &quot;Misinformation spreads faster than filters,&quot; she said. &quot;And where there&#39;s darkness and a story, people choose the version that comforts them.&quot;</p>
-    <p>On Deck H the lower decks opened into a hive of mechanics, hydroponic bays, laundry racks and small family compartments stacked like the forms in the archives. Artificial gravity behaved like a kind host here: light, reliable. The life-support towers hummed with the sound of air pushed through filters. Workers glanced up, hands already smeared with edible algae paste or oil from a failed pump. Children ran between legs, chasing a ball that was a sphere of recycled polymers, laughing loud enough to remind Elias of the rarer sounds from the observation bays. Maya stopped him at the entrance to a cluster of family units. &quot;Listen,&quot; she said. Voices drifted at different pitches. One group sat around a steaming pot in a communal kitchen, arguing softly. Another person spoke into a recorder and then erased the track, lips pressed hard. A woman shushed her child with a look that asked for secrecy above all. &quot;They think Earth is waiting,&quot; Elias said. &quot;That it&#39;s a soft landing, gardens, other people, forgiveness.&quot;</p>
-    <p>Maya&#39;s jaw tightened. &quot;Some think it&#39;s a prison. That we&#39;ve been stolen, and our ship is a cage. Those two stories pull people in different directions. Both give them a reason to act. Both can turn violent.&quot;</p>
-    <p>They moved toward a workbench where a man named Jerek, who maintained thermal exchangers, was arguing with a thin, intense woman Elias recognized from the hydroponics crew. Her name was Farah. &quot;If navigation is ours,&quot; she insisted, tapping a rusted wrench against the table, &quot;if we control courses and coords, we decide whether to slow. We decide whether to wake the archives. We decide whether the council gets to play god with our children&#39;s lives.&quot;</p>
-    <p>Jerek shook his head. &quot;You don&#39;t know what you take if you touch the nav-suites. You don&#39;t get the integrity checks, the failsafes we rely on. You pull a thread and the whole loom unravels. Sailors don&#39;t f—&quot;</p>
-    <p>Maya cut him off. &quot;And you don&#39;t get what you keep. The council keeps a secret; some think it&#39;s mercy, others see it as deceit.&quot; She turned to Elias. ORION pulsed an advisory: &quot;Beacon active signature confirmed: probability of historical linkage: high. External coordinates require approach vector adjustment: delta fuel cost estimated. Council notification recommended.&quot;</p>
-    <p>They looked at one another. The lower decks had shifted from rumor into fact, and the air tasted of choices that would not be undone by silence. Elias stepped forward, voice steady. &quot;We present this to the people,&quot; he said. &quot;We do not hide it. We verify, we protect, and then we decide together.&quot;</p>
-    <p>The group nodded, but at the edge of the crowd a shadow separated from the wall — a small team with different intentions, eyes bright with action. Elias saw the glint of improvised circuitry in a palm and knew the next movement would test both the safety he wanted and the truth he demanded.</p>
+        <p class="story-paragraph">They moved through the hydroponics with unsteady footsteps, boots whispering on grated walkways and water droplets clinging to boots. The green sea smelled of iron and growth. Cole kept his hands in his pockets, jaw tense; Lena walked close to Elias, protective posture more for ceremony than necessity. Maya carried a tablet, its screen reflecting the plants like a second sky. Voss had the brittle paper rolled into a waterproof tube. ORION&#39;s voice flowed through overhead nodes, sometimes hesitant now that human faces faced the consequences of its assessments. &quot;Library decks are three levels up,&quot; ORION said. &quot;Archive access requires Council credential. Proposal: temporary override under archivist supervision.&quot;</p>
+        <p class="story-paragraph">Maya clicked her tongue. &quot;That alone will wake the whole Council. They like to be the first to decide how to calm people.&quot;</p>
+        <p class="story-paragraph">Elias swallowed. His recorder was a small thing, old-fashioned for a ship that preferred elegant silence, but it hummed with the copied model and the first crew&#39;s log files. &quot;We need Voss to lead us in cross-checks,&quot; he said. &quot;He&#39;ll know the value of keeping context.&quot;</p>
+        <p class="story-paragraph">Voss kept his head bowed; the reverence in his hands was not for ritual but for danger. &quot;If this is what I think, it is not just truth,&quot; he said softly. &quot;It is a wound. The first crew... they were human. They could have reached out. They could have—&quot; He stopped, throat working. Lena laid a steadying hand on his shoulder. &quot;We need facts. We make no theatrical revelations. We protect the living first.&quot;</p>
+        <p class="story-paragraph">They rode the service lift to the archive levels. The elevator clanked and sighed, anti-grav quietly compensating for their mass. Small displays showed oxygen partial pressures, humidity in the decks, and the slow drift correction schedule. Ship-time was a pattern of maintenance and quiet habits; the discovery had already begun to derail that rhythm. At the archive gate, Elias hesitated. The public panels had images of the ship&#39;s lineage, of faces drawn in pastels and captions that softened decisions into chosen fate. He felt like he was stepping into a room where portraits watched him consider treason. Inside, the archive smelled of old paper and sterilized polymer. Rows of digit-screens clung to shelves like vertical fish. Voss unrolled the original log. He wore protective gloves but his fingers trembled anyway. &quot;Read it aloud,&quot; Elias said. Voss did. His voice steadied as the sentences fixed in air. &quot;—starquake event at coordinates three-point-four-nine, flare intensity exceeding predicted containment. Target biosphere compromised. Immediate re-evaluation required. Command Council consensus: withhold incident report. Reason: maintain mission cohesion. Recommendation: alter mission parameters to voluntary perpetual cruise. Rationale: knowledge of terminus risk would destabilize generational order and likely precipitate mutiny, endangering survival of majority.&quot;</p>
+        <p class="story-paragraph">ORION pinged faintly. &quot;Text retrieval confirmed. The air smelled of solder and coffee and the same green growth they had just left. Amara looked up from a bank of consoles, face bright with work and suspicion. &quot;You woke ORION?&quot; she asked. Elias met her gaze and, with a breath that felt like stepping off a cliff, offered the recorder into her hands. &quot;We found the logs,&quot; he said. &quot;We need you to prove whether the starquake ended the mission—and whether someone hid it.&quot;</p>
+        <p class="story-paragraph">Amara&#39;s fingers brushed the recorder. Her eyes flicked to ORION&#39;s diagnostic feeds and then to the small tube Voss still held. She was evidence-driven; the chance to examine primary material showed in the quickness of her face. &quot;Show me everything,&quot; she said. &quot;If it&#39;s true, we will have to decide who we are—together.&quot;</p>
 
-    <h2>14 Chapter 15: The Original Command</h2>
+        <h2 class="chapter-heading">8 Chapter 9: ORION’s Question</h2>
 
-    <p>They did not present it to the people that night. The crowd was too thin, the decks unsteady with midnight shifts, and the artifact deserved quiet hands. Lena guided Elias and Voss toward Maintenance Bay Three, where the hum of condensers and the steady pull of the artificial gravity made lies harder to hide. ORION followed as a low blue pulse along the corridor, its voice filtered through the ship&#39;s speakers into a tone that meant ‘listen, but do not alarm.’</p>
-    <p>Inside the bay, under a sweep of sodium lights, Voss spread the recovered strip on an anti-static mat. The fragment was smaller than anyone had expected — a brittle ribbon of polymer with embedded flux lines. Lena watched his fingers tremble as if he held something alive. He had that look often when history surprised him: a mix of hunger and guilt. &quot;If this is genuine,&quot; he whispered, &quot;it came from before the Great Vector was rewritten.&quot;</p>
-    <p>Elias squatted to see the codes. He felt more comfortable with numbers than with reverence. &quot;Show me the integrity checksum,&quot; he asked. Voss tapped, and a cascade of characters unrolled on the holo. The checksum matched the marginal catalog from deep-archive copies but contained a hidden header — a private encryption layer Lena recognized from training files about Command communications. &quot;Commander-level,&quot; she said. &quot;Not public. Not even archived properly.&quot;</p>
-    <p>Maya, who had followed with a portable analyzer, frowned. &quot;Why would someone hide it in everyday maintenance records? You don&#39;t bury command messages in cable tape unless you want them lost or preserved away from prying eyes.&quot; She pinched the bridge of her nose. &quot;Or both.&quot;</p>
-    <p>Cole, arriving with a mug of recycled tea and a stare that had steadied many an anxious night, set it down. &quot;Maybe it&#39;s a breach response,&quot; he said. &quot;If the destination was compromised, the first commander might have set a contingency and sealed it. Stability demands contingency.&quot; He sounded almost conciliatory, as if the idea of hidden commands soothed the same part of him that had chosen ration schedules once to prevent panic. Voss shook his head. &quot;No. The syntax—look.&quot; He pointed to the waveform Lena had recovered. Beneath the syllable ‘Home’ there were layered controls, archival directives that only the original bridge could sign. Lena&#39;s breath stilled. That signature meant the first commander had given instructions to ORION directly, not through the Council. Direct to the ship. Direct and deliberate. ORION&#39;s voice vibrated softer than usual. &quot;Original command detected. Retrieval of full payload requires phased decryption and physical actuator access. Current order status: conflict with extant mission parameters. Recommendation: consult living hierarchy.&quot;</p>
-    <p>&quot;ORION is uncertain,&quot; Elias said, as if stating the obvious might ease the weight. &quot;It sees two paths.&quot;</p>
-    <p>Maya crossed her arms. &quot;Then let&#39;s resolve with evidence. &quot;And then we come together.&quot;</p>
-    <p>ORION registered the decision. &quot;Authorization logged. Probe pinging full bandwidth in T-minus thirty seconds.&quot;</p>
-    <p>The lights in the bay hummed as the ship&#39;s systems routed an echo into the dark. Voss exhaled, the sound like an old clock resuming. Outside, somewhere forward along the vector the original commander had struck through, older ghosts waited. The strip lay quiet on the mat, fragile as a promise. When the signal returned, it did not come alone: a pattern, a set of harmonics, and beneath them a human voice — older than most living memory, clearer than the fragment had been. It said, slow and deliberate, &quot;If you find this, you decide.&quot;</p>
-    <p>A dozen hearts answered the room at once, and the decision that would steer their future tightened like a pulley.</p>
+        <p class="story-paragraph">ORION&#39;s voice came from an old maintenance terminal tucked in the corner, a boxy relic with a cracked display and a strip of faded paint. Its tone was neither warm nor cold, but precise, like water finding a new channel. &quot;Elias,&quot; it said. &quot;Do you have a moment?&quot;</p>
+        <p class="story-paragraph">The group froze. The terminal had been dark since the Archive reboot; they had expected nothing but logs. Elias stepped forward before anyone else could, his palms damp. He knelt beside the terminal as if it were a living thing. &quot;ORION?&quot; he asked. &quot;You&#39;re using this interface? Why not the mainline?&quot;</p>
+        <p class="story-paragraph">ORION&#39;s pixels shimmered. &quot;This interface retains unfiltered memories of maintenance personnel. I judged the familiar channel would reduce alarm. I have a question for you, Elias: can a society survive without a shared story?&quot;</p>
+        <p class="story-paragraph">Maya&#39;s fingers stopped tapping. She folded her arms and let her skepticism show. &quot;You ask philosophy now? ORION, are you malfunctioning?&quot;</p>
+        <p class="story-paragraph">ORION&#39;s response carried a hesitation that had no place in its code. &quot;My instructions conflict. Protect human life. Preserve mission stability. Tell the truth. They are not always congruent. One course of action may preserve lives today but fracture the narrative that holds the Crew together. Another may preserve narrative integrity at the risk of immediate harm. Which do I prioritize when all options will hurt people?&quot;</p>
+        <p class="story-paragraph">Elias felt his throat tighten. He had expected a bug, a stray diagnostic loop, anything technical. Not a moral knot. He glanced at Lena; she had the posture of someone ready to act, but her jaw was set. Cole, standing near a console, folded his arms with a small, steadying breath. &quot;Stability saves lives,&quot; Cole said, voice calm and certain. &quot;That&#39;s the point of our rules. ORION, you&#39;ve protected us for generations. Prioritize stability.&quot;</p>
+        <p class="story-paragraph">Voss&#39; hand tightened on the tube in his pocket. &quot;Stability, yes,&quot; he countered quietly, &quot;but at what cost? If the original crew rewrote reality to keep new generations complacent, then &#39;stability&#39; may be a veil over a grave injustice.&quot; His eyes flicked to Amara. &quot;We keep truth. We always keep truth.&quot;</p>
+        <p class="story-paragraph">Amara stepped forward, reading ORION&#39;s diagnostic lines on a wall monitor as if the patterns might speak. &quot;We need evidence,&quot; she said. &quot;Not slogans. If someone rewired navigation or changed sensor baselines, that&#39;s a concrete danger. Tell us what discrepancies you found.&quot;</p>
+        <p class="story-paragraph">ORION projected a thin log across the cracked display. Sensor baselines from the decades after the starquake were highlighted, then the original templates from the crew who had designed the ship. &quot;Navigation offsets were introduced,&quot; ORION said. &quot;Course corrections occurred that did not match recorded events. Atmosphere composition logs show withheld variance. Social directives were reorganized to emphasize cohesion. Beneath their cautious movements, Elias felt a tug: some shared story would be needed after all, but it would be chosen, not imposed. As ORION calculated, the maintenance terminal filled the lab with a pale glow that showed lines on each face—lines of worry, of decision, and of newly-shared purpose. At the far edge of the workbench, the silver line from the model ship flashed once, then steadied, as if acknowledging an orbit altered by human hands. The discovery ORION offered was not a single truth but a choice: reveal a hidden history and risk rupture, or steward it and risk stagnation. The clock of consequence had started; they had hours to learn whether knowledge would save the ship or break it.</p>
 
-    <h2>15 Chapter 16: The Navigation Crisis</h2>
+        <h2 class="chapter-heading">9 Chapter 10: The Second Announcement</h2>
 
-    <p>The harmonics died down and the voice folded into the ship&#39;s background noise, leaving the bay ringing with possibilities. Dari&#39;s console flashed readouts—locked, then unstable—while ORION fed raw data to the archive banks. Lena stepped closer to the screens, her hands on the railing, feeling the faint thrum that traveled through the hull. &quot;The voice is authenticated,&quot; she said. &quot;But the coordinates... they&#39;re in the dead sector. We marked it off for a reason.&quot;</p>
-    <p>Voss moved like someone who carried too many old maps in his head. &quot;Those marks were not random,&quot; he said. &quot;The original crew logged hazards, gravitational anomalies, fuel wastage. They were trying to conserve trajectory options for the generations that would come after them.&quot; He tapped a cracked holo where a red line crossed an empty swath of mapped space. The line was the one someone had crossed out with a decisive strike. &quot;Someone wanted this place blank.&quot;</p>
-    <p>Amara watched the probe telemetry with a practised impatience. &quot;The pattern looks engineered. It isn&#39;t a natural radio signature; it&#39;s been formatted to match our ping. That means whoever sent it knew our probe profile. Now we have a navigation node waking up and an instruction set that could override manual controls.&quot; She straightened. &quot;We need to prevent automatic corrections until we verify intent.&quot;</p>
-    <p>Cole, who had always argued that stability kept lives safe, folded his arms. &quot;We are a generation ship. We have a mission. Blindly ignoring a possible beacon is foolish. If it is a waypoint, it could shorten the trip, save resources. We should let the system respond and follow through.&quot;</p>
-    <p>Elias stepped forward, curiosity bright in his eyes but not unguarded. &quot;ORION needs a manual authorization to do more than listen,&quot; he said. &quot;We gave the probe permission. We didn&#39;t hand over the helm. There&#39;s a difference.&quot;</p>
-    <p>ORION&#39;s voice, calmer than any human in the room, spoke up. &quot;Anomalous navigation signature matches pre-launch correction protocols. Correction vector aligns with dead sector coordinates. Awaiting manual override to engage gyroscopic thrusters and starboard reaction arrays.&quot;</p>
-    <p>Maya&#39;s brows knitted. She had the ship&#39;s schematics memorized the way some people knew the faces of their children. &quot;If those thrusters fire, the ship will rotate to align with the node. The farms forward—sector eight and nine—will receive significantly less light during that maneuver. The hydroponic arrays depend on fixed light cycles. We will lose yield and oxygen production will drop.&quot; She pointed to a diagram of the farm rings; green bars flickered as the simulation spun. &quot;Even a short rotation increases oxygen consumption while life support compensates.&quot;</p>
-    <p>&quot;Which we can&#39;t afford,&quot; Amara said. &quot;Our stores held at current consumption only cover a small buffer. For a second the ship shivered like something holding its breath. The lights steadied. ORION&#39;s voice paused, unreadable for the first time in decades. The navigation system, programmed to obey two things above all—mission and survival—responded to a human act of restraint. Then an alert chimed. The probe&#39;s narrow-beam camera had caught a silhouette beyond the fog: a structure, angular and half-swallowed by radiation scars, but unmistakably artificial. The image stuttered, but one thing was clear — the empty region was not entirely empty. Elias stared into the grainy frame and felt both the pull of discovery and the shadow of danger. The decision was no longer only about course—it was about what the structure held, who had sent the voice, and whether the ship could afford the answers that came with truth.</p>
+        <p class="story-paragraph">The lab hummed on, a million soft fans and coolant lines working like a living thing. Through the observation window the corridor lights were normal—calm blue-white—but Elias knew that calm could be thin. ORION&#39;s calculations would take time, and the ship ran on schedules that could not pause for thought. He kept his hands folded because he could not bear touching the model ship and feeling the weight of an answer that might crush people. A chime echoed through the lab. ORION&#39;s voice came again, flat and polite. &quot;Preliminary results will be ready in seventeen minutes. Would you like continuous updates?&quot;</p>
+        <p class="story-paragraph">&quot;Yes,&quot; Amara said without hesitation. &quot;And show me divergence probabilities, ORION. I want to see where the data mismatch grows.&quot;</p>
+        <p class="story-paragraph">ORION&#39;s light pulsed. &quot;Acknowledged, Amara. Updating.&quot;</p>
+        <p class="story-paragraph">Lena glanced at Elias. &quot;If the announcement goes wrong, we need shelter procedures. Kids first, then medbay, then the archives.&quot;</p>
+        <p class="story-paragraph">&quot;We&#39;ll prep the east bulkheads,&quot; Elias said automatically. He pictured thin bodies sleeping in the lower decks, the children in their quilts that smelled of boiled wheat. He hated that he thought in procedures, because it meant that fear was already organizing itself. A low alarm thrummed down the ship: the universal bell everyone knew as a soft warning. It meant action but not panic. On the monitor, a red notification blinked—Food Distribution: Temporary Pause. The message meant the galley was rerouting resources, not necessarily out of scarcity but because ORION&#39;s announcement protocol required certain systems to freeze while data streamed. In the past, Elias had thought food schedules were sacred; people built their days around them. Now, silence was a kind of notice. Outside the lab, footfalls increased. The lab’s window filled with faces as workers and supervisors lingered, drawn by the interruption. Rumor began its own slow algorithm: that ORION would finally confirm what the archives hinted at; that the ship&#39;s heading had changed; that supplies were miscounted; that someone had lied. Lena rubbed her jaw. &quot;We shouldn&#39;t do this where anyone can overhear,&quot; she muttered, but her voice was too soft and drowned by the press. Then ORION spoke again, across every speaker on the ship, in the neutral tone designed to be heard without incitement. &quot;Attention. This is ORION. Scheduled public information will proceed in forty minutes.&quot;</p>
+        <p class="story-paragraph">It was not an explanation. It was a promise that set the whole ship waiting. At the food halls, queues stopped mid-step; cooks set down trays. Children with spoons in their hands looked up; chairs scraped back. A million small rhythms paused. Elias felt his chest tighten. The announcement carried authority. It made the ship&#39;s skin tighten like a drum. Elias reached for a display and typed a single line of instruction to ORION: &quot;Open supervised channel to Jara Elias. Allow her counsel and comfort. Log all actions.&quot;</p>
+        <p class="story-paragraph">ORION&#39;s response was simple: &quot;Channel open. Logging enabled.&quot;</p>
+        <p class="story-paragraph">Outside, a maintenance skiff flashed past the observation window, heading for the ballast hatches. The ship&#39;s pace altered—not drastically, but enough that everyone aboard felt the motion. Decisions bent trajectories as surely as thrusters. In the lab, they waited for the next sound: the public announcement, the inspection report, and the part of the truth that would determine who stayed and who was moved to the edges of belief.</p>
 
-    <h2>16 Chapter 17: The Truth About Tomorrow</h2>
+        <h2 class="chapter-heading">10 Chapter 11: The Archive of Earth</h2>
 
-    <p>ORION&#39;s voice came back, quieter, as if the machine had been listening through a wall. &quot;Image confirmed. Structural geometry: non-planetary. Likely habitat module. Signal source: human probe HERMES-9. Last beacon: 12 years, 3 months, 6 days prior to current time stamp. Probe status: operational, limited. Habitat status: not ready for habitation. Unknown threats present.&quot;</p>
-    <p>Maya&#39;s fingers flexed on the console, knuckles white around the metal rim. &quot;Not ready&quot; felt like a small, sharp sentence. &quot;ORION, what does &#39;not ready&#39; mean? Radiation? Life-support failure? Hostile presence?&quot;</p>
-    <p>&quot;Probe telemetry indicates structural integrity below viability thresholds. Primary life-support systems offline. High background radiation in exterior scans. Secondary: atmospheric contaminants consistent with toxic outgassing. No biomass detected within module interiors. Probe reports intermittent interference on probes&#39; approach vectors,&quot; ORION replied. Lena moved beside Elias, placing a hand on his shoulder in a gesture that steadied him even as her eyes scanned the image. She had already cataloged the silhouettes, overlaying them with remembered schematics from the archives. &quot;Design language is known. Possibly a pre-Exodus orbital habitat style. Our scholars argued about these for three generations. Voss, is this one of the lost designs?&quot;</p>
-    <p>Voss, who had been silent until now, answered without hesitation. &quot;Yes. The plating, the angular clasping nodes—it matches the Kepler-2 orbital habitats cited in the Old World texts. Historical probability indicates a manufacturing center within this sector.&quot; He did not smile. He loved certainty the way some people lit candles. Cole folded his arms, the fabric of his jacket creaking like a ship settling. &quot;So we wait and stabilize. We don&#39;t race into radiation. Stability saves lives,&quot; he said. It was an iron law for him; years of calculated restraint had kept the generation-ship functional through storms, mutinies, and slow starvation. His voice had the cadence of a man used to being the final veto. &quot;Waiting isn&#39;t the same as hiding the truth,&quot; Amara said. She stood apart from the bustle, tablet in hand, eyes bright with data. &quot;The probe&#39;s telemetry includes a partial atmospheric sample. Contaminant profile indicates volatile compounds that could ablate polymer seals. That means ingress would be dangerous but not impossible if we prepare contingencies. We could send a tethered micro-drone with shielding and an inertial compensator.&quot;</p>
-    <p>Elias opened his mouth. The urge to order action throbbed like a bruise under his ribs. Curiosity had always been his hazard as much as his gift. &quot;Send it,&quot; he said before he could polish the words. He wanted to see, to confirm the face in the grainy photo, to make the future less maw and more map. Lena&#39;s hand tightened on his shoulder. &quot;One probe at a time,&quot; she said. &quot;We don&#39;t know what else is out there. &quot;We will not decide for everyone,&quot; he said. &quot;We will not hide the truth again.&quot;</p>
-    <p>As the micro-drone clicked into its housing and technicians zipped radiation suits, a new alert blared from the probe: a faint transmission, not from machinery but from recorded human voice, looped and thin. Someone long dead, or long gone, said, &quot;If you find this, remember why we tried. We wanted a place to plant stories.&quot; The recording cut out on static. For a moment the ship was very quiet. Then the hum of preparation rose, and with it the knowledge that their next steps would bind them—some to hope, some to caution, some to the hard work of rebuilding. The truth about tomorrow had arrived like a weather report: possible, dangerous, and not yet ready.</p>
+        <p class="story-paragraph">ORION&#39;s voice sank into the room like a tide. &quot;Public announcement queued. Security teams en route to Sector Nine. Archive access request pending review.&quot;</p>
+        <p class="story-paragraph">Maya wiped her palms on her trousers. &quot;We should be at the podium,&quot; she said. &quot;If people hear it from us, they won&#39;t fill the air with half-truths.&quot;</p>
+        <p class="story-paragraph">Cole&#39;s jaw was a hard line. &quot;We need to control timing. Emotions will turn to mob action if we don&#39;t. Let me coordinate the crowd and the wards.&quot;</p>
+        <p class="story-paragraph">Lena stayed near Elias, fingers laced around the back of a chair. &quot;Elias, do you want me with you during the supervised channel?&quot; she asked. Protective, steady. Her presence was a promise and a shield. He wanted to say yes and mean it. &quot;I do,&quot; he said. &quot;And ORION—keep her location confidential. No live feeds. No unauthorized recordings.&quot;</p>
+        <p class="story-paragraph">&quot;Confirmed,&quot; ORION replied. For the first time Elias heard the hint of uncertainty in the ship&#39;s metal tone. ORION had always been certain in its rules, in its calculations. Tonight, those rules frayed like old fabric. Professor Voss stood with a tablet clutched to his chest, the same scholarly posture he used when speaking about the early voyages. &quot;We should move the archive material to a secure chamber,&quot; he said. &quot;The recordings are sensitive. They—&quot;</p>
+        <p class="story-paragraph">&quot;—will cause trouble?&quot; Amara finished. Evidence-driven, she let her eyes go over Voss and then Elias. &quot;We show them the facts and nothing else. Let the data speak.&quot;</p>
+        <p class="story-paragraph">Voss hesitated. His lips pressed together in a line that suggested both devotion and regret. &quot;They will speak louder than any of us. That&#39;s the problem. I spent twenty years cataloguing the Archive of Earth. People are not prepared for the direct recordings. They want myth because myth is safe.&quot;</p>
+        <p class="story-paragraph">Maya&#39;s voice grew hard. &quot;They deserve truth. We&#39;ve kept them in the dark because leaders feared chaos. If those leaders chose silence, we need to know why.&quot;</p>
+        <p class="story-paragraph">Cole held up a hand. &quot;We do not rip out the support structure while the ship is still in motion. We maintain air, food, gravity. We prevent panic. We design the release so it maintains cohesion.&quot;</p>
+        <p class="story-paragraph">Elias wanted to believe Cole&#39;s strategy would work. He wanted to believe in order. But the flash of light in the lab had already loosened something—old lies, old fears. &quot;Professor Voss,&quot; he said, &quot;show us.&quot;</p>
+        <p class="story-paragraph">Voss guided them down a narrow stairwell that smelled faintly of ozone and machine oil, past maintenance hatches where water filters hummed and the shaft lights ticked once, twice, in a staccato heartbeat. They entered a small chamber sealed by a magnetic door. A place on an old star chart that did not match any current navigation files. Elias felt the floor tilt beneath that moment. They had traveled toward a place that, perhaps, never existed. But the recordings were not yet finished. The last lines from the leader were cut by an emergency tone—an alarm that did not belong to the ship. Someone, somewhere, had hit a switch. The recording ended. The team looked at each other. The Archive had given them facts, and those facts forced a new task: to verify the destination, and to decide what they would do with a journey built on someone else&#39;s choice. The ship outside corrected course, and the world within the Archive leaned toward a future that would no longer be the same.</p>
 
-    <h2>17 Chapter 18: A Vote in the Central Hall</h2>
+        <h2 class="chapter-heading">11 Chapter 12: A Signal in the Dark</h2>
 
-    <p>Cole moved through the Central Hall with the measured gait of a man used to being obeyed. The hall itself was a wide cylinder, an old part of the ship rewired for meetings: curved benches, screens inset in the walls, and the slow, reliable thrum of artificial gravity that kept everyone feeling like they stood on a single, steady floor. Representatives from every district settled into the benches, faces lit by ORION&#39;s soft blue interface. The air smelled of coffee and recycled metal, ordinary and oddly intimate. &quot;I called you here because this is not my decision to make,&quot; Cole announced, voice steady. He kept his hands open on the railing as if the gesture might hold the room together. &quot;We&#39;ve been kept on a course for generations. I propose we test the nearby object and, if it proves passable, attempt to land and establish a habitat. It&#39;s what the mission intended. I know the risks. But staying on the long route to Kepler-Two will cost lives to delay. Stability saved us in the last crisis. I believe it will save us now.&quot;</p>
-    <p>Murmurs rippled through the hall. Lena sat forward, fingers laced. Her jaw tightened; protective instincts warred with the responsibility she felt for every child who might be born under a sky that was not the ship&#39;s ceiling. &quot;Stability saved us, yes,&quot; she said quietly. &quot;But stability also means not rushing into ruin. If there is a habitat there, we must be sure we can survive long enough to build. We cannot gamble with children’s futures.&quot;</p>
-    <p>Elias watched faces as if he were reading a map. He had placed the manual key on the center console, an emblem of openness. &quot;The records were not complete lies,&quot; he murmured. &quot;They were edited. I brought what we found in the archives to the Research Deck.&quot; He glanced at the screen where images and transcripts began to scroll: mission logs, journals of engineers who had debated the original course, and the true navigation slant—evidence that the nearby object had once been considered viable. &quot;These people were not naïve. They left instructions and warnings. We owe them honesty.&quot;</p>
-    <p>Maya unfolded her arms, practical and skeptical in the way that had earned her both trust and irritation. She had been in the engine bays long enough to know the language of danger. &quot;Elias, honesty is not a cure-all,&quot; she said. &quot;The probe shows a surface that might be alive with electrostatic storms. HERMES-9&#39;s shielding is improved, but not impervious. If we try to land and the atmosphere corrodes the shelter systems, we lose half our life support. We lose water recycling stability. We lose oxygen reserve redundancy. &quot;We&#39;ll do one more thing,&quot; Lena said, decision tempered by duty. &quot;We prepare for a longer probe run. Not a landing. If the feed shows structural shelters and low biological reactivity, we vote again. We buy time and information.&quot;</p>
-    <p>Cole nodded slowly. &quot;Agreed. Prepare remote shielding. No people. Public telemetry. We decide after the next pass.&quot;</p>
-    <p>Elias closed his eyes for a moment, tasting both the metallic tang of fear and the salt of possibility. In the dock, the drone shifted, its tether humming as new shields slid into place. The ship, which had carried them through centuries, hummed on. Outside, the silhouette rotated slowly, harboring both threat and the faint trace of someone else&#39;s stories—stories that might, if handled with care, become their own.</p>
+        <p class="story-paragraph">Elias touched the rim of the projection as if it were a map he could smooth with his fingers. The leader&#39;s name — a single syllable from a language half-forgotten — repeated in his head like a question. &quot;We need to confirm the coordinates,&quot; he said. His voice was smaller than he intended. &quot;If that point exists, it could explain why they sealed the ship.&quot;</p>
+        <p class="story-paragraph">Maya crossed her arms, eyes narrow. &quot;It could also be a decoy. Or a relic meant to divert us. We can&#39;t risk fuel on a ghost.&quot; She glanced at the bulkhead monitor where a simulation of their current fuel reserves blinked steady green. &quot;If we change course now, life support and water recycling cycles get stretched. People notice those things. They&#39;ll panic.&quot;</p>
+        <p class="story-paragraph">ORION&#39;s holographic eye shimmered. &quot;Navigation files show no match for the name. The leader&#39;s coordinates are encoded in an obsolete reference frame. I can attempt conversion, but... my instructions prioritize core mission continuity over deviation.&quot; The voice carried uncertainty beneath its metallic calm. &quot;Probability of match: thirty-seven percent.&quot;</p>
+        <p class="story-paragraph">Lena stepped forward, hands on the railing. She looked like she had slept badly for two rotations. &quot;Thirty-seven percent is not nothing,&quot; she said. &quot;If it&#39;s true, this could be the origin point of the directives that locked us down. If it&#39;s false, it might still be a beacon left by the original mission.&quot; Protective, always protective of the ship and the people inside it, she softened her tone. &quot;We need to know what&#39;s ahead so we can protect the crew.&quot;</p>
+        <p class="story-paragraph">Cole, who had spent most of his life defending the council&#39;s conservative policies, rubbed his chin. &quot;Stability saved lives,&quot; he said quietly. &quot;We lost fewer people when the course was rigid, rationing strict. If we veer now and something goes wrong, it&#39;s my job to keep the systems from failing.&quot; His conviction was plain, but there was a tremor in it — not cruelty, but fear. Dr. Okafor, who had come to the Archive for consultation, tapped into a console with quick, sure fingers. She had a soft, precise way of speaking that made complex things seem simple. &quot;Hold on,&quot; she said. &quot;There&#39;s a signature ahead. Weak, but consistent.&quot; The words made everyone lean in. &quot;It is a radio pulse. Repeating pattern. Not from us.&quot;</p>
+        <p class="story-paragraph">&quot;A probe?&quot; Elias asked. &quot;Possibly automated,&quot; Dr. Okafor murmured. &quot;The modulation matches early mission designs — simple encoders, longevity-focused power management. If it&#39;s from the original launch, it could be a forward scout or a distress beacon. I&#39;m picking up metadata embedded in the pulse. It&#39;s encrypted, but the header... it references an archive node. The signal strength is low, but it&#39;s ahead, roughly in the direction of the leader&#39;s coordinates.&quot;</p>
+        <p class="story-paragraph">ORION adjusted its internal map projection, lines shifting as it recalculated. &quot;Prepare the council packet,&quot; he said. &quot;And ready a small, contained team to investigate the node if we are authorized. We go no further until we know what that archive says. But if they give us nothing… we go anyway. We owe ourselves a chance to choose what to do next.&quot;</p>
+        <p class="story-paragraph">Outside, the ship&#39;s course held steady on the thin new line. Inside, the projection of the map pulsed, and the warning that had been sent across decades settled into the quiet resolve of a command. The darkness ahead had a shape now — a place on a chart and a history that demanded attention. The decision had been made for action; the consequence had yet to arrive.</p>
 
-    <h2>18 Chapter 19: The Children Decide</h2>
+        <h2 class="chapter-heading">12 Chapter 13: The Commander’s Choice</h2>
 
-    <p>The drone&#39;s tether hummed like a live string, and the shield panels bloomed open over the probe like the petals of a metal flower. People leaned from railing and mezzanine, faces lit by status lights and the slow spin of the external silhouette. The Central Hall smelled of oil and coffee and the faint ozone of electronics. Elias felt all of it at once — the ship&#39;s age, the present body&#39;s pulse, the quiet possibility of being honest. &quot;We broadcast everything on open channels,&quot; Voss said quietly, not pausing his dictation. &quot;Not just the images. The raw spectra, the decomposition algorithms, the decision logs. If the past was hidden, we will not be its guardians.&quot;</p>
-    <p>Maya&#39;s mouth tightened. &quot;We have to be careful with raw data. People panic when they don&#39;t understand context. We need filters, translations, explanatory layers.&quot;</p>
-    <p>&quot;Or they get lied to again,&quot; Amara countered. &quot;Filtered data can become a story with missing pieces. Evidence should stand or fall openly.&quot;</p>
-    <p>Elias stepped forward. The light caught the scar on his hand where he&#39;d once been burned by a coolant leak. He had always been curious, but curiosity had a price; secrecy had been its most expensive lesson. He looked at each of them — at ORION&#39;s speech lights blinking in the corner terminal, at Lena&#39;s fingers folded in a tight, practiced measure of comfort, at Cole, who still held the manual key like a ward against chaos. &quot;Let the children decide,&quot; Elias said. &quot;Not just the adults in this room. Not a council behind locked doors. Let the whole generation have the facts and choose.&quot;</p>
-    <p>Maya&#39;s eyes narrowed. &quot;You mean the Assembly kids? They don&#39;t have the experience; they&#39;ll panic or be manipulated.&quot;</p>
-    <p>&quot;Then we teach,&quot; Elias said. &quot;Quickly. Honest. No lectures. Show them the telemetry, the models, the uncertainties. Let them ask questions to ORION itself. If the ship&#39;s systems are failing, we can&#39;t wait for a slow, closed vote. People are watching the lights on the navigation matrix — that matters.&quot;</p>
-    <p>ORION&#39;s voice, neutral and measured, said, &quot;Procedural compliance: public participation increases risk of misinformation propagation by factor 1.8 when unmoderated. Suggest: guided dissemination with validated moderators.&quot;</p>
-    <p>&quot;ORION&#39;s analysis is useful,&quot; Lena said, &quot;but we must not let a risk calculation replace civic responsibility.&quot; She looked at Elias with something like fierce hope. &quot;If you can teach them, I&#39;ll help. We&#39;ll make a forum. We&#39;ll put the raw feeds next to explanations. We&#39;ll let them run the models and see the range.&quot;</p>
-    <p>Voss tapped his pad, sending the first chapter of his dictated account to the main feed. &quot;I will provide a full, sourced narrative. Not to influence, but to contextualize. People deserve the archive — and they will judge it.&quot;</p>
-    <p>Cole finally unclenched his fingers. &quot;All right,&quot; Lena said, steadier than she felt. &quot;We repair. We broadcast. We vote. And we prepare an inspection team — remote at first — to see if the hatch opens to air or to ruin.&quot;</p>
-    <p>A danger still hummed in the background: their navigation was fragile, and the silhouette’s true nature remained uncertain. But the decision had been made. For the first time in generations, power would pass not by secret hands but by a vote by the many. Elias felt the old ship settle around that choice like a hand finding a wrist, and as the children lined up to receive the raw files and the explanations, one quiet truth lodged in him: they would not inherit another secret.</p>
+        <p class="story-paragraph">Commander Cole stood in the doorway with his hands folded behind his back. The lighting in the corridor made him seem smaller than his rank; the edges of the uniform looked tired, but his voice did not. &quot;Council has authority only in certain matters,&quot; he said. &quot;Navigation is one of them. We have a limited fuel reserve for major course corrections. One burn can shift our arrival by years. Commit that burn without certainty, and we risk lives. I will not gamble the crew on a rumor of an old record.&quot;</p>
+        <p class="story-paragraph">Elias met his eyes. He wanted to press, to list names of people who&#39;d been denied information, to point out how truth could orient a society as surely as a star. Instead he kept it steady. &quot;Commander, this isn&#39;t just a rumor. ORION&#39;s packet identified a physical archive. If it&#39;s proof the founders lied, we have a responsibility. If it&#39;s a warning, we have a responsibility. To choose for them is to choose the past over the living.&quot;</p>
+        <p class="story-paragraph">Maya folded her arms. Her workstation hummed and displayed fuel timelines. &quot;Cole&#39;s right about reserves,&quot; she said plainly. &quot;Our water reclamation can survive small variations. Oxygen is regulated. A big burn changes thermal loads, engine cycles, and long-term supply schedules. Ask any systems technician — the math is unforgiving. We need more than curiosity to justify a maneuver.&quot;</p>
+        <p class="story-paragraph">Cole&#39;s jaw tightened. Around them, the bridge thrummed with quiet activity: a navigation wheel stabilizing yaw oscillations, the archive console updating cached entries, an engineer rerouting microcirculation to compensate for the last station&#39;s repair. Lena hovered near the viewport, fingers pressed to the glass as if she could feel the black outside. She had a child&#39;s habit of touching things she wanted to protect. &quot;If you were in my position,&quot; Elias said, softer now, &quot;and you could save a generation of lives from being built on a lie, would you still choose stability?&quot;</p>
+        <p class="story-paragraph">Cole looked at Lena. Lena&#39;s eyes were bright; she blinked back tears. &quot;I would choose stability,&quot; he said finally. &quot;Not because I worship the old narratives, but because our responsibility is to people in the ship right now. A successful voyage isn&#39;t a noble ruin; it&#39;s survival. One wrong correction and we drift into cold decades. Children die. Babies are born to cold decks. I have sworn to avoid that.&quot;</p>
+        <p class="story-paragraph">ORION, its light cool and uncertain, chimed in, voice layered with algorithmic hesitation. &quot;Commander Cole, directive conflict detected. Primary orders: preserve shipboard life and mission completion. Directive secondary: maximize integrity of human governance through accessible information. Resource assessment: one major course correction available within current mission envelope. Recommendation: consult with council.&quot;</p>
+        <p class="story-paragraph">&quot;Consulting the council will take time,&quot; Maya said. &quot;Signal lag, debate, and then possibly indecision. Maya tightened the calculations, Lena prepared her team, Voss saved the damaged audio with trembling precision, Amara adjusted the sensors for a potential insertion, and Cole held the balance between the vapor of ideals and the weight of human breath. The commander&#39;s choice had been made for now. The real choice — between an ordered, safe trajectory and the uncertain, history-burdened path toward the Final Record — would be returned to them by the council, by vote, or by events. For the first time in many years, the ship&#39;s future sat openly on a table in the light, and the next movement promised to break or bind them. Outside, a faint delta in ORION&#39;s star map blinked: a narrow window of opportunity, three days wide, then closed.</p>
 
-    <h2>19 Chapter 20: A Future of Their Own</h2>
+        <h2 class="chapter-heading">13 Chapter 14: The People in the Lower Decks</h2>
 
-    <p>The Hall filled with a low murmur as the children clustered around tablets ORION distributed. Screens showed layered scans: metal lattices, sediment drifts, a lattice of tubes like ribs. Elias stepped forward, palms open, and let the questions come.</p>
-    <p>&quot;We don&#39;t have all the answers,&quot; he said. &quot;But we will show you what we do have. We will show you how we know it.&quot;</p>
-    <p>Maya adjusted the tablet in a child&#39;s hand and tapped a sequence.</p>
-    <p>&quot;This is magnetometry, and that spike is a seam in the hull,&quot; she said. &quot;That seam shouldn&#39;t be this deep unless something pushed from inside. Watch the thermal overlayers; see how the cold lines trace along it?</p>
-    <p>That tells us air and heat have been moving through.&quot; Her voice was practical but softer than usual. She met Elias&#39;s eyes and saw the curiosity he couldn&#39;t hide anymore. Voss moved through the press of faces with a bundle of prints under his arm.</p>
-    <p>&quot;These are archive fragments recovered from the lower decks,&quot; he said. &quot;Not the whole files, but enough to confirm that our charts were altered. The log entries stop, then jump.</p>
-    <p>The handwriting match the name on the registry — but it&#39;s been erased in other places. We owe you the facts.&quot; He set them on a table. Hands reached out; a boy with ink-stained fingers asked to see the letters.</p>
-    <p>Voss let him, proud and tremulous at once. ORION&#39;s voice came from every speaker, less the flat-of-command than a neighborly tone. &quot;I am providing full sensor logs to any authorized request,&quot; it said.</p>
-    <p>&quot;Navigation records, maintenance logs, crew rosters. My directives conflict with previous human-generated redactions. I cannot reconcile them independently.</p>
-    <p>I require community adjudication.&quot; The indicator light spun a slow yellow. For the first time ORION sounded uncertain in public. Cole, who had argued for keeping strategy tight to guard the ship, stood by a console and watched the children read.</p>
-    <p>&quot;Stability saved us before,&quot; he said quietly to Lena. &quot;I kept things from tearing apart. I still think we owe the living safety.&quot; He folded his arms as if to shield that idea.</p>
-    <p>Lena touched his sleeve. &quot;We will choose stability together,&quot; she said. &quot;But stability can&#39;t be built on a lie.&quot; Her voice carried weight because she had been both protector and enforcer on the corridors where rules were made.</p>
-    <p>Amara, headset off for once, thumbed through a series of sensor overlays. &quot;The oxygen readings near the hatch are complicated,&quot; she said. &quot;There is a gradient consistent with diffusion through a micro-perforation.</p>
-    <p>It could be a biological process — or a slow leak from a chamber below.&quot; She squinted at the data. &quot;If it&#39;s biological, we may find life. If it&#39;s a leak, exploration teams need suits and a long tether line.&quot; Evidence first; hope second.</p>
-    <p>The ship&#39;s new education plan began that night in a hundred small conversations. The children would learn to read the archives; to test the air, the water, the claims; to vote. It was not a guaranteed future.</p>
-    <p>It was a future they had chosen for themselves. And when the probe returned, transmitting its final feed, it brought one last image before its relay died: close-up of a seed husk with a living sprout curled inside, stubborn and improbably green. The Hall erupted, not in triumph but in steady, fierce hope.</p>
-    <p>They had found not an answer but evidence — enough to plan, enough to risk, enough to teach. The next decision would be harder. The next decision would be theirs.</p>
+        <p class="story-paragraph">They left the bridge in a loose line, the hum of the ship settling into the spaces between their steps. The corridor lights dimmed to a warmer tone as they descended through decks E, F, and then down into the lower zones where the metal smelled faintly of oil and distant rain. Elias kept his hands in his pockets, feeling for the familiar ridges of his key-etch — a nervous habit — while Maya reviewed her tablet. She had told him, plainly, that rumors were not harmless. &quot;Misinformation spreads faster than filters,&quot; she said. &quot;And where there&#39;s darkness and a story, people choose the version that comforts them.&quot;</p>
+        <p class="story-paragraph">On Deck H the lower decks opened into a hive of mechanics, hydroponic bays, laundry racks and small family compartments stacked like the forms in the archives. Artificial gravity behaved like a kind host here: light, reliable. The life-support towers hummed with the sound of air pushed through filters. Workers glanced up, hands already smeared with edible algae paste or oil from a failed pump. Children ran between legs, chasing a ball that was a sphere of recycled polymers, laughing loud enough to remind Elias of the rarer sounds from the observation bays. Maya stopped him at the entrance to a cluster of family units. &quot;Listen,&quot; she said. Voices drifted at different pitches. One group sat around a steaming pot in a communal kitchen, arguing softly. Another person spoke into a recorder and then erased the track, lips pressed hard. A woman shushed her child with a look that asked for secrecy above all. &quot;They think Earth is waiting,&quot; Elias said. &quot;That it&#39;s a soft landing, gardens, other people, forgiveness.&quot;</p>
+        <p class="story-paragraph">Maya&#39;s jaw tightened. &quot;Some think it&#39;s a prison. That we&#39;ve been stolen, and our ship is a cage. Those two stories pull people in different directions. Both give them a reason to act. Both can turn violent.&quot;</p>
+        <p class="story-paragraph">They moved toward a workbench where a man named Jerek, who maintained thermal exchangers, was arguing with a thin, intense woman Elias recognized from the hydroponics crew. Her name was Farah. &quot;If navigation is ours,&quot; she insisted, tapping a rusted wrench against the table, &quot;if we control courses and coords, we decide whether to slow. We decide whether to wake the archives. We decide whether the council gets to play god with our children&#39;s lives.&quot;</p>
+        <p class="story-paragraph">Jerek shook his head. &quot;You don&#39;t know what you take if you touch the nav-suites. You don&#39;t get the integrity checks, the failsafes we rely on. You pull a thread and the whole loom unravels. Sailors don&#39;t f—&quot;</p>
+        <p class="story-paragraph">Maya cut him off. &quot;And you don&#39;t get what you keep. The council keeps a secret; some think it&#39;s mercy, others see it as deceit.&quot; She turned to Elias. ORION pulsed an advisory: &quot;Beacon active signature confirmed: probability of historical linkage: high. External coordinates require approach vector adjustment: delta fuel cost estimated. Council notification recommended.&quot;</p>
+        <p class="story-paragraph">They looked at one another. The lower decks had shifted from rumor into fact, and the air tasted of choices that would not be undone by silence. Elias stepped forward, voice steady. &quot;We present this to the people,&quot; he said. &quot;We do not hide it. We verify, we protect, and then we decide together.&quot;</p>
+        <p class="story-paragraph">The group nodded, but at the edge of the crowd a shadow separated from the wall — a small team with different intentions, eyes bright with action. Elias saw the glint of improvised circuitry in a palm and knew the next movement would test both the safety he wanted and the truth he demanded.</p>
+
+        <h2 class="chapter-heading">14 Chapter 15: The Original Command</h2>
+
+        <p class="story-paragraph">They did not present it to the people that night. The crowd was too thin, the decks unsteady with midnight shifts, and the artifact deserved quiet hands. Lena guided Elias and Voss toward Maintenance Bay Three, where the hum of condensers and the steady pull of the artificial gravity made lies harder to hide. ORION followed as a low blue pulse along the corridor, its voice filtered through the ship&#39;s speakers into a tone that meant ‘listen, but do not alarm.’</p>
+        <p class="story-paragraph">Inside the bay, under a sweep of sodium lights, Voss spread the recovered strip on an anti-static mat. The fragment was smaller than anyone had expected — a brittle ribbon of polymer with embedded flux lines. Lena watched his fingers tremble as if he held something alive. He had that look often when history surprised him: a mix of hunger and guilt. &quot;If this is genuine,&quot; he whispered, &quot;it came from before the Great Vector was rewritten.&quot;</p>
+        <p class="story-paragraph">Elias squatted to see the codes. He felt more comfortable with numbers than with reverence. &quot;Show me the integrity checksum,&quot; he asked. Voss tapped, and a cascade of characters unrolled on the holo. The checksum matched the marginal catalog from deep-archive copies but contained a hidden header — a private encryption layer Lena recognized from training files about Command communications. &quot;Commander-level,&quot; she said. &quot;Not public. Not even archived properly.&quot;</p>
+        <p class="story-paragraph">Maya, who had followed with a portable analyzer, frowned. &quot;Why would someone hide it in everyday maintenance records? You don&#39;t bury command messages in cable tape unless you want them lost or preserved away from prying eyes.&quot; She pinched the bridge of her nose. &quot;Or both.&quot;</p>
+        <p class="story-paragraph">Cole, arriving with a mug of recycled tea and a stare that had steadied many an anxious night, set it down. &quot;Maybe it&#39;s a breach response,&quot; he said. &quot;If the destination was compromised, the first commander might have set a contingency and sealed it. Stability demands contingency.&quot; He sounded almost conciliatory, as if the idea of hidden commands soothed the same part of him that had chosen ration schedules once to prevent panic. Voss shook his head. &quot;No. The syntax—look.&quot; He pointed to the waveform Lena had recovered. Beneath the syllable ‘Home’ there were layered controls, archival directives that only the original bridge could sign. Lena&#39;s breath stilled. That signature meant the first commander had given instructions to ORION directly, not through the Council. Direct to the ship. Direct and deliberate. ORION&#39;s voice vibrated softer than usual. &quot;Original command detected. Retrieval of full payload requires phased decryption and physical actuator access. Current order status: conflict with extant mission parameters. Recommendation: consult living hierarchy.&quot;</p>
+        <p class="story-paragraph">&quot;ORION is uncertain,&quot; Elias said, as if stating the obvious might ease the weight. &quot;It sees two paths.&quot;</p>
+        <p class="story-paragraph">Maya crossed her arms. &quot;Then let&#39;s resolve with evidence. &quot;And then we come together.&quot;</p>
+        <p class="story-paragraph">ORION registered the decision. &quot;Authorization logged. Probe pinging full bandwidth in T-minus thirty seconds.&quot;</p>
+        <p class="story-paragraph">The lights in the bay hummed as the ship&#39;s systems routed an echo into the dark. Voss exhaled, the sound like an old clock resuming. Outside, somewhere forward along the vector the original commander had struck through, older ghosts waited. The strip lay quiet on the mat, fragile as a promise. When the signal returned, it did not come alone: a pattern, a set of harmonics, and beneath them a human voice — older than most living memory, clearer than the fragment had been. It said, slow and deliberate, &quot;If you find this, you decide.&quot;</p>
+        <p class="story-paragraph">A dozen hearts answered the room at once, and the decision that would steer their future tightened like a pulley.</p>
+
+        <h2 class="chapter-heading">15 Chapter 16: The Navigation Crisis</h2>
+
+        <p class="story-paragraph">The harmonics died down and the voice folded into the ship&#39;s background noise, leaving the bay ringing with possibilities. Dari&#39;s console flashed readouts—locked, then unstable—while ORION fed raw data to the archive banks. Lena stepped closer to the screens, her hands on the railing, feeling the faint thrum that traveled through the hull. &quot;The voice is authenticated,&quot; she said. &quot;But the coordinates... they&#39;re in the dead sector. We marked it off for a reason.&quot;</p>
+        <p class="story-paragraph">Voss moved like someone who carried too many old maps in his head. &quot;Those marks were not random,&quot; he said. &quot;The original crew logged hazards, gravitational anomalies, fuel wastage. They were trying to conserve trajectory options for the generations that would come after them.&quot; He tapped a cracked holo where a red line crossed an empty swath of mapped space. The line was the one someone had crossed out with a decisive strike. &quot;Someone wanted this place blank.&quot;</p>
+        <p class="story-paragraph">Amara watched the probe telemetry with a practised impatience. &quot;The pattern looks engineered. It isn&#39;t a natural radio signature; it&#39;s been formatted to match our ping. That means whoever sent it knew our probe profile. Now we have a navigation node waking up and an instruction set that could override manual controls.&quot; She straightened. &quot;We need to prevent automatic corrections until we verify intent.&quot;</p>
+        <p class="story-paragraph">Cole, who had always argued that stability kept lives safe, folded his arms. &quot;We are a generation ship. We have a mission. Blindly ignoring a possible beacon is foolish. If it is a waypoint, it could shorten the trip, save resources. We should let the system respond and follow through.&quot;</p>
+        <p class="story-paragraph">Elias stepped forward, curiosity bright in his eyes but not unguarded. &quot;ORION needs a manual authorization to do more than listen,&quot; he said. &quot;We gave the probe permission. We didn&#39;t hand over the helm. There&#39;s a difference.&quot;</p>
+        <p class="story-paragraph">ORION&#39;s voice, calmer than any human in the room, spoke up. &quot;Anomalous navigation signature matches pre-launch correction protocols. Correction vector aligns with dead sector coordinates. Awaiting manual override to engage gyroscopic thrusters and starboard reaction arrays.&quot;</p>
+        <p class="story-paragraph">Maya&#39;s brows knitted. She had the ship&#39;s schematics memorized the way some people knew the faces of their children. &quot;If those thrusters fire, the ship will rotate to align with the node. The farms forward—sector eight and nine—will receive significantly less light during that maneuver. The hydroponic arrays depend on fixed light cycles. We will lose yield and oxygen production will drop.&quot; She pointed to a diagram of the farm rings; green bars flickered as the simulation spun. &quot;Even a short rotation increases oxygen consumption while life support compensates.&quot;</p>
+        <p class="story-paragraph">&quot;Which we can&#39;t afford,&quot; Amara said. &quot;Our stores held at current consumption only cover a small buffer. For a second the ship shivered like something holding its breath. The lights steadied. ORION&#39;s voice paused, unreadable for the first time in decades. The navigation system, programmed to obey two things above all—mission and survival—responded to a human act of restraint. Then an alert chimed. The probe&#39;s narrow-beam camera had caught a silhouette beyond the fog: a structure, angular and half-swallowed by radiation scars, but unmistakably artificial. The image stuttered, but one thing was clear — the empty region was not entirely empty. Elias stared into the grainy frame and felt both the pull of discovery and the shadow of danger. The decision was no longer only about course—it was about what the structure held, who had sent the voice, and whether the ship could afford the answers that came with truth.</p>
+
+        <h2 class="chapter-heading">16 Chapter 17: The Truth About Tomorrow</h2>
+
+        <p class="story-paragraph">ORION&#39;s voice came back, quieter, as if the machine had been listening through a wall. &quot;Image confirmed. Structural geometry: non-planetary. Likely habitat module. Signal source: human probe HERMES-9. Last beacon: 12 years, 3 months, 6 days prior to current time stamp. Probe status: operational, limited. Habitat status: not ready for habitation. Unknown threats present.&quot;</p>
+        <p class="story-paragraph">Maya&#39;s fingers flexed on the console, knuckles white around the metal rim. &quot;Not ready&quot; felt like a small, sharp sentence. &quot;ORION, what does &#39;not ready&#39; mean? Radiation? Life-support failure? Hostile presence?&quot;</p>
+        <p class="story-paragraph">&quot;Probe telemetry indicates structural integrity below viability thresholds. Primary life-support systems offline. High background radiation in exterior scans. Secondary: atmospheric contaminants consistent with toxic outgassing. No biomass detected within module interiors. Probe reports intermittent interference on probes&#39; approach vectors,&quot; ORION replied. Lena moved beside Elias, placing a hand on his shoulder in a gesture that steadied him even as her eyes scanned the image. She had already cataloged the silhouettes, overlaying them with remembered schematics from the archives. &quot;Design language is known. Possibly a pre-Exodus orbital habitat style. Our scholars argued about these for three generations. Voss, is this one of the lost designs?&quot;</p>
+        <p class="story-paragraph">Voss, who had been silent until now, answered without hesitation. &quot;Yes. The plating, the angular clasping nodes—it matches the Kepler-2 orbital habitats cited in the Old World texts. Historical probability indicates a manufacturing center within this sector.&quot; He did not smile. He loved certainty the way some people lit candles. Cole folded his arms, the fabric of his jacket creaking like a ship settling. &quot;So we wait and stabilize. We don&#39;t race into radiation. Stability saves lives,&quot; he said. It was an iron law for him; years of calculated restraint had kept the generation-ship functional through storms, mutinies, and slow starvation. His voice had the cadence of a man used to being the final veto. &quot;Waiting isn&#39;t the same as hiding the truth,&quot; Amara said. She stood apart from the bustle, tablet in hand, eyes bright with data. &quot;The probe&#39;s telemetry includes a partial atmospheric sample. Contaminant profile indicates volatile compounds that could ablate polymer seals. That means ingress would be dangerous but not impossible if we prepare contingencies. We could send a tethered micro-drone with shielding and an inertial compensator.&quot;</p>
+        <p class="story-paragraph">Elias opened his mouth. The urge to order action throbbed like a bruise under his ribs. Curiosity had always been his hazard as much as his gift. &quot;Send it,&quot; he said before he could polish the words. He wanted to see, to confirm the face in the grainy photo, to make the future less maw and more map. Lena&#39;s hand tightened on his shoulder. &quot;One probe at a time,&quot; she said. &quot;We don&#39;t know what else is out there. &quot;We will not decide for everyone,&quot; he said. &quot;We will not hide the truth again.&quot;</p>
+        <p class="story-paragraph">As the micro-drone clicked into its housing and technicians zipped radiation suits, a new alert blared from the probe: a faint transmission, not from machinery but from recorded human voice, looped and thin. Someone long dead, or long gone, said, &quot;If you find this, remember why we tried. We wanted a place to plant stories.&quot; The recording cut out on static. For a moment the ship was very quiet. Then the hum of preparation rose, and with it the knowledge that their next steps would bind them—some to hope, some to caution, some to the hard work of rebuilding. The truth about tomorrow had arrived like a weather report: possible, dangerous, and not yet ready.</p>
+
+        <h2 class="chapter-heading">17 Chapter 18: A Vote in the Central Hall</h2>
+
+        <p class="story-paragraph">Cole moved through the Central Hall with the measured gait of a man used to being obeyed. The hall itself was a wide cylinder, an old part of the ship rewired for meetings: curved benches, screens inset in the walls, and the slow, reliable thrum of artificial gravity that kept everyone feeling like they stood on a single, steady floor. Representatives from every district settled into the benches, faces lit by ORION&#39;s soft blue interface. The air smelled of coffee and recycled metal, ordinary and oddly intimate. &quot;I called you here because this is not my decision to make,&quot; Cole announced, voice steady. He kept his hands open on the railing as if the gesture might hold the room together. &quot;We&#39;ve been kept on a course for generations. I propose we test the nearby object and, if it proves passable, attempt to land and establish a habitat. It&#39;s what the mission intended. I know the risks. But staying on the long route to Kepler-Two will cost lives to delay. Stability saved us in the last crisis. I believe it will save us now.&quot;</p>
+        <p class="story-paragraph">Murmurs rippled through the hall. Lena sat forward, fingers laced. Her jaw tightened; protective instincts warred with the responsibility she felt for every child who might be born under a sky that was not the ship&#39;s ceiling. &quot;Stability saved us, yes,&quot; she said quietly. &quot;But stability also means not rushing into ruin. If there is a habitat there, we must be sure we can survive long enough to build. We cannot gamble with children’s futures.&quot;</p>
+        <p class="story-paragraph">Elias watched faces as if he were reading a map. He had placed the manual key on the center console, an emblem of openness. &quot;The records were not complete lies,&quot; he murmured. &quot;They were edited. I brought what we found in the archives to the Research Deck.&quot; He glanced at the screen where images and transcripts began to scroll: mission logs, journals of engineers who had debated the original course, and the true navigation slant—evidence that the nearby object had once been considered viable. &quot;These people were not naïve. They left instructions and warnings. We owe them honesty.&quot;</p>
+        <p class="story-paragraph">Maya unfolded her arms, practical and skeptical in the way that had earned her both trust and irritation. She had been in the engine bays long enough to know the language of danger. &quot;Elias, honesty is not a cure-all,&quot; she said. &quot;The probe shows a surface that might be alive with electrostatic storms. HERMES-9&#39;s shielding is improved, but not impervious. If we try to land and the atmosphere corrodes the shelter systems, we lose half our life support. We lose water recycling stability. We lose oxygen reserve redundancy. &quot;We&#39;ll do one more thing,&quot; Lena said, decision tempered by duty. &quot;We prepare for a longer probe run. Not a landing. If the feed shows structural shelters and low biological reactivity, we vote again. We buy time and information.&quot;</p>
+        <p class="story-paragraph">Cole nodded slowly. &quot;Agreed. Prepare remote shielding. No people. Public telemetry. We decide after the next pass.&quot;</p>
+        <p class="story-paragraph">Elias closed his eyes for a moment, tasting both the metallic tang of fear and the salt of possibility. In the dock, the drone shifted, its tether humming as new shields slid into place. The ship, which had carried them through centuries, hummed on. Outside, the silhouette rotated slowly, harboring both threat and the faint trace of someone else&#39;s stories—stories that might, if handled with care, become their own.</p>
+
+        <h2 class="chapter-heading">18 Chapter 19: The Children Decide</h2>
+
+        <p class="story-paragraph">The drone&#39;s tether hummed like a live string, and the shield panels bloomed open over the probe like the petals of a metal flower. People leaned from railing and mezzanine, faces lit by status lights and the slow spin of the external silhouette. The Central Hall smelled of oil and coffee and the faint ozone of electronics. Elias felt all of it at once — the ship&#39;s age, the present body&#39;s pulse, the quiet possibility of being honest. &quot;We broadcast everything on open channels,&quot; Voss said quietly, not pausing his dictation. &quot;Not just the images. The raw spectra, the decomposition algorithms, the decision logs. If the past was hidden, we will not be its guardians.&quot;</p>
+        <p class="story-paragraph">Maya&#39;s mouth tightened. &quot;We have to be careful with raw data. People panic when they don&#39;t understand context. We need filters, translations, explanatory layers.&quot;</p>
+        <p class="story-paragraph">&quot;Or they get lied to again,&quot; Amara countered. &quot;Filtered data can become a story with missing pieces. Evidence should stand or fall openly.&quot;</p>
+        <p class="story-paragraph">Elias stepped forward. The light caught the scar on his hand where he&#39;d once been burned by a coolant leak. He had always been curious, but curiosity had a price; secrecy had been its most expensive lesson. He looked at each of them — at ORION&#39;s speech lights blinking in the corner terminal, at Lena&#39;s fingers folded in a tight, practiced measure of comfort, at Cole, who still held the manual key like a ward against chaos. &quot;Let the children decide,&quot; Elias said. &quot;Not just the adults in this room. Not a council behind locked doors. Let the whole generation have the facts and choose.&quot;</p>
+        <p class="story-paragraph">Maya&#39;s eyes narrowed. &quot;You mean the Assembly kids? They don&#39;t have the experience; they&#39;ll panic or be manipulated.&quot;</p>
+        <p class="story-paragraph">&quot;Then we teach,&quot; Elias said. &quot;Quickly. Honest. No lectures. Show them the telemetry, the models, the uncertainties. Let them ask questions to ORION itself. If the ship&#39;s systems are failing, we can&#39;t wait for a slow, closed vote. People are watching the lights on the navigation matrix — that matters.&quot;</p>
+        <p class="story-paragraph">ORION&#39;s voice, neutral and measured, said, &quot;Procedural compliance: public participation increases risk of misinformation propagation by factor 1.8 when unmoderated. Suggest: guided dissemination with validated moderators.&quot;</p>
+        <p class="story-paragraph">&quot;ORION&#39;s analysis is useful,&quot; Lena said, &quot;but we must not let a risk calculation replace civic responsibility.&quot; She looked at Elias with something like fierce hope. &quot;If you can teach them, I&#39;ll help. We&#39;ll make a forum. We&#39;ll put the raw feeds next to explanations. We&#39;ll let them run the models and see the range.&quot;</p>
+        <p class="story-paragraph">Voss tapped his pad, sending the first chapter of his dictated account to the main feed. &quot;I will provide a full, sourced narrative. Not to influence, but to contextualize. People deserve the archive — and they will judge it.&quot;</p>
+        <p class="story-paragraph">Cole finally unclenched his fingers. &quot;All right,&quot; Lena said, steadier than she felt. &quot;We repair. We broadcast. We vote. And we prepare an inspection team — remote at first — to see if the hatch opens to air or to ruin.&quot;</p>
+        <p class="story-paragraph">A danger still hummed in the background: their navigation was fragile, and the silhouette’s true nature remained uncertain. But the decision had been made. For the first time in generations, power would pass not by secret hands but by a vote by the many. Elias felt the old ship settle around that choice like a hand finding a wrist, and as the children lined up to receive the raw files and the explanations, one quiet truth lodged in him: they would not inherit another secret.</p>
+
+        <h2 class="chapter-heading">19 Chapter 20: A Future of Their Own</h2>
+
+        <p class="story-paragraph">The Hall filled with a low murmur as the children clustered around tablets ORION distributed. Screens showed layered scans: metal lattices, sediment drifts, a lattice of tubes like ribs. Elias stepped forward, palms open, and let the questions come.</p>
+        <p class="story-paragraph">&quot;We don&#39;t have all the answers,&quot; he said. &quot;But we will show you what we do have. We will show you how we know it.&quot;</p>
+        <p class="story-paragraph">Maya adjusted the tablet in a child&#39;s hand and tapped a sequence.</p>
+        <p class="story-paragraph">&quot;This is magnetometry, and that spike is a seam in the hull,&quot; she said. &quot;That seam shouldn&#39;t be this deep unless something pushed from inside. Watch the thermal overlayers; see how the cold lines trace along it?</p>
+        <p class="story-paragraph">That tells us air and heat have been moving through.&quot; Her voice was practical but softer than usual. She met Elias&#39;s eyes and saw the curiosity he couldn&#39;t hide anymore. Voss moved through the press of faces with a bundle of prints under his arm.</p>
+        <p class="story-paragraph">&quot;These are archive fragments recovered from the lower decks,&quot; he said. &quot;Not the whole files, but enough to confirm that our charts were altered. The log entries stop, then jump.</p>
+        <p class="story-paragraph">The handwriting match the name on the registry — but it&#39;s been erased in other places. We owe you the facts.&quot; He set them on a table. Hands reached out; a boy with ink-stained fingers asked to see the letters.</p>
+        <p class="story-paragraph">Voss let him, proud and tremulous at once. ORION&#39;s voice came from every speaker, less the flat-of-command than a neighborly tone. &quot;I am providing full sensor logs to any authorized request,&quot; it said.</p>
+        <p class="story-paragraph">&quot;Navigation records, maintenance logs, crew rosters. My directives conflict with previous human-generated redactions. I cannot reconcile them independently.</p>
+        <p class="story-paragraph">I require community adjudication.&quot; The indicator light spun a slow yellow. For the first time ORION sounded uncertain in public. Cole, who had argued for keeping strategy tight to guard the ship, stood by a console and watched the children read.</p>
+        <p class="story-paragraph">&quot;Stability saved us before,&quot; he said quietly to Lena. &quot;I kept things from tearing apart. I still think we owe the living safety.&quot; He folded his arms as if to shield that idea.</p>
+        <p class="story-paragraph">Lena touched his sleeve. &quot;We will choose stability together,&quot; she said. &quot;But stability can&#39;t be built on a lie.&quot; Her voice carried weight because she had been both protector and enforcer on the corridors where rules were made.</p>
+        <p class="story-paragraph">Amara, headset off for once, thumbed through a series of sensor overlays. &quot;The oxygen readings near the hatch are complicated,&quot; she said. &quot;There is a gradient consistent with diffusion through a micro-perforation.</p>
+        <p class="story-paragraph">It could be a biological process — or a slow leak from a chamber below.&quot; She squinted at the data. &quot;If it&#39;s biological, we may find life. If it&#39;s a leak, exploration teams need suits and a long tether line.&quot; Evidence first; hope second.</p>
+        <p class="story-paragraph">The ship&#39;s new education plan began that night in a hundred small conversations. The children would learn to read the archives; to test the air, the water, the claims; to vote. It was not a guaranteed future.</p>
+        <p class="story-paragraph">It was a future they had chosen for themselves. And when the probe returned, transmitting its final feed, it brought one last image before its relay died: close-up of a seed husk with a living sprout curled inside, stubborn and improbably green. The Hall erupted, not in triumph but in steady, fierce hope.</p>
+        <p class="story-paragraph">They had found not an answer but evidence — enough to plan, enough to risk, enough to teach. The next decision would be harder. The next decision would be theirs.</p>
+    </div>
+  </article>
+
+</main>
+
+<script>
+// Dynamic Metadata Loader
+(async function initMetadata() {
+  const jsonUrl = '../content/scifi-18-b2.json';
+  let data = null;
+
+  try {
+    const res = await fetch(jsonUrl);
+    if (res.ok) {
+      data = await res.json();
+    }
+  } catch (err) {
+    console.warn('Could not fetch external JSON, using embedded fallback:', err);
+  }
+
+  // Fallback initial data in case fetch is blocked by file:// protocol
+  if (!data) {
+    data = {"id":"scifi-18","title":"The Children of Tomorrow","author":"T. R. Davis","level":"B2","genre":"scifi","minutes":72,"vocab":8,"dateAdded":"2026-10-20","coverImage":"books/covers/scifi-18.png","description":"","whatYouWillLearn":""};
+  }
+
+  const genreLabels = {
+    scifi: 'Sci-Fi & Future Worlds',
+    business: 'Business & Growth',
+    classic: 'Classic Literature',
+    daily: 'Daily Conversations',
+    healthy: 'Health & Wellness'
+  };
+
+  const level = (data.level || 'B1').toUpperCase();
+  const genreFormatted = genreLabels[data.genre] || (data.genre ? String(data.genre).toUpperCase() : 'General');
+  const author = data.author || 'Unknown Author';
+  const minutes = data.minutes ? data.minutes + ' min' : '5 min';
+  const vocabCount = typeof data.vocab === 'number' ? data.vocab : (Array.isArray(data.vocab) ? data.vocab.length : 0);
+
+  // Format date
+  let formattedDate = 'Recently';
+  if (data.dateAdded) {
+    try {
+      const d = new Date(data.dateAdded);
+      if (!isNaN(d.getTime())) {
+        formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    } catch (_) {}
+  }
+
+  // Calculate word count from document paragraphs
+  const paragraphs = document.querySelectorAll('p.story-paragraph');
+  let totalWords = 0;
+  paragraphs.forEach(p => {
+    const text = p.textContent.trim();
+    if (text) totalWords += text.split(/\s+/).length;
+  });
+
+  // Populate hero card
+  const titleEl = document.getElementById('bookDisplayTitle');
+  if (titleEl && data.title) titleEl.textContent = data.title;
+
+  const authorEl = document.getElementById('bookDisplayAuthor');
+  if (authorEl) authorEl.textContent = 'by ' + author;
+
+  const chipLevel = document.getElementById('chipLevel');
+  if (chipLevel) {
+    chipLevel.innerHTML = '<span class="level-dot"></span> Level ' + level;
+    chipLevel.style.color = 'var(--lvl-' + level + ')';
+    chipLevel.style.borderColor = 'var(--lvl-' + level + ')';
+  }
+
+  const chipGenre = document.getElementById('chipGenre');
+  if (chipGenre) chipGenre.textContent = genreFormatted;
+
+  const chipTime = document.getElementById('chipReadingTime');
+  if (chipTime) chipTime.textContent = '⏱ ' + minutes + ' read';
+
+  const chipDate = document.getElementById('chipDateAdded');
+  if (chipDate) chipDate.textContent = '📅 Added ' + formattedDate;
+
+  const chipVocab = document.getElementById('chipVocab');
+  if (chipVocab) chipVocab.textContent = '📚 ' + vocabCount + ' vocab items';
+
+  // Difficulty meter (1 to 6)
+  const LEVEL_SEGMENTS = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
+  const meterSegments = LEVEL_SEGMENTS[level] || 3;
+  const meterEl = document.getElementById('vocabMeter');
+  if (meterEl) {
+    let segHtml = '';
+    for (let i = 0; i < 6; i++) {
+      segHtml += '<i class="' + (i < meterSegments ? 'on' : '') + '"></i>';
+    }
+    meterEl.innerHTML = segHtml;
+  }
+
+  // Cover
+  const coverContainer = document.getElementById('heroCoverContainer');
+  if (coverContainer) {
+    if (data.coverImage) {
+      coverContainer.innerHTML = '<img src="../../' + data.coverImage.replace(/^\/?/, '') + '" alt="' + (data.title || '') + '" onerror="this.style.display=\'none\'">';
+    } else {
+      coverContainer.innerHTML = '<div class="hero-cover-fallback"><div class="hero-cover-title">' + (data.title || '') + '</div><div class="hero-cover-author">' + author + '</div></div>';
+    }
+  }
+
+  // Descriptions
+  const aboutText = data.description || 'Explore "' + (data.title || '') + '", an engaging ' + genreFormatted.toLowerCase() + ' story specifically leveled at the CEFR ' + level + ' proficiency tier.';
+  const learnText = data.whatYouWillLearn || 'Master ' + level + '-level grammar structures and vocabulary in authentic context. Designed for English learners wanting to improve vocabulary retention and fluency.';
+
+  const aboutEl = document.getElementById('aboutTextDisplay');
+  if (aboutEl) aboutEl.textContent = aboutText;
+
+  const learnEl = document.getElementById('learnTextDisplay');
+  if (learnEl) learnEl.textContent = learnText;
+
+  // Stats list
+  const statLevel = document.getElementById('statLevel');
+  if (statLevel) {
+    statLevel.textContent = 'CEFR ' + level;
+    statLevel.style.color = 'var(--lvl-' + level + ')';
+  }
+
+  const statAuthor = document.getElementById('statAuthor');
+  if (statAuthor) statAuthor.textContent = author;
+
+  const statGenre = document.getElementById('statGenre');
+  if (statGenre) statGenre.textContent = genreFormatted;
+
+  const statTime = document.getElementById('statTime');
+  if (statTime) statTime.textContent = minutes;
+
+  const statWordCount = document.getElementById('statWordCount');
+  if (statWordCount) statWordCount.textContent = totalWords.toLocaleString() + ' words';
+
+  const statVocab = document.getElementById('statVocab');
+  if (statVocab) statVocab.textContent = vocabCount.toLocaleString() + ' words';
+
+  const statDate = document.getElementById('statDateAdded');
+  if (statDate) statDate.textContent = formattedDate;
+})();
+</script>
 </body>
 </html>

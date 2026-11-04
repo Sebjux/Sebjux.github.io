@@ -2,153 +2,694 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>When the Earth Woke Up</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Literata:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+    <style>
+      :root{
+        --bg-void:#04050A;
+        --bg-deep:#0A0C16;
+        --bg-elevated:#12141F;
+        --bg-reader:#0C0E18;
+
+        --glass-fill: rgba(20,22,36,.55);
+        --glass-fill-soft: rgba(20,22,36,.32);
+        --glass-border: rgba(255,255,255,.08);
+        --glass-border-hi: rgba(255,255,255,.16);
+
+        --text-primary:#F5F7FA;
+        --text-secondary:#A7AFC2;
+        --text-tertiary:#666E82;
+        --text-reader:#EAE6DD;
+
+        --neon-cyan:#4CF5E0;
+        --neon-blue:#7CACF8;
+        --neon-violet:#9B7BFF;
+        --neon-magenta:#F472B6;
+        --neon-amber:#FFC876;
+
+        --lvl-A1:#34D399;
+        --lvl-A2:#4CF5E0;
+        --lvl-B1:#7CACF8;
+        --lvl-B2:#9B7BFF;
+        --lvl-C1:#F472B6;
+        --lvl-C2:#FB7185;
+
+        --radius-card:20px;
+        --radius-panel:26px;
+        --radius-pill:999px;
+
+        --ease-out-expo:cubic-bezier(.16,1,.3,1);
+      }
+
+      *{box-sizing:border-box;}
+      html,body{height:100%;}
+      body{
+        margin:0;
+        background:var(--bg-void);
+        color:var(--text-primary);
+        font-family:'Inter',sans-serif;
+        -webkit-font-smoothing:antialiased;
+        overflow-x:hidden;
+        padding-top:env(safe-area-inset-top,0px);
+        padding-bottom:env(safe-area-inset-bottom,0px);
+      }
+      ::selection{background:rgba(155,123,255,.35); color:#fff;}
+
+      a,button{font-family:inherit;}
+      button{cursor:pointer; background:none; border:none; color:inherit;}
+      img{max-width:100%; display:block;}
+
+      :focus-visible{
+        outline:2px solid var(--neon-cyan);
+        outline-offset:3px;
+        border-radius:6px;
+      }
+
+      h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-0.01em;}
+      p{margin:0;}
+
+      /* AMBIENT BACKGROUND */
+      .ambient{
+        position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+      }
+      .ambient::before, .ambient::after{
+        content:''; position:absolute; border-radius:50%; filter:blur(90px); opacity:.28;
+      }
+      .ambient::before{
+        width:640px; height:640px; top:-220px; left:-160px;
+        background:radial-gradient(circle, var(--neon-violet), transparent 70%);
+      }
+      .ambient::after{
+        width:560px; height:560px; bottom:-260px; right:-140px;
+        background:radial-gradient(circle, var(--neon-cyan), transparent 70%);
+        opacity:.18;
+      }
+      .grain{
+        position:fixed; inset:0; z-index:1; pointer-events:none;
+        opacity:.05; mix-blend-mode:overlay;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      /* GLASS CONTAINER */
+      .glass{
+        background:var(--glass-fill);
+        backdrop-filter:blur(22px) saturate(140%);
+        -webkit-backdrop-filter:blur(22px) saturate(140%);
+        border:1px solid var(--glass-border);
+      }
+
+      /* TOPBAR */
+      .topbar{
+        position:sticky; top:0; z-index:40;
+        display:flex; align-items:center; justify-content:space-between;
+        gap:16px; padding:16px clamp(16px,4vw,48px);
+        padding-top:calc(16px + env(safe-area-inset-top,0px));
+        background:rgba(4,5,10,.65);
+        backdrop-filter:blur(18px);
+        -webkit-backdrop-filter:blur(18px);
+        border-bottom:1px solid var(--glass-border);
+      }
+      .brand{display:flex; align-items:center; gap:10px; flex-shrink:0; text-decoration:none; color:inherit;}
+      .brand-mark{
+        width:34px; height:34px; border-radius:10px;
+        background:linear-gradient(145deg, var(--neon-cyan), var(--neon-violet));
+        display:flex; align-items:center; justify-content:center;
+        box-shadow:0 0 24px -4px rgba(155,123,255,.7);
+      }
+      .brand-mark svg{width:18px; height:18px; color:#04050A;}
+      .brand-name{font-family:'Space Grotesk'; font-weight:600; font-size:1.05rem; letter-spacing:-.01em;}
+
+      .nav-tabs{
+        display:flex; gap:4px; padding:3px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        flex-shrink:0;
+      }
+      .nav-tab-btn{
+        padding:6px 14px; border-radius:var(--radius-pill); font-size:.82rem; font-weight:500;
+        color:var(--text-secondary); transition:all 180ms var(--ease-out-expo);
+        text-decoration:none; display:inline-flex; align-items:center;
+      }
+      .nav-tab-btn:hover{ color:var(--text-primary); }
+
+      /* MAIN LAYOUT */
+      .page-main{
+        position:relative; z-index:2;
+        max-width:1100px; margin:0 auto;
+        padding:32px clamp(16px,4vw,48px) 96px;
+      }
+
+      /* BACK LINK */
+      .back-link-btn{
+        display:inline-flex; align-items:center; gap:8px;
+        padding:8px 16px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border);
+        font-size:.85rem; font-weight:500; color:var(--text-secondary);
+        transition:all 180ms var(--ease-out-expo); margin-bottom:28px;
+        text-decoration:none;
+      }
+      .back-link-btn:hover{ color:var(--text-primary); border-color:var(--glass-border-hi); transform:translateX(-2px); }
+      .back-link-btn svg{ width:16px; height:16px; }
+
+      /* HERO META CARD */
+      .hero-meta-card{
+        position:relative; padding:clamp(24px,4vw,40px);
+        border-radius:32px; overflow:hidden;
+        margin-bottom:36px;
+      }
+      .hero-grid{
+        display:grid; grid-template-columns:220px 1fr; gap:36px; align-items:start;
+      }
+      @media (max-width:768px){
+        .hero-grid{ grid-template-columns:1fr; gap:24px; justify-items:center; text-align:center; }
+        .hero-meta-chips{ justify-content:center; }
+        .hero-actions-row{ justify-content:center; }
+      }
+
+      .hero-cover{
+        width:220px; aspect-ratio:2/3; border-radius:20px; overflow:hidden; position:relative;
+        box-shadow:0 24px 60px -16px rgba(0,0,0,.75); flex-shrink:0;
+        background:linear-gradient(160deg, #3b2d6b, #151829);
+      }
+      .hero-cover img{ width:100%; height:100%; object-fit:cover; }
+      .hero-cover-fallback{
+        position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
+        padding:18px 16px; background:linear-gradient(0deg, rgba(0,0,0,.85) 0%, transparent 80%);
+      }
+      .hero-cover-title{ font-family:'Space Grotesk'; font-size:1.05rem; font-weight:600; color:#fff; }
+      .hero-cover-author{ font-size:.8rem; color:rgba(255,255,255,.7); }
+
+      .hero-info{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+      .book-display-title{ font-size:clamp(1.8rem,3.2vw,2.5rem); font-weight:700; line-height:1.2; }
+      .book-display-author{ font-size:1.05rem; color:var(--text-secondary); }
+
+      .hero-meta-chips{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+      .meta-chip{
+        display:inline-flex; align-items:center; gap:6px;
+        font-size:.82rem; font-weight:600; padding:6px 14px; border-radius:var(--radius-pill);
+        background:var(--glass-fill-soft); border:1px solid var(--glass-border); color:var(--text-secondary);
+      }
+      .level-dot{ width:8px; height:8px; border-radius:50%; background:currentColor; display:inline-block; }
+
+      .vocab-meter{ display:flex; gap:4px; width:160px; height:5px; margin-top:2px; }
+      .vocab-meter i{ display:block; flex:1; height:100%; border-radius:99px; background:rgba(255,255,255,.1); }
+      .vocab-meter i.on{ background:var(--neon-violet); }
+
+      .hero-actions-row{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:8px; }
+      .btn-primary-lg{
+        display:inline-flex; align-items:center; gap:10px;
+        padding:14px 28px; border-radius:var(--radius-pill);
+        background:linear-gradient(120deg, var(--neon-cyan), var(--neon-violet));
+        color:#04050A; font-weight:700; font-size:1rem; text-decoration:none;
+        box-shadow:0 12px 36px -8px rgba(155,123,255,.6);
+        transition:transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+      }
+      .btn-primary-lg:hover{ transform:translateY(-2px); box-shadow:0 16px 42px -8px rgba(155,123,255,.75); }
+      .btn-primary-lg svg{ width:20px; height:20px; }
+
+      /* METADATA STATS GRID */
+      .sections-grid{ display:grid; grid-template-columns:2fr 1fr; gap:28px; margin-bottom:36px; }
+      @media (max-width:840px){
+        .sections-grid{ grid-template-columns:1fr; }
+      }
+
+      .section-box{
+        padding:28px; border-radius:24px; display:flex; flex-direction:column; gap:16px;
+      }
+      .section-box-title{ font-size:1.15rem; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:8px; }
+      .section-box-title svg{ width:18px; height:18px; color:var(--neon-cyan); }
+      .section-box-body{ font-size:.95rem; line-height:1.7; color:var(--text-secondary); }
+
+      .stat-list{ display:flex; flex-direction:column; gap:14px; list-style:none; padding:0; margin:0; }
+      .stat-item{ display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--glass-border); font-size:.88rem; }
+      .stat-item:last-child{ border-bottom:none; padding-bottom:0; }
+      .stat-label{ color:var(--text-tertiary); }
+      .stat-val{ color:var(--text-primary); font-weight:600; }
+
+      /* STORY READER CARD (CONTAINING REQUIRED H1, H2, P ELEMENTS) */
+      .story-reader-card{
+        border-radius:28px;
+        padding:clamp(28px,5vw,60px);
+        background:var(--bg-reader);
+        border:1px solid var(--glass-border);
+        box-shadow:0 30px 80px -20px rgba(0,0,0,.8);
+      }
+      .story-reader-container{
+        max-width:68ch; margin:0 auto;
+      }
+
+      /* REQUIRED ELEMENT SPECIFICATIONS */
+      h1.book-id-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.4rem, 2.5vw, 2rem);
+        font-weight:700;
+        color:var(--text-primary);
+        letter-spacing:-0.01em;
+        margin-bottom:24px;
+        padding-bottom:16px;
+        border-bottom:1px solid var(--glass-border);
+      }
+      h2.chapter-heading{
+        font-family:'Space Grotesk',sans-serif;
+        font-size:clamp(1.2rem, 2vw, 1.5rem);
+        font-weight:600;
+        color:var(--neon-cyan);
+        letter-spacing:-0.01em;
+        margin-top:36px;
+        margin-bottom:20px;
+      }
+      h2.chapter-heading:first-of-type{
+        margin-top:12px;
+      }
+      p.story-paragraph{
+        font-family:'Literata',serif;
+        font-size:1.12rem;
+        line-height:1.9;
+        color:var(--text-reader);
+        margin-bottom:1.5em;
+      }
+      p.story-paragraph:last-child{
+        margin-bottom:0;
+      }
+
+      @media (max-width:768px){
+        .topbar{ padding:10px 14px; }
+        .page-main{ padding:20px 14px 64px; }
+        .hero-meta-card{ padding:20px 16px; border-radius:24px; }
+        .section-box{ padding:20px 18px; }
+        .story-reader-card{ padding:24px 18px; border-radius:20px; }
+        p.story-paragraph{ font-size:1.02rem; line-height:1.75; }
+      }
+    </style>
 </head>
 <body>
-    <h1>scifi-19</h1>
-    <h2>0 Chapter 1: The Fast Forest</h2>
 
-    <p>Lina Green walked with Tom on the old road to Green Valley. Lina was a young scientist. She had a small notebook and a bright smile.</p>
-    <p>Tom was her friend. He worked with his hands and knew the land. He was kind and quiet.</p>
-    <p>They both wanted to help the valley. The valley looked tired. Forests were small and thin.</p>
-    <p>Rivers were muddy and slow. The town wells had bad taste. Sometimes the sky was gray for many days.</p>
-    <p>People said the weather was hard. Machines and past farming had changed the soil and water. Lina read tests and maps.</p>
-    <p>She wanted to learn how roots, fungi, and water work together in the ground. After a storm, Lina and Tom walked near the river. Rain hit the dust and moved trash in the water.</p>
-    <p>Birds flew up from the trees. They left the town in one big group. &quot;They go away,&quot; Tom said.</p>
-    <p>&quot;We do not hear them now.&quot; Lina watched the empty branches. She felt a cold worry in her chest. Then Lina saw something strange.</p>
-    <p>On the river bank, young plants pushed out of wet soil very fast. One small willow grew many new leaves in one day. Grass sprouted like a soft green wave.</p>
-    <p>Vines reached for old fences. Lina pointed and said, &quot;Look, Tom. They grow so fast after the rain.&quot; Tom touched the plants.</p>
-    <p>&quot;This is good and strange,&quot; he said. &quot;Why now?&quot;
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a href="../../index.html" class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M20 6v14h-4V6a2 2 0 0 1 4 0z" opacity=".55"/></svg>
+    </div>
+    <span class="brand-name">Lumen</span>
+  </a>
+  <nav class="nav-tabs">
+    <a href="../../index.html" class="nav-tab-btn">Library / Search</a>
+    <a href="../../discover.html" class="nav-tab-btn">Discover</a>
+  </nav>
+</header>
+
+<main class="page-main">
+
+  <a href="../../book.html?id=scifi-19" class="back-link-btn" id="backBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    Back to Book Details
+  </a>
+
+  <!-- HERO METADATA CARD (POPULATED DYNAMICALLY FROM JSON) -->
+  <article class="hero-meta-card glass" id="metaHeroCard">
+    <div class="hero-grid">
+      <div class="hero-cover" id="heroCoverContainer">
+        <!-- Render cover image or styled fallback -->
+      </div>
+      <div class="hero-info">
+        <h2 class="book-display-title" id="bookDisplayTitle">When the Earth Woke Up</h2>
+        <p class="book-display-author" id="bookDisplayAuthor">—</p>
+
+        <div class="hero-meta-chips" id="heroMetaChips">
+          <span class="meta-chip" id="chipLevel">Level —</span>
+          <span class="meta-chip" id="chipGenre">Genre —</span>
+          <span class="meta-chip" id="chipReadingTime">⏱ — min read</span>
+          <span class="meta-chip" id="chipDateAdded">📅 Added —</span>
+          <span class="meta-chip" id="chipVocab">📚 — vocab items</span>
+        </div>
+
+        <div>
+          <p style="font-size: .78rem; color: var(--text-tertiary); margin-bottom: 6px;">DIFFICULTY RATING</p>
+          <div class="vocab-meter" id="vocabMeter" aria-label="Difficulty Rating"></div>
+        </div>
+
+        <div class="hero-actions-row">
+          <a href="../../book.html?id=scifi-19" class="btn-primary-lg" id="readInteractiveBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span>Interactive Reader</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- METADATA SECTIONS (ABOUT, LEARNING, STATS) -->
+  <div class="sections-grid">
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        About This Book
+      </h3>
+      <p class="section-box-body" id="aboutTextDisplay">
+        Loading description…
+      </p>
+
+      <h3 class="section-box-title" style="margin-top: 14px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        What You'll Learn
+      </h3>
+      <p class="section-box-body" id="learnTextDisplay">
+        Loading learning objectives…
+      </p>
+    </div>
+
+    <div class="section-box glass">
+      <h3 class="section-box-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Reading Stats
+      </h3>
+      <ul class="stat-list">
+        <li class="stat-item">
+          <span class="stat-label">CEFR Level</span>
+          <span class="stat-val" id="statLevel">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Author</span>
+          <span class="stat-val" id="statAuthor">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Genre</span>
+          <span class="stat-val" id="statGenre">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Estimated Time</span>
+          <span class="stat-val" id="statTime">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Word Count</span>
+          <span class="stat-val" id="statWordCount">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Vocabulary Items</span>
+          <span class="stat-val" id="statVocab">—</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-label">Date Added</span>
+          <span class="stat-val" id="statDateAdded">—</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- STORY CONTENT (CONTAINING REQUIRED H1, H2, P ELEMENTS) -->
+  <article class="story-reader-card">
+    <div class="story-reader-container">
+        <h1 class="book-id-heading">scifi-19</h1>
+        <h2 class="chapter-heading">0 Chapter 1: The Fast Forest</h2>
+
+        <p class="story-paragraph">Lina Green walked with Tom on the old road to Green Valley. Lina was a young scientist. She had a small notebook and a bright smile.</p>
+        <p class="story-paragraph">Tom was her friend. He worked with his hands and knew the land. He was kind and quiet.</p>
+        <p class="story-paragraph">They both wanted to help the valley. The valley looked tired. Forests were small and thin.</p>
+        <p class="story-paragraph">Rivers were muddy and slow. The town wells had bad taste. Sometimes the sky was gray for many days.</p>
+        <p class="story-paragraph">People said the weather was hard. Machines and past farming had changed the soil and water. Lina read tests and maps.</p>
+        <p class="story-paragraph">She wanted to learn how roots, fungi, and water work together in the ground. After a storm, Lina and Tom walked near the river. Rain hit the dust and moved trash in the water.</p>
+        <p class="story-paragraph">Birds flew up from the trees. They left the town in one big group. &quot;They go away,&quot; Tom said.</p>
+        <p class="story-paragraph">&quot;We do not hear them now.&quot; Lina watched the empty branches. She felt a cold worry in her chest. Then Lina saw something strange.</p>
+        <p class="story-paragraph">On the river bank, young plants pushed out of wet soil very fast. One small willow grew many new leaves in one day. Grass sprouted like a soft green wave.</p>
+        <p class="story-paragraph">Vines reached for old fences. Lina pointed and said, &quot;Look, Tom. They grow so fast after the rain.&quot; Tom touched the plants.</p>
+        <p class="story-paragraph">&quot;This is good and strange,&quot; he said. &quot;Why now?&quot;
 
 Lina checked the soil. She dug with a small tool and looked at the roots.</p>
-    <p>There were thin white threads in the soil. They were like tiny ropes between roots. Lina knew about fungi that make threads and help plants.</p>
-    <p>She wrote in her notebook. &quot;Threads connect roots,&quot; she said. &quot;They move water and food.&quot; But some places had very few threads.</p>
-    <p>The threads were broken near factories and roads. A bird called once in the distance. Dr.</p>
-    <p>Eva was careful and had many years of work in green places. She could explain slow science and safe actions. They walked back under a low sky.</p>
-    <p>Lina held her notebook tight. The fast plants were a wonder. The empty trees and dirty river were a problem.</p>
-    <p>Birds leaving made the town feel alone. Lina had one big question. How did the wet storm make plants grow so fast, and could the valley keep that power?</p>
-    <p>They would find Dr. Eva and try to answer. The next step felt very important.</p>
+        <p class="story-paragraph">There were thin white threads in the soil. They were like tiny ropes between roots. Lina knew about fungi that make threads and help plants.</p>
+        <p class="story-paragraph">She wrote in her notebook. &quot;Threads connect roots,&quot; she said. &quot;They move water and food.&quot; But some places had very few threads.</p>
+        <p class="story-paragraph">The threads were broken near factories and roads. A bird called once in the distance. Dr.</p>
+        <p class="story-paragraph">Eva was careful and had many years of work in green places. She could explain slow science and safe actions. They walked back under a low sky.</p>
+        <p class="story-paragraph">Lina held her notebook tight. The fast plants were a wonder. The empty trees and dirty river were a problem.</p>
+        <p class="story-paragraph">Birds leaving made the town feel alone. Lina had one big question. How did the wet storm make plants grow so fast, and could the valley keep that power?</p>
+        <p class="story-paragraph">They would find Dr. Eva and try to answer. The next step felt very important.</p>
 
-    <h2>1 Chapter 2: A Strange Sound</h2>
+        <h2 class="chapter-heading">1 Chapter 2: A Strange Sound</h2>
 
-    <p>They walked to Dr. Eva&#39;s small office by the school. The office smelled of wet earth and old books. Dr. Eva was looking at maps. Her hair had grey strands. She smiled when she saw Lina and Tom. &quot;We saw fast plants,&quot; Lina said. &quot;Roots grew into the river. Threads were broken near factories. The mud is dirty. We want to know why.&quot; Lina breathed fast. She was excited and scared. Dr. Eva put on her jacket. &quot;Show me the site,&quot; she said. They went back to the green place. The sky was low and grey. Water ran slow in the river. Small plants shone with new green. Lina knelt by a willow. She put her hand on the soil. It felt warm. She looked at Tom. &quot;The roots are warm,&quot; she said. &quot;Not hot. Just warm.&quot;</p>
-    <p>Dr. Eva touched the ground with a small probe. &quot;Warm roots mean energy moves there,&quot; she said. &quot;Maybe the plants take water and work faster. Or tiny life in the soil is busy. We must measure.&quot; Tom opened a small metal box. A little machine blinked. Lina put a thin mic into the soil. The box made a soft tick. Later, it made a low sound. The sound was like a deep hum. Tom frowned. &quot;It is only the machine,&quot; he said. &quot;Maybe the battery is bad.&quot; He tapped the box. The hum stopped. Tom smiled. &quot;See? Fixed.&quot;</p>
-    <p>Lina did not smile. She kept her hand on the willow roots. Then many trees moved their roots a little. The soil trembled. Lina heard the low sound again, clear and slow under the ground. It was the same hum. The little machine recorded it this time too. Dr. Eva listened with a quiet face. &quot;This is real,&quot; she said. &quot;Not a broken battery.&quot; She knelt and wrote notes. &quot;The sound could come from water moving fast through root channels. Dr. Eva closed her notebook. &quot;We must watch and listen,&quot; she said. &quot;We must test the soil and water and follow the sound.&quot; Lina held her pen like a wand. She wanted to help. Tom packed the small machine. The trees were quiet now. The hum came back like a long breath under the ground. Lina looked at Dr. Eva. &quot;What do we do next?&quot; she asked. Dr. Eva smiled, but her eyes were firm. &quot;We learn more. We will go deeper.&quot; The low sound kept coming. They had to follow it.</p>
+        <p class="story-paragraph">They walked to Dr. Eva&#39;s small office by the school. The office smelled of wet earth and old books. Dr. Eva was looking at maps. Her hair had grey strands. She smiled when she saw Lina and Tom. &quot;We saw fast plants,&quot; Lina said. &quot;Roots grew into the river. Threads were broken near factories. The mud is dirty. We want to know why.&quot; Lina breathed fast. She was excited and scared. Dr. Eva put on her jacket. &quot;Show me the site,&quot; she said. They went back to the green place. The sky was low and grey. Water ran slow in the river. Small plants shone with new green. Lina knelt by a willow. She put her hand on the soil. It felt warm. She looked at Tom. &quot;The roots are warm,&quot; she said. &quot;Not hot. Just warm.&quot;</p>
+        <p class="story-paragraph">Dr. Eva touched the ground with a small probe. &quot;Warm roots mean energy moves there,&quot; she said. &quot;Maybe the plants take water and work faster. Or tiny life in the soil is busy. We must measure.&quot; Tom opened a small metal box. A little machine blinked. Lina put a thin mic into the soil. The box made a soft tick. Later, it made a low sound. The sound was like a deep hum. Tom frowned. &quot;It is only the machine,&quot; he said. &quot;Maybe the battery is bad.&quot; He tapped the box. The hum stopped. Tom smiled. &quot;See? Fixed.&quot;</p>
+        <p class="story-paragraph">Lina did not smile. She kept her hand on the willow roots. Then many trees moved their roots a little. The soil trembled. Lina heard the low sound again, clear and slow under the ground. It was the same hum. The little machine recorded it this time too. Dr. Eva listened with a quiet face. &quot;This is real,&quot; she said. &quot;Not a broken battery.&quot; She knelt and wrote notes. &quot;The sound could come from water moving fast through root channels. Dr. Eva closed her notebook. &quot;We must watch and listen,&quot; she said. &quot;We must test the soil and water and follow the sound.&quot; Lina held her pen like a wand. She wanted to help. Tom packed the small machine. The trees were quiet now. The hum came back like a long breath under the ground. Lina looked at Dr. Eva. &quot;What do we do next?&quot; she asked. Dr. Eva smiled, but her eyes were firm. &quot;We learn more. We will go deeper.&quot; The low sound kept coming. They had to follow it.</p>
 
-    <h2>2 Chapter 3: The Empty River</h2>
+        <h2 class="chapter-heading">2 Chapter 3: The Empty River</h2>
 
-    <p>They walked along the river at dawn. The sun was small and orange. Air was warm. The low hum under the ground was like a sleeping animal. At the old bridge, the water was gone. The bed was empty. Mud lay in long cracks. Fish marks were on the wet stones. Lina stepped close and saw a track. Small fish prints led away from the old river. &quot;They moved,&quot; she said. Tom knelt. He found a thin line of clear water. It went into a new channel between roots. &quot;Look,&quot; he said. &quot;The river moved at night.&quot;</p>
-    <p>Birds flew up from the trees. Deer crossed the empty place. They left quietly. &quot;Animals go where water is,&quot; Dr. Eva said. She took out a small bottle and filled it with muddy water. She smelled it and frowned. &quot;There is oil here,&quot; she said. &quot;And heat made the ground weak.&quot; Lina asked, &quot;Can pollution make the river move?&quot; Dr. Eva looked at the new channel. &quot;Pollution can change the soil,&quot; she said. &quot;Heat makes it dry. Roots can break hard mud. The parts are small. But they join. The result is big.&quot;</p>
-    <p>They followed the wet thread. The clear water ran into a deep new pool under a group of old willows. Fish swam in the pool. They hugged the roots. Frogs sat on leaves. &quot;They found a new home,&quot; Lina said. She felt happy. Then Tom pointed to the pool edge. A slick lay on the water. Tiny drops shined. &quot;Oil is here too,&quot; he said. &quot;Some fish have a film on their skin.&quot; Lina touched a leaf near the pool. It felt warm. The ground was hot, not like the cool ground near healthy roots. Dr. Eva wrote in her notebook. &quot;Heat, roots, fungus, and pollution,&quot; she said. &quot;All of them change how water moves. But this time the change was fast. Dr. Eva folded her notebook. &quot;We will test the soil for oil and heat,&quot; she said. &quot;We will watch the fish and the pool. We must find where the river split.&quot;</p>
-    <p>They walked on, following the new flow. The hum under the ground was louder now. It felt like a path. Lina listened. She wanted to know the story under the earth. They had found a new home for fish and a new danger of oil and heat. They had a small plan. They had to follow the sound to learn why the river moved.</p>
+        <p class="story-paragraph">They walked along the river at dawn. The sun was small and orange. Air was warm. The low hum under the ground was like a sleeping animal. At the old bridge, the water was gone. The bed was empty. Mud lay in long cracks. Fish marks were on the wet stones. Lina stepped close and saw a track. Small fish prints led away from the old river. &quot;They moved,&quot; she said. Tom knelt. He found a thin line of clear water. It went into a new channel between roots. &quot;Look,&quot; he said. &quot;The river moved at night.&quot;</p>
+        <p class="story-paragraph">Birds flew up from the trees. Deer crossed the empty place. They left quietly. &quot;Animals go where water is,&quot; Dr. Eva said. She took out a small bottle and filled it with muddy water. She smelled it and frowned. &quot;There is oil here,&quot; she said. &quot;And heat made the ground weak.&quot; Lina asked, &quot;Can pollution make the river move?&quot; Dr. Eva looked at the new channel. &quot;Pollution can change the soil,&quot; she said. &quot;Heat makes it dry. Roots can break hard mud. The parts are small. But they join. The result is big.&quot;</p>
+        <p class="story-paragraph">They followed the wet thread. The clear water ran into a deep new pool under a group of old willows. Fish swam in the pool. They hugged the roots. Frogs sat on leaves. &quot;They found a new home,&quot; Lina said. She felt happy. Then Tom pointed to the pool edge. A slick lay on the water. Tiny drops shined. &quot;Oil is here too,&quot; he said. &quot;Some fish have a film on their skin.&quot; Lina touched a leaf near the pool. It felt warm. The ground was hot, not like the cool ground near healthy roots. Dr. Eva wrote in her notebook. &quot;Heat, roots, fungus, and pollution,&quot; she said. &quot;All of them change how water moves. But this time the change was fast. Dr. Eva folded her notebook. &quot;We will test the soil for oil and heat,&quot; she said. &quot;We will watch the fish and the pool. We must find where the river split.&quot;</p>
+        <p class="story-paragraph">They walked on, following the new flow. The hum under the ground was louder now. It felt like a path. Lina listened. She wanted to know the story under the earth. They had found a new home for fish and a new danger of oil and heat. They had a small plan. They had to follow the sound to learn why the river moved.</p>
 
-    <h2>3 Chapter 4: The Message in the Leaves</h2>
+        <h2 class="chapter-heading">3 Chapter 4: The Message in the Leaves</h2>
 
-    <p>They came to a wide meadow. The sun was warm. A wind moved over the grass. Lina looked up. The trees held their leaves open like hands. &quot;Look,&quot; Tom said. He pointed to the oaks and maples. &quot;They all opened now.&quot;</p>
-    <p>Lina took her notebook. She wrote the time. She wrote the direction of the wind. Her pencil moved fast. &quot;They opened at the same hour,&quot; she said. &quot;Here. At ten o&#39;clock.&quot;</p>
-    <p>Dr. Eva put a hand on Lina&#39;s shoulder. She looked at the trees and then at her phone. &quot;We have messages from other stations,&quot; she said. She tapped the screen. &quot;Listen.&quot;</p>
-    <p>Dr. Eva played the data. A woman in a city far away spoke in a calm voice. Her papers showed the same pattern. Plants at a lake had also opened leaves at ten. A farmer by the sea sent a note. His coastal grasses opened at the same time. Lina&#39;s eyes grew wide. &quot;This is not only here,&quot; Lina said. &quot;It is many places.&quot;</p>
-    <p>Tom furrowed his brow. He looked at the meadow soil. &quot;Are the roots talking?&quot; he asked. &quot;Or is it the weather?&quot;</p>
-    <p>&quot;It is not talking like a voice,&quot; Dr. Eva said. &quot;It is a system. Roots and fungi move water and salt and heat. When many plants change at once, the water paths change too.&quot; She used easy words. She gave an example: &quot;Like people opening umbrellas at the same rain. The rain is the same. The umbrellas change how the ground holds water.&quot;</p>
-    <p>They compared notes with a photo from a mountain. Leaves there opened at the same hour. A team near the coast sent a chart. Their graph had the same spike. Lina&#39;s chest felt tight. She put the new papers with her notes. A truck arrived near the meadow. Men stepped out with chainsaws. Their leader stood tall. The open leaves shivered in the warm wind. Far away, other leaves did the same. Lina thought: many places were changing at once. She had a new map to read. The hum under the ground pulled at her curiosity. They set up more sensors. Dr. Eva drew a slow plan. Tom checked the bridge and the road for oil. Lina sent her notes to the other teams. The men left for now. But the pattern kept going. Lina looked at the leaves and the water. She knew they had one day to learn more.</p>
+        <p class="story-paragraph">They came to a wide meadow. The sun was warm. A wind moved over the grass. Lina looked up. The trees held their leaves open like hands. &quot;Look,&quot; Tom said. He pointed to the oaks and maples. &quot;They all opened now.&quot;</p>
+        <p class="story-paragraph">Lina took her notebook. She wrote the time. She wrote the direction of the wind. Her pencil moved fast. &quot;They opened at the same hour,&quot; she said. &quot;Here. At ten o&#39;clock.&quot;</p>
+        <p class="story-paragraph">Dr. Eva put a hand on Lina&#39;s shoulder. She looked at the trees and then at her phone. &quot;We have messages from other stations,&quot; she said. She tapped the screen. &quot;Listen.&quot;</p>
+        <p class="story-paragraph">Dr. Eva played the data. A woman in a city far away spoke in a calm voice. Her papers showed the same pattern. Plants at a lake had also opened leaves at ten. A farmer by the sea sent a note. His coastal grasses opened at the same time. Lina&#39;s eyes grew wide. &quot;This is not only here,&quot; Lina said. &quot;It is many places.&quot;</p>
+        <p class="story-paragraph">Tom furrowed his brow. He looked at the meadow soil. &quot;Are the roots talking?&quot; he asked. &quot;Or is it the weather?&quot;</p>
+        <p class="story-paragraph">&quot;It is not talking like a voice,&quot; Dr. Eva said. &quot;It is a system. Roots and fungi move water and salt and heat. When many plants change at once, the water paths change too.&quot; She used easy words. She gave an example: &quot;Like people opening umbrellas at the same rain. The rain is the same. The umbrellas change how the ground holds water.&quot;</p>
+        <p class="story-paragraph">They compared notes with a photo from a mountain. Leaves there opened at the same hour. A team near the coast sent a chart. Their graph had the same spike. Lina&#39;s chest felt tight. She put the new papers with her notes. A truck arrived near the meadow. Men stepped out with chainsaws. Their leader stood tall. The open leaves shivered in the warm wind. Far away, other leaves did the same. Lina thought: many places were changing at once. She had a new map to read. The hum under the ground pulled at her curiosity. They set up more sensors. Dr. Eva drew a slow plan. Tom checked the bridge and the road for oil. Lina sent her notes to the other teams. The men left for now. But the pattern kept going. Lina looked at the leaves and the water. She knew they had one day to learn more.</p>
 
-    <h2>4 Chapter 5: The Road of Roots</h2>
+        <h2 class="chapter-heading">4 Chapter 5: The Road of Roots</h2>
 
-    <p>They worked through the night. Machines hummed softly. Lina and Tom put sensors in the soil. Dr. Eva wrote numbers in her book. Small lights from the town blinked far away. The wind made the leaves whisper. In the morning, a new problem began. Roots covered the road near the town. Thick roots rose like old ropes. Cars could not pass. People stopped. Buses waited. Tom spoke to a driver. &quot;We can walk,&quot; he said. &quot;The road is not safe for wheels.&quot;</p>
-    <p>&quot;They need to go to work,&quot; the driver said. &quot;What is this? Trees taking the road?&quot;</p>
-    <p>Dr. Eva knelt by a root. She used a small camera. She looked inside the soil. &quot;This is not wild growth,&quot; she said. &quot;The roots came from many plants. Fungi threads are here too. The soil is swollen with water. The roots spread to find air.&quot;</p>
-    <p>Lina watched children step over a root. She felt sad for the cars. She also felt the hum again. It was stronger now. &quot;It sounds like a small engine under the ground,&quot; she told Tom. &quot;But it is not machines. It is the soil moving.&quot;</p>
-    <p>They wanted to go to the old research station in the hills. The station had old data about roots, fungi, and water. They put their tools in the electric vehicle. The road was slow. The roots made a red line on the map. Other teams were blocked too. The vehicle stopped near a forest. The motor clicked and went quiet. Tom checked the battery. &quot;We have power for the hills,&quot; he said. &quot;But we cannot go fast. We walk now.&quot;</p>
-    <p>They walked under the trees. Birds called. The air smelled like wet earth. The roots grew close to the path. Lina saw small lights under the soil. They looked like tiny lamps. She bent down. The lights were in pockets of fungi and root tips. &quot;If we cut roots now, we might make water go new ways,&quot; he said. &quot;That could flood houses.&quot;</p>
-    <p>Lina felt both fear and hope. She looked at the old station on the hill. The team must know more. They had new data and a big problem: roots could close more roads and move water. They had to test the station sensors. They had to learn how to help. The lights under the soil pulled her forward. They needed to go up the hill.</p>
+        <p class="story-paragraph">They worked through the night. Machines hummed softly. Lina and Tom put sensors in the soil. Dr. Eva wrote numbers in her book. Small lights from the town blinked far away. The wind made the leaves whisper. In the morning, a new problem began. Roots covered the road near the town. Thick roots rose like old ropes. Cars could not pass. People stopped. Buses waited. Tom spoke to a driver. &quot;We can walk,&quot; he said. &quot;The road is not safe for wheels.&quot;</p>
+        <p class="story-paragraph">&quot;They need to go to work,&quot; the driver said. &quot;What is this? Trees taking the road?&quot;</p>
+        <p class="story-paragraph">Dr. Eva knelt by a root. She used a small camera. She looked inside the soil. &quot;This is not wild growth,&quot; she said. &quot;The roots came from many plants. Fungi threads are here too. The soil is swollen with water. The roots spread to find air.&quot;</p>
+        <p class="story-paragraph">Lina watched children step over a root. She felt sad for the cars. She also felt the hum again. It was stronger now. &quot;It sounds like a small engine under the ground,&quot; she told Tom. &quot;But it is not machines. It is the soil moving.&quot;</p>
+        <p class="story-paragraph">They wanted to go to the old research station in the hills. The station had old data about roots, fungi, and water. They put their tools in the electric vehicle. The road was slow. The roots made a red line on the map. Other teams were blocked too. The vehicle stopped near a forest. The motor clicked and went quiet. Tom checked the battery. &quot;We have power for the hills,&quot; he said. &quot;But we cannot go fast. We walk now.&quot;</p>
+        <p class="story-paragraph">They walked under the trees. Birds called. The air smelled like wet earth. The roots grew close to the path. Lina saw small lights under the soil. They looked like tiny lamps. She bent down. The lights were in pockets of fungi and root tips. &quot;If we cut roots now, we might make water go new ways,&quot; he said. &quot;That could flood houses.&quot;</p>
+        <p class="story-paragraph">Lina felt both fear and hope. She looked at the old station on the hill. The team must know more. They had new data and a big problem: roots could close more roads and move water. They had to test the station sensors. They had to learn how to help. The lights under the soil pulled her forward. They needed to go up the hill.</p>
 
-    <h2>5 Chapter 6: Under the Hill</h2>
+        <h2 class="chapter-heading">5 Chapter 6: Under the Hill</h2>
 
-    <p>They climbed the path to the old station. The building was small and round. Wind hit the windows. Tom tied his coat. Dr. Eva checked the roof. Lina felt the lights under the soil in her chest. The station smelled like old paper and wet earth. Inside, Lina went to a metal cabinet. She opened a drawer and found yellowed files. The papers had notes and drawings. One page showed roots like roads. Another page showed threads of fungi like ropes. The notes said plants can share water, food, and signals. &quot;Plants talk,&quot; Lina read out loud. Her voice was small. Dr. Eva looked over the papers. &quot;They move things in the soil,&quot; she said. &quot;Fungi link plants. They pass water and sugar. They send warning signals when a plant is dry or sick.&quot; Tom pointed to a picture. &quot;This shows rain and dry patches. The links can move water from wet soil to dry soil. That helps seedlings and old trees.&quot;</p>
-    <p>Lina felt better for a moment. She liked the idea that roots helped each other. She also read a note about change. The old team wrote that if the balance of water and salt shifts, the links can stop. The fungi can pull back. Then plants do not help. Roads can sink. Rivers can find new ways. Lina frowned. &quot;So small change can make big problems,&quot; she said. A new sound began. It was soft and low. The floor under the desk moved gently. A paper slid off the table. Tom put his hand on the floor. &quot;It felt like a long heartbeat,&quot; he said. Dr. Eva stood very still. Her face was calm but alert. She took a meter from her bag and measured the soil near the building. The meter showed tiny pulses of moisture and tiny shifts in gas. &quot;The ground is alive in a way,&quot; she said. It could flood the farm.&quot; Dr. Eva closed the files carefully. &quot;We must map the deep path,&quot; she said. &quot;We must watch how fast the water moves.&quot;</p>
-    <p>Lina stood. Her heart beat fast with fear and wonder. She wanted to help, but she knew she could not fix it alone. The strings of light under the hill were busy and the ground still moved. They needed a plan, more people, and fast sensors outside. Lina held the papers tight. &quot;Let&#39;s go,&quot; she said. &quot;We need to see the hill from the outside.&quot;</p>
+        <p class="story-paragraph">They climbed the path to the old station. The building was small and round. Wind hit the windows. Tom tied his coat. Dr. Eva checked the roof. Lina felt the lights under the soil in her chest. The station smelled like old paper and wet earth. Inside, Lina went to a metal cabinet. She opened a drawer and found yellowed files. The papers had notes and drawings. One page showed roots like roads. Another page showed threads of fungi like ropes. The notes said plants can share water, food, and signals. &quot;Plants talk,&quot; Lina read out loud. Her voice was small. Dr. Eva looked over the papers. &quot;They move things in the soil,&quot; she said. &quot;Fungi link plants. They pass water and sugar. They send warning signals when a plant is dry or sick.&quot; Tom pointed to a picture. &quot;This shows rain and dry patches. The links can move water from wet soil to dry soil. That helps seedlings and old trees.&quot;</p>
+        <p class="story-paragraph">Lina felt better for a moment. She liked the idea that roots helped each other. She also read a note about change. The old team wrote that if the balance of water and salt shifts, the links can stop. The fungi can pull back. Then plants do not help. Roads can sink. Rivers can find new ways. Lina frowned. &quot;So small change can make big problems,&quot; she said. A new sound began. It was soft and low. The floor under the desk moved gently. A paper slid off the table. Tom put his hand on the floor. &quot;It felt like a long heartbeat,&quot; he said. Dr. Eva stood very still. Her face was calm but alert. She took a meter from her bag and measured the soil near the building. The meter showed tiny pulses of moisture and tiny shifts in gas. &quot;The ground is alive in a way,&quot; she said. It could flood the farm.&quot; Dr. Eva closed the files carefully. &quot;We must map the deep path,&quot; she said. &quot;We must watch how fast the water moves.&quot;</p>
+        <p class="story-paragraph">Lina stood. Her heart beat fast with fear and wonder. She wanted to help, but she knew she could not fix it alone. The strings of light under the hill were busy and the ground still moved. They needed a plan, more people, and fast sensors outside. Lina held the papers tight. &quot;Let&#39;s go,&quot; she said. &quot;We need to see the hill from the outside.&quot;</p>
 
-    <h2>6 Chapter 7: The Earth’s Network</h2>
+        <h2 class="chapter-heading">6 Chapter 7: The Earth’s Network</h2>
 
-    <p>They left the old building and walked down the hill. The air was cool. Small trees bent in the wind.</p>
-    <p>Birds called from the top of the pines. Lina kept the papers in her bag. Her feet sank a little in soft soil.</p>
-    <p>She looked for worms and small mushrooms. The ground hummed under her boots. Tom carried a small meter and a coil of bright tape.</p>
-    <p>He wanted to mark the places where the deep path might come up. &quot;We put sensors here,&quot; he said. He pointed to a line of stones by the road.</p>
-    <p>&quot;If water moves, we will see it first.&quot; His hands were steady. He checked the meter and talked in a slow voice so Lina could follow. &quot;We need to watch the road and the farm,&quot; he added.</p>
-    <p>Dr. Eva moved with care. She stopped near a clump of old roots.</p>
-    <p>She knelt and touched the soil. &quot;Roots and fungi make a web,&quot; she said. &quot;They move water and nutrients through the ground.</p>
-    <p>They change when the soil is hot or dirty.&quot; She used small words. She drew a circle in the dirt with a stick. &quot;This is natural.</p>
-    <p>It is not an animal brain. It is a system. It reacts, but it does not think like we do.&quot;
+        <p class="story-paragraph">They left the old building and walked down the hill. The air was cool. Small trees bent in the wind.</p>
+        <p class="story-paragraph">Birds called from the top of the pines. Lina kept the papers in her bag. Her feet sank a little in soft soil.</p>
+        <p class="story-paragraph">She looked for worms and small mushrooms. The ground hummed under her boots. Tom carried a small meter and a coil of bright tape.</p>
+        <p class="story-paragraph">He wanted to mark the places where the deep path might come up. &quot;We put sensors here,&quot; he said. He pointed to a line of stones by the road.</p>
+        <p class="story-paragraph">&quot;If water moves, we will see it first.&quot; His hands were steady. He checked the meter and talked in a slow voice so Lina could follow. &quot;We need to watch the road and the farm,&quot; he added.</p>
+        <p class="story-paragraph">Dr. Eva moved with care. She stopped near a clump of old roots.</p>
+        <p class="story-paragraph">She knelt and touched the soil. &quot;Roots and fungi make a web,&quot; she said. &quot;They move water and nutrients through the ground.</p>
+        <p class="story-paragraph">They change when the soil is hot or dirty.&quot; She used small words. She drew a circle in the dirt with a stick. &quot;This is natural.</p>
+        <p class="story-paragraph">It is not an animal brain. It is a system. It reacts, but it does not think like we do.&quot;
 
 Lina looked at the roots and the small white threads of fungus.</p>
-    <p>She held a piece of paper from the old files. The drawings showed lines like rivers under the hill. &quot;The web is very long,&quot; she said.</p>
-    <p>&quot;It goes under many fields. It may join with other webs far away.&quot; Her voice was soft. She felt small, but she was curious.</p>
-    <p>&quot;Can it move to the city?&quot; she asked. Tom folded the map and pointed to a dark mark that showed a path toward the city. &quot;It is moving that way,&quot; he said.</p>
-    <p>Rain might come. Lina held the papers and felt the weight of the problem. The web went toward the city.</p>
-    <p>If it reached the pipes, the city could get flooded or its water could change. They needed more people and faster sensors. Lina said, &quot;We must warn them.&quot; Tom nodded.</p>
-    <p>Dr. Eva looked at the skyline, then back at the dark path under the hill. They had a plan, but they needed time.</p>
-    <p>The clouds moved faster. They hurried to place the first sensors. The story did not end.</p>
+        <p class="story-paragraph">She held a piece of paper from the old files. The drawings showed lines like rivers under the hill. &quot;The web is very long,&quot; she said.</p>
+        <p class="story-paragraph">&quot;It goes under many fields. It may join with other webs far away.&quot; Her voice was soft. She felt small, but she was curious.</p>
+        <p class="story-paragraph">&quot;Can it move to the city?&quot; she asked. Tom folded the map and pointed to a dark mark that showed a path toward the city. &quot;It is moving that way,&quot; he said.</p>
+        <p class="story-paragraph">Rain might come. Lina held the papers and felt the weight of the problem. The web went toward the city.</p>
+        <p class="story-paragraph">If it reached the pipes, the city could get flooded or its water could change. They needed more people and faster sensors. Lina said, &quot;We must warn them.&quot; Tom nodded.</p>
+        <p class="story-paragraph">Dr. Eva looked at the skyline, then back at the dark path under the hill. They had a plan, but they needed time.</p>
+        <p class="story-paragraph">The clouds moved faster. They hurried to place the first sensors. The story did not end.</p>
 
-    <h2>7 Chapter 8: The City in Danger</h2>
+        <h2 class="chapter-heading">7 Chapter 8: The City in Danger</h2>
 
-    <p>They finished placing the first sensors by the road. Rain fell in slow drops. The sky was low and gray. Lina felt the cold on her hands. Tom fixed the last sensor with tape. He smiled to keep calm. &quot;This will tell us if the water moves,&quot; he said. &quot;We will know fast.&quot;</p>
-    <p>They walked toward the city. Plants grew thicker near the machines that made water for the homes. Strange roots wrapped the pipes. Small green leaves pushed through cracks. The plants liked the warm steam of the machines. The fungi in the soil liked the heat too. Dr. Eva bent down. She looked at a white thread of fungus on a root. &quot;They seek warmth,&quot; she said. &quot;They find new water. They pull it with their threads.&quot;</p>
-    <p>Near the riverside homes, the river rose a little. It touched the low banks. A child watched from a doorway. Her mother waved them away. People were nervous. Lina saw two men with big drums. They spoke fast. &quot;We must stop this plant,&quot; one said. &quot;We will pour chemicals. The roots will die. The pipes will be safe.&quot; Lina felt a hot worry in her chest. The drums had labels she did not like. Dr. Eva put a hand on Lina&#39;s shoulder. She spoke with a soft voice. &quot;Chemicals stop growth fast,&quot; she said. &quot;But they can stay in soil. They can kill good fungi. The soil will not clean water well. The next rain will carry poisons to the river.&quot; Tom looked at the men with the drums. &quot;If the soil dies, the roots will not hold the banks. Then the river will break the homes,&quot; he said. His voice was steady and kind. Lina listened. She wanted fast action. She wanted to stop the plant now. But she also knew the soil mattered. The web under the ground was old and slow. She showed the chemicals and the soil. The picture was simple. &quot;If you use poison,&quot; she said, &quot;the soil will take years to come back. You will need new soil or time. If you act gentle, the plants will slow. We can save the water and the ground.&quot; Lina saw the tired men look at the child. They were thinking. A new problem came. The map on Lina&#39;s paper blinked. The web moved again. The dark line reached the first water pipe. The city had little time. Lina took a breath. She must choose now.</p>
+        <p class="story-paragraph">They finished placing the first sensors by the road. Rain fell in slow drops. The sky was low and gray. Lina felt the cold on her hands. Tom fixed the last sensor with tape. He smiled to keep calm. &quot;This will tell us if the water moves,&quot; he said. &quot;We will know fast.&quot;</p>
+        <p class="story-paragraph">They walked toward the city. Plants grew thicker near the machines that made water for the homes. Strange roots wrapped the pipes. Small green leaves pushed through cracks. The plants liked the warm steam of the machines. The fungi in the soil liked the heat too. Dr. Eva bent down. She looked at a white thread of fungus on a root. &quot;They seek warmth,&quot; she said. &quot;They find new water. They pull it with their threads.&quot;</p>
+        <p class="story-paragraph">Near the riverside homes, the river rose a little. It touched the low banks. A child watched from a doorway. Her mother waved them away. People were nervous. Lina saw two men with big drums. They spoke fast. &quot;We must stop this plant,&quot; one said. &quot;We will pour chemicals. The roots will die. The pipes will be safe.&quot; Lina felt a hot worry in her chest. The drums had labels she did not like. Dr. Eva put a hand on Lina&#39;s shoulder. She spoke with a soft voice. &quot;Chemicals stop growth fast,&quot; she said. &quot;But they can stay in soil. They can kill good fungi. The soil will not clean water well. The next rain will carry poisons to the river.&quot; Tom looked at the men with the drums. &quot;If the soil dies, the roots will not hold the banks. Then the river will break the homes,&quot; he said. His voice was steady and kind. Lina listened. She wanted fast action. She wanted to stop the plant now. But she also knew the soil mattered. The web under the ground was old and slow. She showed the chemicals and the soil. The picture was simple. &quot;If you use poison,&quot; she said, &quot;the soil will take years to come back. You will need new soil or time. If you act gentle, the plants will slow. We can save the water and the ground.&quot; Lina saw the tired men look at the child. They were thinking. A new problem came. The map on Lina&#39;s paper blinked. The web moved again. The dark line reached the first water pipe. The city had little time. Lina took a breath. She must choose now.</p>
 
-    <h2>8 Chapter 9: The Deep Garden</h2>
+        <h2 class="chapter-heading">8 Chapter 9: The Deep Garden</h2>
 
-    <p>Lina looked at the blinking map. The dark line moved fast. &quot;We must go,&quot; she said. &quot;The signal is strong there.&quot;</p>
-    <p>Tom tied his boots. He was calm. &quot;We go together,&quot; he said. &quot;We will help the people and the land.&quot;</p>
-    <p>They followed the web signal down a narrow road. The air grew cooler. Trees leaned over the path. Tiny fungi glowed near old roots. Lina touched a root. It was warm and wet. &quot;The ground talks,&quot; she whispered. &quot;It has a voice.&quot;</p>
-    <p>They reached a deep valley. The valley was like a bowl in the earth. Water ran in small streams. Big roots crossed the open space like bridges. New plants grew where light came down. The place felt alive. Tom pushed away a fallen branch. &quot;Look,&quot; he said. &quot;The roots make channels for water.&quot;</p>
-    <p>They climbed down a steep trail. The web sound grew louder. It was a soft hum now, not a voice. The hum came from many roots and from the soil. Dr. Eva knelt and listened. She closed her eyes. &quot;The network is older than the town,&quot; she said. &quot;It moves water and food. It does not think like a person. It reacts.&quot;</p>
-    <p>Suddenly a noise came from above. A factory engine started. The hum in the valley got stronger and sharp. The roots thinned and made quick sounds. Dr. Eva touched the soil. &quot;Now I see,&quot; she said. &quot;When machines start, the network sends warning signals. It wants more water. It fights the pollution.&quot;</p>
-    <p>Lina felt the air change. The small plants near a stream curled their leaves. Some fungi stopped glowing. &quot;The ground is hurting,&quot; Lina said. &quot;It tells us when people do damage.&quot;</p>
-    <p>Tom watched the factory lights on the hill. &quot;They need money,&quot; he said. &quot;They need work. If we stop them now, people will suffer. If we do nothing, the water will die.&quot;</p>
-    <p>Dr. The web hummed like a clock. It wanted help fast. Lina held Tom&#39;s hand. She looked at the valley and the village above. &quot;We must show them this place,&quot; she said. &quot;They must meet the roots and the water. Then they will understand.&quot;</p>
-    <p>Tom nodded. He looked ready. Dr. Eva wrote a note for the town. The hum in the ground became a steady beat. It was a plea and a clock. Lina knew they had to act soon. They started up the trail. The lights of the factory blinked again. The valley waited.</p>
+        <p class="story-paragraph">Lina looked at the blinking map. The dark line moved fast. &quot;We must go,&quot; she said. &quot;The signal is strong there.&quot;</p>
+        <p class="story-paragraph">Tom tied his boots. He was calm. &quot;We go together,&quot; he said. &quot;We will help the people and the land.&quot;</p>
+        <p class="story-paragraph">They followed the web signal down a narrow road. The air grew cooler. Trees leaned over the path. Tiny fungi glowed near old roots. Lina touched a root. It was warm and wet. &quot;The ground talks,&quot; she whispered. &quot;It has a voice.&quot;</p>
+        <p class="story-paragraph">They reached a deep valley. The valley was like a bowl in the earth. Water ran in small streams. Big roots crossed the open space like bridges. New plants grew where light came down. The place felt alive. Tom pushed away a fallen branch. &quot;Look,&quot; he said. &quot;The roots make channels for water.&quot;</p>
+        <p class="story-paragraph">They climbed down a steep trail. The web sound grew louder. It was a soft hum now, not a voice. The hum came from many roots and from the soil. Dr. Eva knelt and listened. She closed her eyes. &quot;The network is older than the town,&quot; she said. &quot;It moves water and food. It does not think like a person. It reacts.&quot;</p>
+        <p class="story-paragraph">Suddenly a noise came from above. A factory engine started. The hum in the valley got stronger and sharp. The roots thinned and made quick sounds. Dr. Eva touched the soil. &quot;Now I see,&quot; she said. &quot;When machines start, the network sends warning signals. It wants more water. It fights the pollution.&quot;</p>
+        <p class="story-paragraph">Lina felt the air change. The small plants near a stream curled their leaves. Some fungi stopped glowing. &quot;The ground is hurting,&quot; Lina said. &quot;It tells us when people do damage.&quot;</p>
+        <p class="story-paragraph">Tom watched the factory lights on the hill. &quot;They need money,&quot; he said. &quot;They need work. If we stop them now, people will suffer. If we do nothing, the water will die.&quot;</p>
+        <p class="story-paragraph">Dr. The web hummed like a clock. It wanted help fast. Lina held Tom&#39;s hand. She looked at the valley and the village above. &quot;We must show them this place,&quot; she said. &quot;They must meet the roots and the water. Then they will understand.&quot;</p>
+        <p class="story-paragraph">Tom nodded. He looked ready. Dr. Eva wrote a note for the town. The hum in the ground became a steady beat. It was a plea and a clock. Lina knew they had to act soon. They started up the trail. The lights of the factory blinked again. The valley waited.</p>
 
-    <h2>9 Chapter 10: The Final Warning</h2>
+        <h2 class="chapter-heading">9 Chapter 10: The Final Warning</h2>
 
-    <p>They walked up the trail. Wind moved the dry grass. The sky was dark on the north. Far clouds gathered over the river. A storm was coming. At the town gate, the leaders met them. A man in a grey coat spoke first. &quot;We must cut the plants by the water station,&quot; he said. &quot;A storm will come. The network will move the river again. Fire is the fastest way to clear the bank.&quot;</p>
-    <p>Lina showed the roots and the black film. She put her hand on the ground. &quot;Look,&quot; she said. &quot;The roots stopped the poison. The plants keep the soil strong. If you burn them, the river will move. The water will go away.&quot;</p>
-    <p>Tom pulled out a photo of the old water map. &quot;The old channels can slow the river,&quot; he said. &quot;I can fix them. Give us one night. Let me try. I can make small channels. They will hold the water near the station.&quot;</p>
-    <p>Dr. Eva spoke in a low voice. &quot;The soil here holds life,&quot; she said. &quot;Fungi and roots make it strong. Fire will break the soil. The burned soil will not hold water. The water will run fast and take the pollution with it. Then the river will change again.&quot;</p>
-    <p>A woman in a blue scarf looked at Lina. &quot;You are a child,&quot; she said. &quot;You want us to trust a root. You want us to wait a night.&quot;</p>
-    <p>Lina was small, but her eyes were steady. &quot;I will take them to the roots,&quot; she said. &quot;I will show them the black film. If the pipe leaks more, we must stop the pipe. Let Dr. Eva test the soil today. Let Tom work tonight. If the storm comes and the river moves, we all lose water.&quot;</p>
-    <p>The leaders talked together. They looked at the sky and at the hill where the factory lights blinked. Dr. Eva took soil samples. She saw thin white threads in the dirt. They were fungi. They joined the roots. &quot;This web is strong,&quot; she said. &quot;But the poison is new. If we do not find the pipe, the web will keep fighting and will grow weak.&quot;</p>
-    <p>Lina watched the web glow faintly under the rain. The hum in the ground was louder. The storm would come in hours. The town had one night. They had one chance to find the pipe and stop the leak. The valley waited for the morning.</p>
+        <p class="story-paragraph">They walked up the trail. Wind moved the dry grass. The sky was dark on the north. Far clouds gathered over the river. A storm was coming. At the town gate, the leaders met them. A man in a grey coat spoke first. &quot;We must cut the plants by the water station,&quot; he said. &quot;A storm will come. The network will move the river again. Fire is the fastest way to clear the bank.&quot;</p>
+        <p class="story-paragraph">Lina showed the roots and the black film. She put her hand on the ground. &quot;Look,&quot; she said. &quot;The roots stopped the poison. The plants keep the soil strong. If you burn them, the river will move. The water will go away.&quot;</p>
+        <p class="story-paragraph">Tom pulled out a photo of the old water map. &quot;The old channels can slow the river,&quot; he said. &quot;I can fix them. Give us one night. Let me try. I can make small channels. They will hold the water near the station.&quot;</p>
+        <p class="story-paragraph">Dr. Eva spoke in a low voice. &quot;The soil here holds life,&quot; she said. &quot;Fungi and roots make it strong. Fire will break the soil. The burned soil will not hold water. The water will run fast and take the pollution with it. Then the river will change again.&quot;</p>
+        <p class="story-paragraph">A woman in a blue scarf looked at Lina. &quot;You are a child,&quot; she said. &quot;You want us to trust a root. You want us to wait a night.&quot;</p>
+        <p class="story-paragraph">Lina was small, but her eyes were steady. &quot;I will take them to the roots,&quot; she said. &quot;I will show them the black film. If the pipe leaks more, we must stop the pipe. Let Dr. Eva test the soil today. Let Tom work tonight. If the storm comes and the river moves, we all lose water.&quot;</p>
+        <p class="story-paragraph">The leaders talked together. They looked at the sky and at the hill where the factory lights blinked. Dr. Eva took soil samples. She saw thin white threads in the dirt. They were fungi. They joined the roots. &quot;This web is strong,&quot; she said. &quot;But the poison is new. If we do not find the pipe, the web will keep fighting and will grow weak.&quot;</p>
+        <p class="story-paragraph">Lina watched the web glow faintly under the rain. The hum in the ground was louder. The storm would come in hours. The town had one night. They had one chance to find the pipe and stop the leak. The valley waited for the morning.</p>
 
-    <h2>10 Chapter 11: When the Earth Woke Up</h2>
+        <h2 class="chapter-heading">10 Chapter 11: When the Earth Woke Up</h2>
 
-    <p>They talked together. They looked at the sky and at the hill where the factory lights blinked. The wind came harder. A few drops fell. The town clock struck seven. The leaders made a choice. &quot;One night,&quot; the man in grey said. &quot;No burning tonight. But if the river goes wild, we will make a plan tomorrow.&quot;</p>
-    <p>Tom smiled. He carried his tools. He walked to the old channels. He found a broken gate and a log. He worked quickly. He set small stones and checked the flow. The channels were old and slow, but they could help for a while. Dr. Eva took soil samples. She saw thin white threads in the dirt. They were fungi. They joined the roots. &quot;This web is strong,&quot; she said. &quot;But the poison is new. If we do not find the pipe, the web will keep fighting and will grow weak.&quot;</p>
-    <p>Lina watched the web glow faintly under the rain. The hum in the ground was louder. The storm would come in hours. The town had one night. They had one chance to find the pipe and stop the leak. The valley waited for the morning. The storm arrived at midnight. Wind beat the windows. Rain cut the road like a curtain. The town held its breath. Outside the hill, the roots moved. The trees bent and clung. The roots spread like hands. They pushed soil to hold the slope. Stones sat in new places. The hill did not fall. &quot;The roots protect the hill,&quot; Dr. Eva said. &quot;They slow the slide. They hold the water.&quot;</p>
-    <p>But the river did not stay quiet. It rose fast and dark. It pulled at the banks and ate the soft soil. It turned toward the city. Water found the old rail line and the lower ground. The people watched from the high houses. They felt fear and hope at once. The soil where the pipe leaked was black and sick. Dr. Eva knelt and touched the ground. &quot;This poison went far,&quot; she said. &quot;We saved the town, but the web will need help.&quot;</p>
-    <p>Lina looked at the dark wet earth and the old ruined pipe. She felt small and brave. She knew they had more to do. The storm had passed, but the next day would bring a new task. They must find where the poison came from and how to clean the ground. The valley held its breath again.</p>
+        <p class="story-paragraph">They talked together. They looked at the sky and at the hill where the factory lights blinked. The wind came harder. A few drops fell. The town clock struck seven. The leaders made a choice. &quot;One night,&quot; the man in grey said. &quot;No burning tonight. But if the river goes wild, we will make a plan tomorrow.&quot;</p>
+        <p class="story-paragraph">Tom smiled. He carried his tools. He walked to the old channels. He found a broken gate and a log. He worked quickly. He set small stones and checked the flow. The channels were old and slow, but they could help for a while. Dr. Eva took soil samples. She saw thin white threads in the dirt. They were fungi. They joined the roots. &quot;This web is strong,&quot; she said. &quot;But the poison is new. If we do not find the pipe, the web will keep fighting and will grow weak.&quot;</p>
+        <p class="story-paragraph">Lina watched the web glow faintly under the rain. The hum in the ground was louder. The storm would come in hours. The town had one night. They had one chance to find the pipe and stop the leak. The valley waited for the morning. The storm arrived at midnight. Wind beat the windows. Rain cut the road like a curtain. The town held its breath. Outside the hill, the roots moved. The trees bent and clung. The roots spread like hands. They pushed soil to hold the slope. Stones sat in new places. The hill did not fall. &quot;The roots protect the hill,&quot; Dr. Eva said. &quot;They slow the slide. They hold the water.&quot;</p>
+        <p class="story-paragraph">But the river did not stay quiet. It rose fast and dark. It pulled at the banks and ate the soft soil. It turned toward the city. Water found the old rail line and the lower ground. The people watched from the high houses. They felt fear and hope at once. The soil where the pipe leaked was black and sick. Dr. Eva knelt and touched the ground. &quot;This poison went far,&quot; she said. &quot;We saved the town, but the web will need help.&quot;</p>
+        <p class="story-paragraph">Lina looked at the dark wet earth and the old ruined pipe. She felt small and brave. She knew they had more to do. The storm had passed, but the next day would bring a new task. They must find where the poison came from and how to clean the ground. The valley held its breath again.</p>
 
-    <h2>11 Chapter 12: A New Beginning</h2>
+        <h2 class="chapter-heading">11 Chapter 12: A New Beginning</h2>
 
-    <p>They walked out of the factory into a wet street. Rain had stopped. The sky was pale.</p>
-    <p>People moved slowly. They watched the river flow with tired eyes. Boats and sandbags were on the bank.</p>
-    <p>Small groups talked in low voices. Dr. Eva looked at the water.</p>
-    <p>She tested it with a small kit. &quot;There is oil and chemicals,&quot; she said. &quot;The pipe carried waste.</p>
-    <p>It went into the ground and the water.&quot; Tom pointed to the broken pipe. &quot;We must find all the leaks,&quot; he said. He spoke in a steady voice.</p>
-    <p>Workers nodded. They put on gloves and boots. They marked the places that needed repair.</p>
-    <p>Lina walked with them. She bent to the soil and touched the wet dirt. She listened with her small instrument.</p>
-    <p>The fungi threads showed gray and slow. Root tips seemed tired. Lina felt sad.</p>
-    <p>&quot;Is the Earth like a mind?&quot; she asked Dr. Eva. Dr.</p>
-    <p>Eva smiled gently. &quot;No,&quot; she said. &quot;It is a living system.</p>
-    <p>It is many parts that work together. Roots, fungi, soil, water — they react to stress. They do not think like us.</p>
-    <p>They change when we change the land and the water.&quot; Lina was curious. She still listened, but she knew she could not fix everything alone. They made an important discovery near the farm field.</p>
-    <p>The old sewer line went under the road. It had a crack. Water and waste had flowed into the soil for months.</p>
-    <p>Little animals were gone near the ditch. That explained why the fungi were weak and the roots looked sick. The problem was bigger than the factory.</p>
-    <p>It came from many places: the factory, old pipes, and too much use of chemicals on the farms. People in the town began to act. They cleaned the river bank with rakes and nets.</p>
-    <p>Families took out bottles and old tires. Farmers stopped dumping waste. She taught simple tests, quiet listening, and careful planting.</p>
-    <p>She kept her small instrument and still bent to the ground sometimes. One morning, Lina walked along the old pipe with Dr. Eva and Tom.</p>
-    <p>She looked where the soil had been black before. There was a small green shoot pushing through the mud. Lina smiled.</p>
-    <p>It was weak but alive. She touched it gently. &quot;We will keep going,&quot; she said.</p>
-    <p>The three of them looked at the shoot and then at the valley. There was work to do. They had hope to continue.</p>
+        <p class="story-paragraph">They walked out of the factory into a wet street. Rain had stopped. The sky was pale.</p>
+        <p class="story-paragraph">People moved slowly. They watched the river flow with tired eyes. Boats and sandbags were on the bank.</p>
+        <p class="story-paragraph">Small groups talked in low voices. Dr. Eva looked at the water.</p>
+        <p class="story-paragraph">She tested it with a small kit. &quot;There is oil and chemicals,&quot; she said. &quot;The pipe carried waste.</p>
+        <p class="story-paragraph">It went into the ground and the water.&quot; Tom pointed to the broken pipe. &quot;We must find all the leaks,&quot; he said. He spoke in a steady voice.</p>
+        <p class="story-paragraph">Workers nodded. They put on gloves and boots. They marked the places that needed repair.</p>
+        <p class="story-paragraph">Lina walked with them. She bent to the soil and touched the wet dirt. She listened with her small instrument.</p>
+        <p class="story-paragraph">The fungi threads showed gray and slow. Root tips seemed tired. Lina felt sad.</p>
+        <p class="story-paragraph">&quot;Is the Earth like a mind?&quot; she asked Dr. Eva. Dr.</p>
+        <p class="story-paragraph">Eva smiled gently. &quot;No,&quot; she said. &quot;It is a living system.</p>
+        <p class="story-paragraph">It is many parts that work together. Roots, fungi, soil, water — they react to stress. They do not think like us.</p>
+        <p class="story-paragraph">They change when we change the land and the water.&quot; Lina was curious. She still listened, but she knew she could not fix everything alone. They made an important discovery near the farm field.</p>
+        <p class="story-paragraph">The old sewer line went under the road. It had a crack. Water and waste had flowed into the soil for months.</p>
+        <p class="story-paragraph">Little animals were gone near the ditch. That explained why the fungi were weak and the roots looked sick. The problem was bigger than the factory.</p>
+        <p class="story-paragraph">It came from many places: the factory, old pipes, and too much use of chemicals on the farms. People in the town began to act. They cleaned the river bank with rakes and nets.</p>
+        <p class="story-paragraph">Families took out bottles and old tires. Farmers stopped dumping waste. She taught simple tests, quiet listening, and careful planting.</p>
+        <p class="story-paragraph">She kept her small instrument and still bent to the ground sometimes. One morning, Lina walked along the old pipe with Dr. Eva and Tom.</p>
+        <p class="story-paragraph">She looked where the soil had been black before. There was a small green shoot pushing through the mud. Lina smiled.</p>
+        <p class="story-paragraph">It was weak but alive. She touched it gently. &quot;We will keep going,&quot; she said.</p>
+        <p class="story-paragraph">The three of them looked at the shoot and then at the valley. There was work to do. They had hope to continue.</p>
+    </div>
+  </article>
+
+</main>
+
+<script>
+// Dynamic Metadata Loader
+(async function initMetadata() {
+  const jsonUrl = '../content/scifi-19-A2.json';
+  let data = null;
+
+  try {
+    const res = await fetch(jsonUrl);
+    if (res.ok) {
+      data = await res.json();
+    }
+  } catch (err) {
+    console.warn('Could not fetch external JSON, using embedded fallback:', err);
+  }
+
+  // Fallback initial data in case fetch is blocked by file:// protocol
+  if (!data) {
+    data = {"id":"scifi-19","title":"When the Earth Woke Up","author":"Mira Lane","level":"A2","genre":"scifi","minutes":51,"vocab":4,"dateAdded":"2026-10-20","coverImage":"books/covers/scifi-19.png","description":"","whatYouWillLearn":""};
+  }
+
+  const genreLabels = {
+    scifi: 'Sci-Fi & Future Worlds',
+    business: 'Business & Growth',
+    classic: 'Classic Literature',
+    daily: 'Daily Conversations',
+    healthy: 'Health & Wellness'
+  };
+
+  const level = (data.level || 'B1').toUpperCase();
+  const genreFormatted = genreLabels[data.genre] || (data.genre ? String(data.genre).toUpperCase() : 'General');
+  const author = data.author || 'Unknown Author';
+  const minutes = data.minutes ? data.minutes + ' min' : '5 min';
+  const vocabCount = typeof data.vocab === 'number' ? data.vocab : (Array.isArray(data.vocab) ? data.vocab.length : 0);
+
+  // Format date
+  let formattedDate = 'Recently';
+  if (data.dateAdded) {
+    try {
+      const d = new Date(data.dateAdded);
+      if (!isNaN(d.getTime())) {
+        formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    } catch (_) {}
+  }
+
+  // Calculate word count from document paragraphs
+  const paragraphs = document.querySelectorAll('p.story-paragraph');
+  let totalWords = 0;
+  paragraphs.forEach(p => {
+    const text = p.textContent.trim();
+    if (text) totalWords += text.split(/\s+/).length;
+  });
+
+  // Populate hero card
+  const titleEl = document.getElementById('bookDisplayTitle');
+  if (titleEl && data.title) titleEl.textContent = data.title;
+
+  const authorEl = document.getElementById('bookDisplayAuthor');
+  if (authorEl) authorEl.textContent = 'by ' + author;
+
+  const chipLevel = document.getElementById('chipLevel');
+  if (chipLevel) {
+    chipLevel.innerHTML = '<span class="level-dot"></span> Level ' + level;
+    chipLevel.style.color = 'var(--lvl-' + level + ')';
+    chipLevel.style.borderColor = 'var(--lvl-' + level + ')';
+  }
+
+  const chipGenre = document.getElementById('chipGenre');
+  if (chipGenre) chipGenre.textContent = genreFormatted;
+
+  const chipTime = document.getElementById('chipReadingTime');
+  if (chipTime) chipTime.textContent = '⏱ ' + minutes + ' read';
+
+  const chipDate = document.getElementById('chipDateAdded');
+  if (chipDate) chipDate.textContent = '📅 Added ' + formattedDate;
+
+  const chipVocab = document.getElementById('chipVocab');
+  if (chipVocab) chipVocab.textContent = '📚 ' + vocabCount + ' vocab items';
+
+  // Difficulty meter (1 to 6)
+  const LEVEL_SEGMENTS = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
+  const meterSegments = LEVEL_SEGMENTS[level] || 3;
+  const meterEl = document.getElementById('vocabMeter');
+  if (meterEl) {
+    let segHtml = '';
+    for (let i = 0; i < 6; i++) {
+      segHtml += '<i class="' + (i < meterSegments ? 'on' : '') + '"></i>';
+    }
+    meterEl.innerHTML = segHtml;
+  }
+
+  // Cover
+  const coverContainer = document.getElementById('heroCoverContainer');
+  if (coverContainer) {
+    if (data.coverImage) {
+      coverContainer.innerHTML = '<img src="../../' + data.coverImage.replace(/^\/?/, '') + '" alt="' + (data.title || '') + '" onerror="this.style.display=\'none\'">';
+    } else {
+      coverContainer.innerHTML = '<div class="hero-cover-fallback"><div class="hero-cover-title">' + (data.title || '') + '</div><div class="hero-cover-author">' + author + '</div></div>';
+    }
+  }
+
+  // Descriptions
+  const aboutText = data.description || 'Explore "' + (data.title || '') + '", an engaging ' + genreFormatted.toLowerCase() + ' story specifically leveled at the CEFR ' + level + ' proficiency tier.';
+  const learnText = data.whatYouWillLearn || 'Master ' + level + '-level grammar structures and vocabulary in authentic context. Designed for English learners wanting to improve vocabulary retention and fluency.';
+
+  const aboutEl = document.getElementById('aboutTextDisplay');
+  if (aboutEl) aboutEl.textContent = aboutText;
+
+  const learnEl = document.getElementById('learnTextDisplay');
+  if (learnEl) learnEl.textContent = learnText;
+
+  // Stats list
+  const statLevel = document.getElementById('statLevel');
+  if (statLevel) {
+    statLevel.textContent = 'CEFR ' + level;
+    statLevel.style.color = 'var(--lvl-' + level + ')';
+  }
+
+  const statAuthor = document.getElementById('statAuthor');
+  if (statAuthor) statAuthor.textContent = author;
+
+  const statGenre = document.getElementById('statGenre');
+  if (statGenre) statGenre.textContent = genreFormatted;
+
+  const statTime = document.getElementById('statTime');
+  if (statTime) statTime.textContent = minutes;
+
+  const statWordCount = document.getElementById('statWordCount');
+  if (statWordCount) statWordCount.textContent = totalWords.toLocaleString() + ' words';
+
+  const statVocab = document.getElementById('statVocab');
+  if (statVocab) statVocab.textContent = vocabCount.toLocaleString() + ' words';
+
+  const statDate = document.getElementById('statDateAdded');
+  if (statDate) statDate.textContent = formattedDate;
+})();
+</script>
 </body>
 </html>
